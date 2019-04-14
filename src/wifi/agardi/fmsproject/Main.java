@@ -1,5 +1,7 @@
 package wifi.agardi.fmsproject;
 	
+import java.sql.SQLException;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,6 +24,11 @@ import javafx.scene.text.Text;
 
 
 public class Main extends Application {
+	TextField userNameTField;
+	PasswordField passwordField;
+	Label actionTarget;
+	
+	
 	@Override
 	public void start(Stage primaryStage) {
 			BorderPane loginBP = new BorderPane();
@@ -43,13 +50,14 @@ public class Main extends Application {
 			Label userNameLabel = new Label("User Name");
 			loginGP.add(userNameLabel, 0, 2, 1, 1);
 			
-			TextField userNameTField = new TextField();
+			userNameTField = new TextField();
+			userNameTField.setPrefSize(200, 30);
 			loginGP.add(userNameTField, 0, 3, 1, 1);
 //Password			
 			Label passwordLabel = new Label("Password");
 			loginGP.add(passwordLabel, 0, 4, 1, 1);
 			
-			PasswordField passwordField = new PasswordField();
+			passwordField = new PasswordField();
 			loginGP.add(passwordField, 0, 5, 1, 1);
 //Button Log in			
 			Button logInButton = new Button("Login");
@@ -58,7 +66,7 @@ public class Main extends Application {
 			logInHBox.getChildren().add(logInButton);
 			loginGP.add(logInHBox, 0, 6);
 //ActionTarget			
-			Label actionTarget = new Label();
+			actionTarget = new Label();
 			actionTarget.setId("actionTarget");
 			HBox actionHBox = new HBox();
 			actionHBox.setAlignment(Pos.BOTTOM_CENTER);
@@ -68,7 +76,16 @@ public class Main extends Application {
 			logInButton.setOnAction(new EventHandler<ActionEvent>() {	
 				@Override
 				public void handle(ActionEvent event) {
-					actionTarget.setText("Sign in button pressed");
+					try {
+						if(Database.logIn(userNameTField.getText(), passwordField.getText())) {
+						actionTarget.setText("Super TRUE");
+						}
+						else {
+						actionTarget.setText("Login failed");
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 				}
 			});
 			
@@ -82,6 +99,21 @@ public class Main extends Application {
 			loginBP.setBottom(signUpVBox);
 			
 			
+			signUpButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					try {
+						if((userNameTField.getText().length() > 2) && (passwordField.getText().length() > 2)) {
+						Database.signUp(userNameTField.getText(), passwordField.getText());
+						} else {
+						actionTarget.setText("You should type min. 3 characters!");	
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			});
 			
 			
 			
@@ -102,6 +134,13 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
+		try {
+			Database.createUsersTable();
+			System.out.println("Created Users table, or already exists");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	
 		launch(args);
 	}
 }

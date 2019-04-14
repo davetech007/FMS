@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Sun Apr 14 17:58:44 CEST 2019:
+ Derby The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579) változat betöltése: a816c00e-016a-1c92-8170-0000068b9d00 példány
+a(z) /Users/david.agardi/eclipse-workspace/FleetManagementSystem/DatabaseTest adatbázis-könyvtáron: sun.misc.Launcher$AppClassLoader@2a139a55 
+
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_191-b12
+user.dir=/Users/david.agardi/eclipse-workspace/FleetManagementSystem
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.14.4
+derby.system.home=null
+Az adatbázis-osztálybetöltő elindult - derby.database.classpath=''
