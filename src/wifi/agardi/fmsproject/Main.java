@@ -34,12 +34,11 @@ public class Main extends Application {
 			loginBP.setCenter(loginGP);
 //Login Page BORDER PANE TOP			
 			Label nameLabel = new Label("Fleet Management System");
-			nameLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 24));
+			nameLabel.setId("nameLabel");
 			HBox nameHBox = new HBox(10);
 			nameHBox.setAlignment(Pos.CENTER);
 			nameHBox.getChildren().add(nameLabel);
-			loginBP.setTop(nameHBox);
-			
+			loginBP.setTop(nameHBox);			
 //User name			
 			Label userNameLabel = new Label("User Name");
 			loginGP.add(userNameLabel, 0, 2, 1, 1);
@@ -58,18 +57,21 @@ public class Main extends Application {
 			logInHBox.setAlignment(Pos.BOTTOM_CENTER);
 			logInHBox.getChildren().add(logInButton);
 			loginGP.add(logInHBox, 0, 6);
+//ActionTarget			
+			Label actionTarget = new Label();
+			actionTarget.setId("actionTarget");
+			HBox actionHBox = new HBox();
+			actionHBox.setAlignment(Pos.BOTTOM_CENTER);
+			actionHBox.getChildren().add(actionTarget);
+			loginGP.add(actionHBox, 0, 8);
 			
-			final Text actionTarget = new Text();
-			loginGP.add(actionTarget, 0, 7);
-			
-			logInButton.setOnAction(new EventHandler<ActionEvent>() {
-				
+			logInButton.setOnAction(new EventHandler<ActionEvent>() {	
 				@Override
 				public void handle(ActionEvent event) {
-					actionTarget.setFill(Color.FIREBRICK);
 					actionTarget.setText("Sign in button pressed");
 				}
 			});
+			
 //Sign up BORDER PANE BOTTOM
 			Label signUpLabel = new Label("You don't have an account?");
 			Button signUpButton = new Button("Sign up");
@@ -93,6 +95,7 @@ public class Main extends Application {
 			
 			Scene scene = new Scene(loginBP, 450, 450);
 			primaryStage.setScene(scene);
+			loginBP.getStylesheets().add(Main.class.getResource("/Login.css").toExternalForm());
 			primaryStage.setTitle("Welcome");
 			primaryStage.show();
 	

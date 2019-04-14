@@ -1,0 +1,31 @@
+
+.root {
+	-fx-background-image: url("logincar.jpg");
+	
+}
+.label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0) , 0,0,1,1 );
+}
+
+#nameLabel{
+	-fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow( gaussian , rgba(255, 255, 255) , 0,0,1,1 );
+}
+
+#actionTarget{
+    -fx-text-fill: #ff0000;
+  	-fx-font-weight: bold;
+  	-fx-effect: dropshadow( gaussian , rgba(255,255,255, 0.5) , 0,0,0,0 );
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#8ee7f9, #61a2b1);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
