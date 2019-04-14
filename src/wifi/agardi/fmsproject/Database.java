@@ -12,8 +12,7 @@ public class Database {
 	public static final String DBlocation = "DatabaseTest";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
-	public static final String usersTable = "UserT";
-	public static final String userIDCol = "UserID";
+	public static final String usersTable = "UsersNew";
 	public static final String userNameCol = "Username";
 	public static final String passwordCol = "Password";
 	
@@ -23,10 +22,8 @@ public class Database {
 		Statement stmt = null;
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + usersTable + "(" +
-						 userIDCol + " INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) " +
 				         userNameCol + " VARCHAR(50), " +
-				         passwordCol + " VARCHAR(50), " +
-				         "PRIMARY KEY(" + userIDCol + ")" +")";
+				         passwordCol + " VARCHAR(50))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			System.out.println("Connection is successfully established");

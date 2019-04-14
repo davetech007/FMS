@@ -78,7 +78,10 @@ public class Main extends Application {
 				public void handle(ActionEvent event) {
 					try {
 						if(Database.logIn(userNameTField.getText(), passwordField.getText())) {
+						actionTarget.setId("actionTargetSuccess");
 						actionTarget.setText("Super TRUE");
+						primaryStage.close();
+						openMainWindow();
 						}
 						else {
 						actionTarget.setText("Login failed");
@@ -105,6 +108,8 @@ public class Main extends Application {
 					try {
 						if((userNameTField.getText().length() > 2) && (passwordField.getText().length() > 2)) {
 						Database.signUp(userNameTField.getText(), passwordField.getText());
+						actionTarget.setId("actionTargetSuccess");
+						actionTarget.setText("Successfully signed up!");
 						} else {
 						actionTarget.setText("You should type min. 3 characters!");	
 						}
@@ -132,6 +137,28 @@ public class Main extends Application {
 			primaryStage.show();
 	
 	}
+	
+	
+	
+	public void openMainWindow() {
+		Stage mainStage = new Stage();
+		BorderPane mainBP = new BorderPane();
+		
+		Scene sceneMain = new Scene(mainBP, 600, 600);
+		
+		
+		mainStage.setScene(sceneMain);
+		mainStage.show();
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	public static void main(String[] args) {
 		try {
