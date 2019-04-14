@@ -1,6 +1,7 @@
 package wifi.agardi.fmsproject;
 	
 import java.sql.SQLException;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -17,10 +19,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 
 
 public class Main extends Application {
@@ -31,6 +29,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+//Setting up LOGIN page		
 			BorderPane loginBP = new BorderPane();
 			loginBP.setPadding(new Insets(35, 35, 35, 35));
 			GridPane loginGP = new GridPane();
@@ -78,8 +77,6 @@ public class Main extends Application {
 				public void handle(ActionEvent event) {
 					try {
 						if(Database.logIn(userNameTField.getText(), passwordField.getText())) {
-						actionTarget.setId("actionTargetSuccess");
-						actionTarget.setText("Super TRUE");
 						primaryStage.close();
 						openMainWindow();
 						}
@@ -107,11 +104,26 @@ public class Main extends Application {
 				public void handle(ActionEvent event) {
 					try {
 						if((userNameTField.getText().length() > 2) && (passwordField.getText().length() > 2)) {
-						Database.signUp(userNameTField.getText(), passwordField.getText());
-						actionTarget.setId("actionTargetSuccess");
-						actionTarget.setText("Successfully signed up!");
+						SignUpDialog signUpDialog = new SignUpDialog(userNameTField.getText(), passwordField.getText());
+						
+						if(Database.checkUser(userNameTField.getText())) {
+							actionTarget.setText("User already exists!");
+							return;
+						}
+						
+						Optional<ButtonType> result = signUpDialog.showAndWait();
+						if(result.isPresent())
+							if(result.get() == ButtonType.OK) {
+								Database.signUp(userNameTField.getText(), passwordField.getText());
+								actionTarget.setId("actionTargetSuccess");
+								actionTarget.setText("Successfully signed up!");
+							}
+							else {
+								actionTarget.setText("Signing up cancelled!");
+							}
+									
 						} else {
-						actionTarget.setText("You should type min. 3 characters!");	
+						        actionTarget.setText("You should type min. 3 characters!");	
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -119,17 +131,7 @@ public class Main extends Application {
 				}
 				
 			});
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+					
 			Scene scene = new Scene(loginBP, 450, 450);
 			primaryStage.setScene(scene);
 			loginBP.getStylesheets().add(Main.class.getResource("/Login.css").toExternalForm());
@@ -140,11 +142,12 @@ public class Main extends Application {
 	
 	
 	
+	
 	public void openMainWindow() {
 		Stage mainStage = new Stage();
 		BorderPane mainBP = new BorderPane();
 		
-		Scene sceneMain = new Scene(mainBP, 600, 600);
+		Scene sceneMain = new Scene(mainBP, 1200, 700);
 		
 		
 		mainStage.setScene(sceneMain);

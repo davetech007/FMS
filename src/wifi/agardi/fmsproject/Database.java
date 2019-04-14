@@ -17,6 +17,8 @@ public class Database {
 	public static final String passwordCol = "Password";
 	
 	
+	
+//USER TABLE	
 	public static void createUsersTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
@@ -80,8 +82,8 @@ public class Database {
 		
 		try {
 			rs = stmt.executeQuery("SELECT * FROM "+ usersTable + 
-										  " WHERE " + userNameCol + " = '" + username + 
-										  "' AND " + passwordCol + " = '" + password + "'");
+								   " WHERE " + userNameCol + " = '" + username + 
+								   "' AND " + passwordCol + " = '" + password + "'");
 			
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with login...");
@@ -128,8 +130,7 @@ public class Database {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				if(pstmt != null)
 				  pstmt.close();
@@ -140,6 +141,35 @@ public class Database {
 		    }
 		
 	   }
+	}
+	
+	
+	public static boolean checkUser(String username) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ usersTable +
+								   " WHERE " + userNameCol + " = '" + username + "'");
+		    if(rs.next()) {
+		    	return true;
+		    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return false;
 	}
 	
 
