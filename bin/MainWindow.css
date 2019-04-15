@@ -1,0 +1,43 @@
+
+.root{
+	-fx-background-image: url("Background.jpg");
+}
+
+.tab {
+          
+    -fx-pref-width: 295
+} 
+.tab {
+
+    -fx-pref-height: 40
+} 
+
+.tab-header-background {
+    -fx-background-color:transparent
+}
+
+.tab-container {
+    -fx-alignment: center;
+}
+
+.tab-pane{
+    -fx-tab-min-width: 250.0px;
+}
+
+.tab .tab-label{
+    -fx-text-fill: #015363;
+    -fx-alignment: center;
+}
+
+.tab-label { 
+    -fx-pref-width:200; 
+}
+
+#mainTitle{
+	-fx-font-size: 26px;
+	-fx-font-family: "Arial Black", Gadget, sans-serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: #156b7c;
+    -fx-effect: dropshadow( gaussian , rgba(255, 255, 255) , 0,0,1,1 );
+}
+

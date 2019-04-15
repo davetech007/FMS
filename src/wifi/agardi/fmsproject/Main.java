@@ -14,7 +14,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -71,7 +75,7 @@ public class Main extends Application {
 			actionHBox.setAlignment(Pos.BOTTOM_CENTER);
 			actionHBox.getChildren().add(actionTarget);
 			loginGP.add(actionHBox, 0, 8);
-			
+//LogIn on action			
 			logInButton.setOnAction(new EventHandler<ActionEvent>() {	
 				@Override
 				public void handle(ActionEvent event) {
@@ -98,7 +102,7 @@ public class Main extends Application {
 			signUpVBox.getChildren().add(signUpButton);
 			loginBP.setBottom(signUpVBox);
 			
-			
+//SignUp on action			
 			signUpButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
@@ -143,15 +147,88 @@ public class Main extends Application {
 	
 	
 	
+
+	
 	public void openMainWindow() {
-		Stage mainStage = new Stage();
-		BorderPane mainBP = new BorderPane();
+			Stage mainStage = new Stage();
+			BorderPane mainBP = new BorderPane();
+			mainBP.setPadding(new Insets(10,0,0,0));
+//Main Title		
+			Label mainTitle = new Label("Fleet Management System");
+			mainTitle.setId("mainTitle");
+			
+			VBox mainTopVBox = new VBox();
+			HBox mainTopHBox = new HBox();
+			mainTopVBox.getChildren().add(mainTopHBox);
+			mainTopHBox.getChildren().add(mainTitle);
+			mainTopVBox.setAlignment(Pos.CENTER);
+			mainTopHBox.setAlignment(Pos.CENTER);
+
+			mainBP.setTop(mainTopVBox);
+//Tab Pane		
+			Tab reserveTab = new Tab("Reserve");
+			reserveTab.setClosable(false);
+			Image imageReserve = new Image(Main.class.getResource("/Reserve.png").toExternalForm(), 30, 30, true, true);
+			reserveTab.setGraphic(new ImageView(imageReserve));
+			
+			Tab carsTab = new Tab("Cars");
+			carsTab.setClosable(false);
+			Image imageCars = new Image(Main.class.getResource("/Cars.png").toExternalForm(), 30, 30, true, true);
+			carsTab.setGraphic(new ImageView(imageCars));
+			
+			Tab reservationsTab = new Tab("Reservaitons");
+			reservationsTab.setClosable(false);
+			Image imageRes = new Image(Main.class.getResource("/Reservations.png").toExternalForm(), 30, 30, true, true);
+			reservationsTab.setGraphic(new ImageView(imageRes));
+			
+			Tab dashboardTab = new Tab("Dashboard");
+			dashboardTab.setClosable(false);
+			Image imageDashboard = new Image(Main.class.getResource("/Dashboard.png").toExternalForm(), 30, 30, true, true);
+			dashboardTab.setGraphic(new ImageView(imageDashboard));
 		
-		Scene sceneMain = new Scene(mainBP, 1200, 700);
+			TabPane mainTabPane = new TabPane();
+			mainTabPane.setPrefSize(1200, 150);
+			
+			
+			mainTabPane.getTabs().addAll(reserveTab, carsTab, reservationsTab, dashboardTab);
+			HBox mainTabPaneHBox = new HBox();
+			mainTabPaneHBox.getChildren().add(mainTabPane);
+			mainTabPaneHBox.setAlignment(Pos.CENTER);
+			
+//Main VBox Top second Child			
+			mainTopVBox.getChildren().add(mainTabPaneHBox);
+//Tab on Action		
+			reserveTab.setOnSelectionChanged(e -> {
+				if(reserveTab.isSelected()) {
+					mainTitle.setText("Make a reservation");
+				}
+			});  
+			carsTab.setOnSelectionChanged(e -> {
+				if(carsTab.isSelected()) {
+					mainTitle.setText("Manage Cars");
+				}
+			});
+			reservationsTab.setOnSelectionChanged(e -> {
+				if(reservationsTab.isSelected()) {
+					mainTitle.setText("Manage Reservations");
+				}
+			});
+			dashboardTab.setOnSelectionChanged(e -> {
+				if(dashboardTab.isSelected()) {
+					mainTitle.setText("Dashboard");
+				}
+			});
 		
 		
-		mainStage.setScene(sceneMain);
-		mainStage.show();
+		
+		
+		
+		
+		
+			mainBP.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
+			Scene sceneMain = new Scene(mainBP, 1200, 700);
+			mainStage.setScene(sceneMain);
+			mainStage.show();
 		
 		
 	}
