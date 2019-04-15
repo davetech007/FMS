@@ -1,17 +1,22 @@
 package wifi.agardi.fmsproject;
 	
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
@@ -19,9 +24,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
 
@@ -29,6 +37,8 @@ public class Main extends Application {
 	TextField userNameTField;
 	PasswordField passwordField;
 	Label actionTarget;
+	
+	BorderPane mainBP;
 	
 	
 	@Override
@@ -42,7 +52,7 @@ public class Main extends Application {
 			loginGP.setVgap(10);
 			loginGP.setPadding(new Insets(15, 15, 15, 15));
 			loginBP.setCenter(loginGP);
-//Login Page BORDER PANE TOP			
+//Login Page BORDER PANE TOP TITLE		
 			Label nameLabel = new Label("Fleet Management System");
 			nameLabel.setId("nameLabel");
 			HBox nameHBox = new HBox(10);
@@ -148,11 +158,13 @@ public class Main extends Application {
 	
 	
 
+//After login, MAIN Window	
 	
 	public void openMainWindow() {
 			Stage mainStage = new Stage();
-			BorderPane mainBP = new BorderPane();
-			mainBP.setPadding(new Insets(10,0,0,0));
+			mainBP = new BorderPane();
+			mainBP.setPadding(new Insets(10,0,10,0));
+		
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
 			mainTitle.setId("mainTitle");
@@ -161,8 +173,9 @@ public class Main extends Application {
 			HBox mainTopHBox = new HBox();
 			mainTopVBox.getChildren().add(mainTopHBox);
 			mainTopHBox.getChildren().add(mainTitle);
-			mainTopVBox.setAlignment(Pos.CENTER);
-			mainTopHBox.setAlignment(Pos.CENTER);
+			mainTopVBox.setAlignment(Pos.TOP_CENTER);
+			mainTopVBox.setPrefHeight(120);
+			mainTopHBox.setAlignment(Pos.TOP_CENTER);
 
 			mainBP.setTop(mainTopVBox);
 //Tab Pane		
@@ -193,24 +206,25 @@ public class Main extends Application {
 			mainTabPane.getTabs().addAll(reserveTab, carsTab, reservationsTab, dashboardTab);
 			HBox mainTabPaneHBox = new HBox();
 			mainTabPaneHBox.getChildren().add(mainTabPane);
-			mainTabPaneHBox.setAlignment(Pos.CENTER);
+			mainTabPaneHBox.setAlignment(Pos.TOP_CENTER);
 			
 //Main VBox Top second Child			
 			mainTopVBox.getChildren().add(mainTabPaneHBox);
 //Tab on Action		
 			reserveTab.setOnSelectionChanged(e -> {
 				if(reserveTab.isSelected()) {
+					openReserveMenu();
 					mainTitle.setText("Make a reservation");
 				}
 			});  
 			carsTab.setOnSelectionChanged(e -> {
 				if(carsTab.isSelected()) {
-					mainTitle.setText("Manage Cars");
+					mainTitle.setText("Manage cars");
 				}
 			});
 			reservationsTab.setOnSelectionChanged(e -> {
 				if(reservationsTab.isSelected()) {
-					mainTitle.setText("Manage Reservations");
+					mainTitle.setText("Manage reservations");
 				}
 			});
 			dashboardTab.setOnSelectionChanged(e -> {
@@ -220,13 +234,11 @@ public class Main extends Application {
 			});
 		
 		
+			
 		
-		
-		
-		
-		
+			openReserveMenu();
 			mainBP.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
-			Scene sceneMain = new Scene(mainBP, 1200, 700);
+			Scene sceneMain = new Scene(mainBP, 1200, 800);
 			mainStage.setScene(sceneMain);
 			mainStage.show();
 		
@@ -234,6 +246,134 @@ public class Main extends Application {
 	}
 	
 	
+	
+	
+	public void openReserveMenu() {
+			BorderPane reserveBP = new BorderPane();
+			reserveBP.setPadding(new Insets(10, 30, 30, 30));
+			
+			GridPane reserveGP1 = new GridPane();
+			reserveGP1.setAlignment(Pos.TOP_CENTER);
+			reserveGP1.setPadding(new Insets(10, 10, 10, 0));
+			
+			VBox leftVBox = new VBox();
+			leftVBox.setPadding(new Insets(10, 10, 10, 50));
+			
+			reserveBP.setLeft(leftVBox);
+			
+			GridPane reserveGP2 = new GridPane();
+			reserveGP2.setAlignment(Pos.TOP_CENTER);
+			reserveGP2.setPadding(new Insets(10, 50, 10, 10));
+			//reserveBP.setRight(reserveGP2);
+			
+			
+//Searching for a driver
+			HBox searchHBox = new HBox();
+			VBox searchVBox = new VBox();
+			searchHBox.getChildren().add(searchVBox);
+			searchVBox.setAlignment(Pos.CENTER_LEFT);
+			
+			ChoiceBox<String> driverChoiceBox = new ChoiceBox<>();
+			driverChoiceBox.setPrefWidth(200);
+			driverChoiceBox.getItems().addAll("First Name", "Last Name", "Email");
+			driverChoiceBox.setValue("First Name");
+			searchVBox.getChildren().add(driverChoiceBox);
+			
+			TextField searchDriver = new TextField();
+			searchDriver.setMaxWidth(200);
+			searchDriver.setPromptText("search for a driver");
+			searchVBox.getChildren().add(searchDriver);
+			
+			Button searchButton = new Button();
+			Image imageSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 45, 45, true, true);
+			searchButton.setGraphic(new ImageView(imageSearch));
+			searchHBox.getChildren().add(searchButton);
+			
+			leftVBox.getChildren().add(searchHBox);
+			leftVBox.getChildren().add(reserveGP1);			
+			
+
+//GRIDPANE LEFT
+		
+			for(int i = 0; i < 10; i++) {
+				RowConstraints row = new RowConstraints();
+				row.setPercentHeight(10);
+				reserveGP1.getRowConstraints().add(row);
+			}
+			
+			
+			Label driverLabel = new Label("Driver details");
+			reserveGP1.add(driverLabel, 0, 1);
+			
+			TextField firstName = new TextField();
+			firstName.setPromptText("First name");
+			reserveGP1.add(firstName, 0, 2);
+			
+			TextField lastName = new TextField();
+			lastName.setPromptText("Last name");
+			reserveGP1.add(lastName, 0, 3);
+			
+			DatePicker dateBornPicker = new DatePicker();
+			//dateBornPicker.setValue(LocalDate.now());
+			dateBornPicker.setPromptText("Date of Born");
+			reserveGP1.add(dateBornPicker, 0, 4);
+			
+			
+			TextField passport = new TextField();
+			passport.setPromptText("Passport number");
+			reserveGP1.add(passport, 0, 5);
+			
+			
+			
+			TextField land = new TextField();
+			land.setPromptText("land");
+			reserveGP1.add(land, 1, 2);
+			
+			
+			
+//GRIDPANE RIGHT	
+		
+			
+			
+		
+			
+//Reserve BorderPane BOTTOM BUTTONS
+			Button clearPageButton = new Button("Clear");
+			clearPageButton.setPrefSize(110, 40);
+			Image imageClear = new Image(Main.class.getResource("/ClearRes.png").toExternalForm(), 30, 30, true, true);
+			clearPageButton.setGraphic(new ImageView(imageClear));
+			
+			
+			Button reserveButton = new Button("Reserve");
+			reserveButton.setPrefSize(110, 40);
+			Image imageReserve = new Image(Main.class.getResource("/SaveRes.png").toExternalForm(), 30, 30, true, true);
+			reserveButton.setGraphic(new ImageView(imageReserve));
+			
+			
+			HBox bottomHBox = new HBox();
+			bottomHBox.setPadding(new Insets(20, 20, 10, 20));
+			bottomHBox.setSpacing(5);
+			bottomHBox.getChildren().addAll(clearPageButton, reserveButton);
+			bottomHBox.setAlignment(Pos.CENTER_RIGHT);
+			
+			reserveBP.setId("reserveBP");
+			
+			mainBP.setCenter(reserveBP);
+			mainBP.setBottom(bottomHBox);
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	public void openCarsMenu() {
+			
+		
+		
+	}
 	
 	
 	

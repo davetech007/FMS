@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
-	public static final String DBlocation = "DatabaseTest";
+	public static final String DBlocation = "DatabaseTestNew";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
 	public static final String usersTable = "UsersNew";
@@ -30,8 +30,9 @@ public class Database {
 			conn = DriverManager.getConnection(connString);
 			System.out.println("Connection is successfully established");
 			rs = conn.getMetaData().getTables(null, null, usersTable.toUpperCase(), new String[] {"TABLE"});
-			if(rs.next())
+			if(rs.next()) {
 				return;
+			}
 			 
 			stmt = conn.createStatement();
 			stmt.executeUpdate(create);
