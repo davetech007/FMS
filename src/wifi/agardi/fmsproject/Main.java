@@ -19,12 +19,16 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -36,7 +40,7 @@ import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
-
+	Image imageSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -236,7 +240,7 @@ public class Main extends Application {
 	
 		
 			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
-			Scene sceneMain = new Scene(mainHB, 1200, 800);
+			Scene sceneMain = new Scene(mainHB, 1100, 750);
 			mainStage.setScene(sceneMain);
 			mainStage.show();
     	
@@ -253,11 +257,11 @@ public class Main extends Application {
 	
 	public BorderPane openReserveMenu() {
 			BorderPane reserveBP = new BorderPane();
-			reserveBP.setPadding(new Insets(10, 35, 0, 35));
+			reserveBP.setPadding(new Insets(0, 35, 0, 35));
 			
 			GridPane reserveGP1 = new GridPane();
 			reserveGP1.setAlignment(Pos.CENTER);
-			reserveGP1.setPadding(new Insets(50, 10, 10, 10));
+			reserveGP1.setPadding(new Insets(50, 20, 10, 20));
 			reserveGP1.setHgap(15);
 			reserveGP1.setVgap(10);
 			reserveBP.setCenter(reserveGP1);
@@ -273,7 +277,6 @@ public class Main extends Application {
 //TODO
 			Button searchCostButton = new Button("Search for a driver");
 			searchCostButton.setPrefWidth(195);
-			Image imageSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
 			searchCostButton.setGraphic(new ImageView(imageSearch));
 			reserveGP1.add(searchCostButton, 0, 0);
 	
@@ -369,12 +372,17 @@ public class Main extends Application {
 			ComboBox<String> carComboBox = new ComboBox<>();
 			carComboBox.setPrefWidth(195);
 			carComboBox.getItems().addAll("CatA", "CatB");
-			carComboBox.setValue("Choose categorie");
+			carComboBox.setValue("Choose category");
 			reserveGP1.add(carComboBox, 3, 0);
 			
 			Button searchCarButton = new Button("Search for a car");
 			searchCarButton.setPrefWidth(195);
 			searchCarButton.setGraphic(new ImageView(imageSearch));
+//TODO			
+			searchCarButton.setOnAction(e ->{
+				CarListeDialog carLD = new CarListeDialog(showCarsTableView());
+				carLD.showAndWait();
+			});
 			reserveGP1.add(searchCarButton, 4, 0);
 	
 			
@@ -511,11 +519,92 @@ public class Main extends Application {
 	
 	public BorderPane carsMenu() {
 		    BorderPane carsBP = new BorderPane();
+		    carsBP.setPadding(new Insets(10, 20, 0, 20));
+		    carsBP.setLeft(showCarsTableView());
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		  
 			
-			Label test = new Label("test");
-			carsBP.setLeft(test);
+			
 		
 		return carsBP;
+	}
+	
+	
+	
+	public VBox showCarsTableView() {
+		VBox carsLeftVBox = new VBox();
+//Searching		
+				ComboBox<String> carSearchBox = new ComboBox<>();
+				carSearchBox.setPrefWidth(195);
+				carSearchBox.getItems().addAll("All", "Category", "Fuel");
+				carSearchBox.setValue("Searching criteria");
+					
+				Button carSearchButton = new Button("Search for a car");
+				carSearchButton.setPrefWidth(195);
+				carSearchButton.setGraphic(new ImageView(imageSearch));
+				HBox carSearchHB = new HBox();
+				carSearchHB.setAlignment(Pos.CENTER);
+				carSearchHB.setSpacing(10);
+					
+				carSearchHB.getChildren().addAll(carSearchBox, carSearchButton);
+					
+				carsLeftVBox.getChildren().add(carSearchHB);
+				carsLeftVBox.getChildren().add(carsTableView());
+					
+			return carsLeftVBox;	
+	}
+	
+	
+	
+	
+	public TableView<String> carsTableView() {
+//TableView			
+			TableColumn<String, String> categorieCol = new TableColumn<>("Category");
+			categorieCol.setMinWidth(60);
+		    categorieCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		
+			TableColumn<String, String> markeCol = new TableColumn<>("Marke");
+		    markeCol.setMinWidth(100);
+		    markeCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+			
+		    TableColumn<String, String> modellCol = new TableColumn<>("Modell");
+		    modellCol.setMinWidth(100);
+		    modellCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		    
+		    TableColumn<String, String> licPlateCol = new TableColumn<>("License Plate");
+		    licPlateCol.setMinWidth(100);
+		    licPlateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		    
+		    TableColumn<String, String> fuelTypeCol = new TableColumn<>("License Plate");
+		    licPlateCol.setMinWidth(100);
+		    licPlateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		    
+		    TableColumn<String, String> onRentCol = new TableColumn<>("On Rent");
+		    onRentCol.setMinWidth(100);
+		    onRentCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		    
+		   
+			TableView<String> carsTableView = new TableView<>();
+			carsTableView.setPrefHeight(550);
+			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
+			carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			
+			return carsTableView;
+		
 	}
 	
 	
