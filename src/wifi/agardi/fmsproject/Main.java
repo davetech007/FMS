@@ -1,11 +1,12 @@
 package wifi.agardi.fmsproject;
-	
+
 import java.sql.SQLException;
 import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -21,19 +22,21 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
-	BorderPane mainBP;
-	
+
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -86,7 +89,7 @@ public class Main extends Application {
 					try {
 						if(Database.logIn(userNameTField.getText(), passwordField.getText())) {
 						primaryStage.close();
-						openMainWindow();
+						mainMenu();
 						}
 						else {
 						actionTarget.setText("Login failed");
@@ -149,73 +152,74 @@ public class Main extends Application {
 	}
 	
 	
-	
+
 	
 	
 	
 
 //After login, MAIN Window	
-	
-	public void openMainWindow() {
-			Stage mainStage = new Stage();
-			mainBP = new BorderPane();
-			mainBP.setPadding(new Insets(10,0,10,0));
 		
+	public void mainMenu() {
+			Stage mainStage = new Stage();
+			HBox mainHB = new HBox();
+			mainHB.setPadding(new Insets(20,0,10,0));
+			mainHB.setAlignment(Pos.CENTER);
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
 			mainTitle.setId("mainTitle");
-			
+		
 			VBox mainTopVBox = new VBox();
 			HBox mainTopHBox = new HBox();
 			mainTopVBox.getChildren().add(mainTopHBox);
 			mainTopHBox.getChildren().add(mainTitle);
 			mainTopVBox.setAlignment(Pos.TOP_CENTER);
-			mainTopVBox.setPrefHeight(120);
+			//mainTopVBox.setPrefHeight(120);
 			mainTopHBox.setAlignment(Pos.TOP_CENTER);
 
-			mainBP.setTop(mainTopVBox);
+			mainHB.getChildren().add(mainTopVBox);
 //Tab Pane		
 			Tab reserveTab = new Tab("Reserve");
+			reserveTab.setContent(openReserveMenu());
+		
 			reserveTab.setClosable(false);
 			Image imageReserve = new Image(Main.class.getResource("/Reserve.png").toExternalForm(), 30, 30, true, true);
 			reserveTab.setGraphic(new ImageView(imageReserve));
 			
 			Tab carsTab = new Tab("Cars");
+			carsTab.setContent(carsMenu());
+		
+		
 			carsTab.setClosable(false);
 			Image imageCars = new Image(Main.class.getResource("/Cars.png").toExternalForm(), 30, 30, true, true);
 			carsTab.setGraphic(new ImageView(imageCars));
-			
+		
 			Tab reservationsTab = new Tab("Reservaitons");
 			reservationsTab.setClosable(false);
 			Image imageRes = new Image(Main.class.getResource("/Reservations.png").toExternalForm(), 30, 30, true, true);
 			reservationsTab.setGraphic(new ImageView(imageRes));
-			
+		
 			Tab dashboardTab = new Tab("Dashboard");
 			dashboardTab.setClosable(false);
 			Image imageDashboard = new Image(Main.class.getResource("/Dashboard.png").toExternalForm(), 30, 30, true, true);
 			dashboardTab.setGraphic(new ImageView(imageDashboard));
-		
+	
 			TabPane mainTabPane = new TabPane();
-			mainTabPane.setPrefSize(1200, 150);
-			
-			
+		
 			mainTabPane.getTabs().addAll(reserveTab, carsTab, reservationsTab, dashboardTab);
 			HBox mainTabPaneHBox = new HBox();
 			mainTabPaneHBox.getChildren().add(mainTabPane);
-			mainTabPaneHBox.setAlignment(Pos.TOP_CENTER);
-			
+			//mainTabPaneHBox.setAlignment(Pos.TOP_CENTER);
+		
 //Main VBox Top second Child			
 			mainTopVBox.getChildren().add(mainTabPaneHBox);
 //Tab on Action		
 			reserveTab.setOnSelectionChanged(e -> {
 				if(reserveTab.isSelected()) {
-					openReserveMenu();
 					mainTitle.setText("Make a reservation");
 				}
 			});  
 			carsTab.setOnSelectionChanged(e -> {
-				if(carsTab.isSelected()) {
-					openCarsMenu();
+				if(carsTab.isSelected()) {	
 					mainTitle.setText("Manage cars");
 				}
 			});
@@ -229,18 +233,17 @@ public class Main extends Application {
 					mainTitle.setText("Dashboard");
 				}
 			});
+	
 		
-		
-			
-		
-			openReserveMenu();
-			mainBP.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
-			Scene sceneMain = new Scene(mainBP, 1200, 800);
+			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
+			Scene sceneMain = new Scene(mainHB, 1200, 800);
 			mainStage.setScene(sceneMain);
 			mainStage.show();
-		
-		
-	}
+    	
+    }
+	
+	
+
 	
 	
 	
@@ -248,178 +251,171 @@ public class Main extends Application {
 	
 	
 	
-	
-	public void openReserveMenu() {
+	public BorderPane openReserveMenu() {
 			BorderPane reserveBP = new BorderPane();
-			reserveBP.setPadding(new Insets(5, 30, 30, 30));
+			reserveBP.setPadding(new Insets(10, 35, 10, 35));
 			
 			GridPane reserveGP1 = new GridPane();
-			reserveGP1.setAlignment(Pos.TOP_CENTER);
-			reserveGP1.setPadding(new Insets(10, 10, 10, 60));
+			reserveGP1.setAlignment(Pos.CENTER);
+			reserveGP1.setPadding(new Insets(50, 10, 10, 10));
 			reserveGP1.setHgap(15);
 			reserveGP1.setVgap(10);
-			reserveBP.setLeft(reserveGP1);
+			reserveBP.setCenter(reserveGP1);
 			
-			GridPane reserveGP2 = new GridPane();
-			reserveGP2.setAlignment(Pos.TOP_CENTER);
-			reserveGP2.setPadding(new Insets(10, 60, 10, 10));
-			reserveGP2.setHgap(15);
-			reserveGP2.setVgap(10);
-			reserveBP.setRight(reserveGP2);
-			
-//GRIDPANE LEFT				
-//Searching for a driver
-			
-			ComboBox<String> driverComboBox = new ComboBox<>();
-			driverComboBox.setPrefWidth(195);
-			driverComboBox.getItems().addAll("First Name", "Last Name", "Email");
-			driverComboBox.setValue("Searching criteria");
-			reserveGP1.add(driverComboBox, 0, 0);
-			
-			TextField searchDriverTF = new TextField();
-			searchDriverTF.setPromptText("search for a driver");
-			reserveGP1.add(searchDriverTF, 0, 1);
-			
-			Button searchCostButton = new Button();
+			ColumnConstraints columnSpace = new ColumnConstraints();
+			columnSpace.setHgrow(Priority.ALWAYS);				
+			ColumnConstraints col1 = new ColumnConstraints();
+			reserveGP1.getColumnConstraints().addAll(col1, col1, columnSpace);
+			reserveGP1.setMinSize(0, 0);
+		
+//GRIDPANE			
+//Searching for a driver	
+//TODO
+//			ComboBox<String> driverComboBox = new ComboBox<>();
+//			driverComboBox.setPrefWidth(195);
+//			driverComboBox.getItems().addAll("First Name", "Last Name", "Email");
+//			driverComboBox.setValue("Searching a customer");
+
+			Button searchCostButton = new Button("Search for a driver");
+			searchCostButton.setPrefWidth(195);
 			Image imageSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
 			searchCostButton.setGraphic(new ImageView(imageSearch));
-			reserveGP1.add(searchCostButton, 1, 0);	
+			reserveGP1.add(searchCostButton, 0, 0);
 			
-			TextField custIdTF = new TextField();
-			custIdTF.setPromptText("Customer ID");
-			reserveGP1.add(custIdTF, 1, 1);
-			
-
 		
-//Grid1 left side			
+//Grid 0. column			
 			Label driverLabel = new Label("Driver details");
-			reserveGP1.add(driverLabel, 0, 2);
+			reserveGP1.add(driverLabel, 0, 1);
 			
 			TextField firstNameTF = new TextField();
 			firstNameTF.setPromptText("First name");
-			reserveGP1.add(firstNameTF, 0, 3);
+			reserveGP1.add(firstNameTF, 0, 2);
 			
 			TextField lastNameTF = new TextField();
 			lastNameTF.setPromptText("Last name");
-			reserveGP1.add(lastNameTF, 0, 4);
+			reserveGP1.add(lastNameTF, 0, 3);
 			
 			DatePicker dateBornPicker = new DatePicker();
 			dateBornPicker.setPromptText("Date of Born");
-			reserveGP1.add(dateBornPicker, 0, 5);
+			reserveGP1.add(dateBornPicker, 0, 4);
 			
 			
 			ComboBox<String> landComboBox = new ComboBox<>();
-			landComboBox.setPrefWidth(195);
 			landComboBox.getItems().addAll("American", "Hungarian", "Deutsch", "Chinese");
-			landComboBox.setPromptText("Nationality");
-			reserveGP1.add(landComboBox, 0, 6);
+			landComboBox.setPromptText("Choose nationality");
+			reserveGP1.add(landComboBox, 0, 5);
 			
 			
 			TextField passportTF = new TextField();
 			passportTF.setPromptText("Passport nr.");
-			reserveGP1.add(passportTF, 0, 7);
+			reserveGP1.add(passportTF, 0, 6);
 			
 			TextField dLicenseTF = new TextField();
 			dLicenseTF.setPromptText("Driver's license nr.");
-			reserveGP1.add(dLicenseTF, 0, 8);
+			reserveGP1.add(dLicenseTF, 0, 7);
 			
-			Label contactLabel = new Label("Contact");
-			reserveGP1.add(contactLabel, 0, 9);
+			Label contactLabel = new Label("Contact");		
+			reserveGP1.add(contactLabel, 0, 8);
 			
 			TextField telefonTF = new TextField();
 			telefonTF.setPromptText("Telefon nr.");
-			reserveGP1.add(telefonTF, 0, 10);
+			reserveGP1.add(telefonTF, 0, 9);
 			
 			TextField emailTF = new TextField();
 			emailTF.setPromptText("E-mail");
-			reserveGP1.add(emailTF, 0,11);
+			reserveGP1.add(emailTF, 0, 10);
+//Notes
+//TODO
+			Label notesLabel = new Label("Notes");
+			reserveGP1.add(notesLabel, 0, 11);
 			
+			TextArea notesTA = new TextArea();
+			notesTA.setPromptText("comments");
+			notesTA.setPrefSize(195, 50);
+			reserveGP1.add(notesTA, 0, 12);
+		
 			
-//Grid1 right side			
+			Label resErrorLabel = new Label();
+			reserveGP1.add(resErrorLabel, 0, 13);
+			
+//Grid 1. column		
 			Label addressLabel = new Label("Address");
-			reserveGP1.add(addressLabel, 1, 2);
+			reserveGP1.add(addressLabel, 1, 1);
 			
 			TextField landTF = new TextField();
 			landTF.setPrefWidth(195);
 			landTF.setPromptText("Land");
-			reserveGP1.add(landTF, 1, 3);
+			reserveGP1.add(landTF, 1, 2);
 			
 			TextField cityTF = new TextField();
 			cityTF.setPrefWidth(195);
 			cityTF.setPromptText("City");
-			reserveGP1.add(cityTF, 1, 4);
+			reserveGP1.add(cityTF, 1, 3);
 			
 			TextField streetTF = new TextField();
 			streetTF.setPrefWidth(195);
 			streetTF.setPromptText("Street");
-			reserveGP1.add(streetTF, 1, 5);
+			reserveGP1.add(streetTF, 1, 4);
 			
 			TextField housenrTF = new TextField();
 			housenrTF.setPrefWidth(195);
 			housenrTF.setPromptText("House nr./door");
-			reserveGP1.add(housenrTF, 1, 6);
+			reserveGP1.add(housenrTF, 1, 5);
 			
 					
 			TextField postCodeTF = new TextField();
 			postCodeTF.setPrefWidth(195);
 			postCodeTF.setPromptText("Postal code");
-			reserveGP1.add(postCodeTF, 1, 7);
+			reserveGP1.add(postCodeTF, 1, 6);
 			
-			Label notesLabel = new Label("Notes");
-			reserveGP1.add(notesLabel, 1, 9);
-			
-			TextField notesTF = new TextField();
-			notesTF.setPromptText("comments");
-			reserveGP1.add(notesTF, 1, 10);
-			
-			Label resErrorLabel = new Label();
-			reserveGP1.add(resErrorLabel, 0, 13);
+		
+
 			
 			
-			
-//GRIDPANE RIGHT
+//Grid 3. column
 //Searching for a car			
 			ComboBox<String> carComboBox = new ComboBox<>();
 			carComboBox.setPrefWidth(195);
 			carComboBox.getItems().addAll("CatA", "CatB");
 			carComboBox.setValue("Categorie");
-			reserveGP2.add(carComboBox, 0, 0);
+			reserveGP1.add(carComboBox, 3, 0);
 			
 			TextField searchCarTF = new TextField();
 			searchCarTF.setPromptText("search for a marke");
-			reserveGP2.add(searchCarTF, 0, 1);
+			reserveGP1.add(searchCarTF, 3, 1);
 			
 			Button searchCarButton = new Button();
 			searchCarButton.setGraphic(new ImageView(imageSearch));
-			reserveGP2.add(searchCarButton, 1, 0);	
+			reserveGP1.add(searchCarButton, 4, 0);	
 			
 			TextField carLicensePlateTF = new TextField();
 			carLicensePlateTF.setPromptText("Car license plate");
-			reserveGP2.add(carLicensePlateTF, 1, 1);
-			
+			reserveGP1.add(carLicensePlateTF, 4, 1);
 
-//Grid2 left side			
+
+			
 			Label carLabel = new Label("Car details");
-			reserveGP2.add(carLabel, 0, 2);
+			reserveGP1.add(carLabel, 3, 2);
 			
 			TextField carMarkeTF = new TextField();
 			carMarkeTF.setPromptText("Marke");
-			reserveGP2.add(carMarkeTF, 0, 3);
+			reserveGP1.add(carMarkeTF, 3, 3);
+		
 			
 			TextField carModellTF = new TextField();
 			carModellTF.setPromptText("Modell");
-			reserveGP2.add(carModellTF, 0, 4);
+			reserveGP1.add(carModellTF, 3, 4);
 			
 			Label pickupLabel = new Label("Pick up");
-			reserveGP2.add(pickupLabel, 0, 5);
+			reserveGP1.add(pickupLabel, 3, 5);
 			
 			TextField pickupLocTF = new TextField();
 			pickupLocTF.setPromptText("Pickup location");
-			reserveGP2.add(pickupLocTF, 0, 6);
+			reserveGP1.add(pickupLocTF, 3, 6);
 			
 			DatePicker datePickupPicker = new DatePicker();
 			datePickupPicker.setPromptText("Pickup date");
-			reserveGP2.add(datePickupPicker, 0, 7);
+			reserveGP1.add(datePickupPicker, 3, 7);
 			
 
 			HBox pickupHBox = new HBox();
@@ -431,33 +427,31 @@ public class Main extends Application {
 			pickupMinTF.setMaxWidth(40);
 			Label pickupMinuteLB = new Label("minutes");
 			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
-			reserveGP2.add(pickupHBox, 0, 8);
+			reserveGP1.add(pickupHBox, 3, 8);
+
 			
-			
-			
-			
-//Grid2 right side			
+//Grid 4. column			
 			Label dateLabel = new Label("Insurance");
-			reserveGP2.add(dateLabel, 1, 2);
+			reserveGP1.add(dateLabel, 4, 2);
 			
 			ToggleGroup tg = new ToggleGroup();
 			RadioButton cascoRB = new RadioButton("Casco");
 			cascoRB.setToggleGroup(tg);
 			RadioButton fullCascoRB = new RadioButton("Full Casco");
 			fullCascoRB.setToggleGroup(tg);
-			reserveGP2.add(cascoRB, 1, 3);
-			reserveGP2.add(fullCascoRB, 1, 4);
+			reserveGP1.add(cascoRB, 4, 3);
+			reserveGP1.add(fullCascoRB, 4, 4);
 			
 			Label returnLabel = new Label("Return");
-			reserveGP2.add(returnLabel, 1, 5);
+			reserveGP1.add(returnLabel, 4, 5);
 			
 			TextField returnLocTF = new TextField();
 			returnLocTF.setPromptText("Return location");
-			reserveGP2.add(returnLocTF, 1, 6);
+			reserveGP1.add(returnLocTF, 4, 6);
 			
 			DatePicker dateReturnPicker = new DatePicker();
 			dateReturnPicker.setPromptText("Return date");
-			reserveGP2.add(dateReturnPicker, 1, 7);
+			reserveGP1.add(dateReturnPicker, 4, 7);
 			
 			
 			HBox returnHBox = new HBox();
@@ -469,7 +463,7 @@ public class Main extends Application {
 			returnMinTF.setMaxWidth(40);
 			Label returnMinuteLB = new Label("minutes");
 			returnHBox.getChildren().addAll(returnHourTF, returnHourLB, returnMinTF, returnMinuteLB);
-			reserveGP2.add(returnHBox, 1, 8);
+			reserveGP1.add(returnHBox, 4, 8);
 		
 			
 //Reserve BorderPane BOTTOM BUTTONS
@@ -478,7 +472,7 @@ public class Main extends Application {
 			saveCustomerButton.setPrefSize(110, 40);
 			Image imageSave = new Image(Main.class.getResource("/SaveCustomer.png").toExternalForm(), 45, 45, true, true);
 			saveCustomerButton.setGraphic(new ImageView(imageSave));
-			
+			saveCustomerButton.setAlignment(Pos.BOTTOM_RIGHT);
 			
 			Button clearPageButton = new Button("Clear");
 			clearPageButton.setPrefSize(110, 40);
@@ -493,18 +487,14 @@ public class Main extends Application {
 			
 			
 			HBox bottomHBox = new HBox();
-			bottomHBox.setPadding(new Insets(20, 20, 10, 20));
+			bottomHBox.setPadding(new Insets(110, 20, 10, 20));
 			bottomHBox.setSpacing(10);
 			bottomHBox.getChildren().addAll(saveCustomerButton, clearPageButton, reserveButton);
-			bottomHBox.setAlignment(Pos.CENTER_RIGHT);
+			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
 			
-			reserveBP.setId("reserveBP");
-			
-			mainBP.setCenter(reserveBP);
-			mainBP.setBottom(bottomHBox);
-			
+			reserveBP.setBottom(bottomHBox);
 
-		
+		return reserveBP;
 		
 	}
 	
@@ -513,11 +503,13 @@ public class Main extends Application {
 	
 	
 	
-	public void openCarsMenu() {
+	public BorderPane carsMenu() {
+		    BorderPane carsBP = new BorderPane();
+			
 			Label test = new Label("test");
-			mainBP.setCenter(test);
+			carsBP.setLeft(test);
 		
-		
+		return carsBP;
 	}
 	
 	
