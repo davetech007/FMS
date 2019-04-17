@@ -253,7 +253,7 @@ public class Main extends Application {
 	
 	public BorderPane openReserveMenu() {
 			BorderPane reserveBP = new BorderPane();
-			reserveBP.setPadding(new Insets(10, 35, 10, 35));
+			reserveBP.setPadding(new Insets(10, 35, 0, 35));
 			
 			GridPane reserveGP1 = new GridPane();
 			reserveGP1.setAlignment(Pos.CENTER);
@@ -271,16 +271,12 @@ public class Main extends Application {
 //GRIDPANE			
 //Searching for a driver	
 //TODO
-//			ComboBox<String> driverComboBox = new ComboBox<>();
-//			driverComboBox.setPrefWidth(195);
-//			driverComboBox.getItems().addAll("First Name", "Last Name", "Email");
-//			driverComboBox.setValue("Searching a customer");
-
 			Button searchCostButton = new Button("Search for a driver");
 			searchCostButton.setPrefWidth(195);
 			Image imageSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
 			searchCostButton.setGraphic(new ImageView(imageSearch));
 			reserveGP1.add(searchCostButton, 0, 0);
+	
 			
 		
 //Grid 0. column			
@@ -331,12 +327,12 @@ public class Main extends Application {
 			
 			TextArea notesTA = new TextArea();
 			notesTA.setPromptText("comments");
-			notesTA.setPrefSize(195, 50);
+			notesTA.setPrefSize(195, 70);
 			reserveGP1.add(notesTA, 0, 12);
-		
-			
-			Label resErrorLabel = new Label();
-			reserveGP1.add(resErrorLabel, 0, 13);
+
+//			Label resErrorLabel = new Label();
+//			reserveGP1.add(resErrorLabel, 0, 13);
+
 			
 //Grid 1. column		
 			Label addressLabel = new Label("Address");
@@ -348,23 +344,19 @@ public class Main extends Application {
 			reserveGP1.add(landTF, 1, 2);
 			
 			TextField cityTF = new TextField();
-			cityTF.setPrefWidth(195);
 			cityTF.setPromptText("City");
 			reserveGP1.add(cityTF, 1, 3);
 			
 			TextField streetTF = new TextField();
-			streetTF.setPrefWidth(195);
 			streetTF.setPromptText("Street");
 			reserveGP1.add(streetTF, 1, 4);
 			
 			TextField housenrTF = new TextField();
-			housenrTF.setPrefWidth(195);
 			housenrTF.setPromptText("House nr./door");
 			reserveGP1.add(housenrTF, 1, 5);
 			
 					
 			TextField postCodeTF = new TextField();
-			postCodeTF.setPrefWidth(195);
 			postCodeTF.setPromptText("Postal code");
 			reserveGP1.add(postCodeTF, 1, 6);
 			
@@ -373,49 +365,41 @@ public class Main extends Application {
 			
 			
 //Grid 3. column
-//Searching for a car			
+//Searching for a car	
 			ComboBox<String> carComboBox = new ComboBox<>();
 			carComboBox.setPrefWidth(195);
 			carComboBox.getItems().addAll("CatA", "CatB");
-			carComboBox.setValue("Categorie");
+			carComboBox.setValue("Choose categorie");
 			reserveGP1.add(carComboBox, 3, 0);
 			
-			TextField searchCarTF = new TextField();
-			searchCarTF.setPromptText("search for a marke");
-			reserveGP1.add(searchCarTF, 3, 1);
-			
-			Button searchCarButton = new Button();
+			Button searchCarButton = new Button("Search for a car");
+			searchCarButton.setPrefWidth(195);
 			searchCarButton.setGraphic(new ImageView(imageSearch));
-			reserveGP1.add(searchCarButton, 4, 0);	
-			
-			TextField carLicensePlateTF = new TextField();
-			carLicensePlateTF.setPromptText("Car license plate");
-			reserveGP1.add(carLicensePlateTF, 4, 1);
-
-
+			reserveGP1.add(searchCarButton, 4, 0);
+	
 			
 			Label carLabel = new Label("Car details");
-			reserveGP1.add(carLabel, 3, 2);
+			reserveGP1.add(carLabel, 3, 1);
 			
-			TextField carMarkeTF = new TextField();
-			carMarkeTF.setPromptText("Marke");
-			reserveGP1.add(carMarkeTF, 3, 3);
-		
+			TextField carLicensePlateTF = new TextField();
+			carLicensePlateTF.setPromptText("Reserved car's license pl.");
+			reserveGP1.add(carLicensePlateTF, 3, 2);
 			
-			TextField carModellTF = new TextField();
-			carModellTF.setPromptText("Modell");
-			reserveGP1.add(carModellTF, 3, 4);
+			TextField carWishTF = new TextField();
+			carWishTF.setPromptText("Type wish");
+			reserveGP1.add(carWishTF, 3, 3);
+			
 			
 			Label pickupLabel = new Label("Pick up");
-			reserveGP1.add(pickupLabel, 3, 5);
+			reserveGP1.add(pickupLabel, 3, 4);
 			
 			TextField pickupLocTF = new TextField();
 			pickupLocTF.setPromptText("Pickup location");
-			reserveGP1.add(pickupLocTF, 3, 6);
+			reserveGP1.add(pickupLocTF, 3, 5);
 			
 			DatePicker datePickupPicker = new DatePicker();
 			datePickupPicker.setPromptText("Pickup date");
-			reserveGP1.add(datePickupPicker, 3, 7);
+			reserveGP1.add(datePickupPicker, 3, 6);
 			
 
 			HBox pickupHBox = new HBox();
@@ -427,31 +411,31 @@ public class Main extends Application {
 			pickupMinTF.setMaxWidth(40);
 			Label pickupMinuteLB = new Label("minutes");
 			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
-			reserveGP1.add(pickupHBox, 3, 8);
+			reserveGP1.add(pickupHBox, 3, 7);
 
 			
 //Grid 4. column			
 			Label dateLabel = new Label("Insurance");
-			reserveGP1.add(dateLabel, 4, 2);
+			reserveGP1.add(dateLabel, 4, 1);
 			
 			ToggleGroup tg = new ToggleGroup();
 			RadioButton cascoRB = new RadioButton("Casco");
 			cascoRB.setToggleGroup(tg);
 			RadioButton fullCascoRB = new RadioButton("Full Casco");
 			fullCascoRB.setToggleGroup(tg);
-			reserveGP1.add(cascoRB, 4, 3);
-			reserveGP1.add(fullCascoRB, 4, 4);
+			reserveGP1.add(cascoRB, 4, 2);
+			reserveGP1.add(fullCascoRB, 4, 3);
 			
 			Label returnLabel = new Label("Return");
-			reserveGP1.add(returnLabel, 4, 5);
+			reserveGP1.add(returnLabel, 4, 4);
 			
 			TextField returnLocTF = new TextField();
 			returnLocTF.setPromptText("Return location");
-			reserveGP1.add(returnLocTF, 4, 6);
+			reserveGP1.add(returnLocTF, 4, 5);
 			
 			DatePicker dateReturnPicker = new DatePicker();
 			dateReturnPicker.setPromptText("Return date");
-			reserveGP1.add(dateReturnPicker, 4, 7);
+			reserveGP1.add(dateReturnPicker, 4, 6);
 			
 			
 			HBox returnHBox = new HBox();
@@ -463,8 +447,30 @@ public class Main extends Application {
 			returnMinTF.setMaxWidth(40);
 			Label returnMinuteLB = new Label("minutes");
 			returnHBox.getChildren().addAll(returnHourTF, returnHourLB, returnMinTF, returnMinuteLB);
-			reserveGP1.add(returnHBox, 4, 8);
-		
+			reserveGP1.add(returnHBox, 4, 7);
+			
+//EXTRAS		
+			Label extrasLB = new Label("Extras");
+			reserveGP1.add(extrasLB, 3, 8);
+			
+			CheckBox cb1 = new CheckBox("GPS");
+			CheckBox cb2 = new CheckBox("Additional driver");
+			CheckBox cb3 = new CheckBox("Child seat");
+			CheckBox cb4 = new CheckBox("Border crossing");
+			reserveGP1.add(cb1, 3, 9);
+			reserveGP1.add(cb2, 3, 10);
+			reserveGP1.add(cb3, 4, 9);
+			reserveGP1.add(cb4, 4, 10);
+			//reserveGP1.setGridLinesVisible(true);
+	
+//PRICE TODO
+			VBox priceVBox = new VBox();
+			Label priceLabel1 = new Label("Base price * days =");
+			Label priceLabel2 = new Label("Extras =");
+			Label priceLabel3 = new Label("Expected total price =");
+			priceVBox.getChildren().addAll(priceLabel1, priceLabel2, priceLabel3);
+			reserveGP1.add(priceVBox, 4, 12);
+			
 			
 //Reserve BorderPane BOTTOM BUTTONS
 			
@@ -487,7 +493,7 @@ public class Main extends Application {
 			
 			
 			HBox bottomHBox = new HBox();
-			bottomHBox.setPadding(new Insets(110, 20, 10, 20));
+			bottomHBox.setPadding(new Insets(60, 20, 10, 20));
 			bottomHBox.setSpacing(10);
 			bottomHBox.getChildren().addAll(saveCustomerButton, clearPageButton, reserveButton);
 			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
