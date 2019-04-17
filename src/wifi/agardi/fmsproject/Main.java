@@ -247,11 +247,6 @@ public class Main extends Application {
     }
 	
 	
-
-	
-	
-	
-	
 	
 	
 	
@@ -261,7 +256,7 @@ public class Main extends Application {
 			
 			GridPane reserveGP1 = new GridPane();
 			reserveGP1.setAlignment(Pos.CENTER);
-			reserveGP1.setPadding(new Insets(50, 20, 10, 20));
+			reserveGP1.setPadding(new Insets(50, 30, 0, 30));
 			reserveGP1.setHgap(15);
 			reserveGP1.setVgap(10);
 			reserveBP.setCenter(reserveGP1);
@@ -372,10 +367,10 @@ public class Main extends Application {
 			ComboBox<String> carComboBox = new ComboBox<>();
 			carComboBox.setPrefWidth(195);
 			carComboBox.getItems().addAll("CatA", "CatB");
-			carComboBox.setValue("Choose category");
+			carComboBox.setValue("Reserve only a category");
 			reserveGP1.add(carComboBox, 3, 0);
 			
-			Button searchCarButton = new Button("Search for a car");
+			Button searchCarButton = new Button("or search for a car");
 			searchCarButton.setPrefWidth(195);
 			searchCarButton.setGraphic(new ImageView(imageSearch));
 //TODO			
@@ -473,9 +468,9 @@ public class Main extends Application {
 	
 //PRICE TODO
 			VBox priceVBox = new VBox();
-			Label priceLabel1 = new Label("Base price * days =");
+			Label priceLabel1 = new Label("Price * days =");
 			Label priceLabel2 = new Label("Extras =");
-			Label priceLabel3 = new Label("Expected total price =");
+			Label priceLabel3 = new Label("Total price =");
 			priceVBox.getChildren().addAll(priceLabel1, priceLabel2, priceLabel3);
 			reserveGP1.add(priceVBox, 4, 12);
 			
@@ -546,21 +541,25 @@ public class Main extends Application {
 	
 	
 	public VBox showCarsTableView() {
-		VBox carsLeftVBox = new VBox();
+			VBox carsLeftVBox = new VBox();
 //Searching		
 				ComboBox<String> carSearchBox = new ComboBox<>();
 				carSearchBox.setPrefWidth(195);
-				carSearchBox.getItems().addAll("All", "Category", "Fuel");
-				carSearchBox.setValue("Searching criteria");
-					
-				Button carSearchButton = new Button("Search for a car");
-				carSearchButton.setPrefWidth(195);
-				carSearchButton.setGraphic(new ImageView(imageSearch));
+				carSearchBox.getItems().addAll("M_Mini", "A_Small", "B_Economy", "C_Midsize", 
+												"D_Fullsize", "F_Premium", "P_Luxus", "S_Minivan", 
+												"V_FullsizeVan", "R_Convertible", "X_Suv");
+				
+				carSearchBox.setValue("Choose category");
+				
+				Label carSearchLB = new Label("Search for a car -> "); 
+				Button carSearchBT = new Button("Search");
+				carSearchBT.setPrefWidth(150);
+				carSearchBT.setGraphic(new ImageView(imageSearch));
 				HBox carSearchHB = new HBox();
 				carSearchHB.setAlignment(Pos.CENTER);
-				carSearchHB.setSpacing(10);
+				carSearchHB.setSpacing(15);
 					
-				carSearchHB.getChildren().addAll(carSearchBox, carSearchButton);
+				carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, carSearchBT);
 					
 				carsLeftVBox.getChildren().add(carSearchHB);
 				carsLeftVBox.getChildren().add(carsTableView());
@@ -570,11 +569,10 @@ public class Main extends Application {
 	
 	
 	
-	
 	public TableView<String> carsTableView() {
 //TableView			
 			TableColumn<String, String> categorieCol = new TableColumn<>("Category");
-			categorieCol.setMinWidth(60);
+			categorieCol.setMinWidth(50);
 		    categorieCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		
 			TableColumn<String, String> markeCol = new TableColumn<>("Marke");
@@ -589,12 +587,12 @@ public class Main extends Application {
 		    licPlateCol.setMinWidth(100);
 		    licPlateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		    
-		    TableColumn<String, String> fuelTypeCol = new TableColumn<>("License Plate");
+		    TableColumn<String, String> fuelTypeCol = new TableColumn<>("Fuel Type");
 		    licPlateCol.setMinWidth(100);
 		    licPlateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		    
 		    TableColumn<String, String> onRentCol = new TableColumn<>("On Rent");
-		    onRentCol.setMinWidth(100);
+		    onRentCol.setMinWidth(90);
 		    onRentCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		    
 		   

@@ -8,7 +8,6 @@ public class Car {
 	private String carBrand;
 	private String carModel;
 	private Categorie carCategorie;
-	private BodyStyle carBodyStyle;
 	private String carColor;
 	private FuelType carFuelType;
 	private Transmission carTransmission;
@@ -76,16 +75,6 @@ public class Car {
 
 	public void setCarCategorie(Categorie carCategorie) {
 		this.carCategorie = carCategorie;
-	}
-
-
-	public BodyStyle getCarBodyStyle() {
-		return carBodyStyle;
-	}
-
-
-	public void setCarBodyStyle(BodyStyle carBodyStyle) {
-		this.carBodyStyle = carBodyStyle;
 	}
 
 
