@@ -12,7 +12,7 @@ public class CarListeDialog extends Dialog<ButtonType> {
 		this.setHeaderText("Car list");
 	
 	
-
+		
 		this.getDialogPane().setContent(carList);
 		ButtonType close = ButtonType.OK; 
 		ButtonType cancel = ButtonType.CANCEL; 

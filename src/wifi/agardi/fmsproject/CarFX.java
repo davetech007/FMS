@@ -16,7 +16,6 @@ public class CarFX {
 	private StringProperty carLicensePlate;
 	private StringProperty carBrand;
 	private StringProperty carModel;
-	private StringProperty carColor;
 	private IntegerProperty carManufYear;
 	private IntegerProperty carManufMonth;
 	private IntegerProperty carKM;
@@ -32,7 +31,6 @@ public class CarFX {
 		carLicensePlate = new SimpleStringProperty(car.getCarLicensePlate());
 		carBrand = new SimpleStringProperty(car.getCarBrand());
 		carModel = new SimpleStringProperty(car.getCarModel());
-		carColor = new SimpleStringProperty(car.getCarColor());
 		carManufYear = new SimpleIntegerProperty(car.getCarManufYear());
 		carManufMonth = new SimpleIntegerProperty(car.getCarManufMonth());;
 		carKM = new SimpleIntegerProperty(car.getCarKM());
@@ -106,17 +104,6 @@ public class CarFX {
 	
 	
 	
-	
-	public String getCarColor() {
-		return carColor.get();
-	}
-	public void setCarColor(String v) {
-		carColor.set(v);
-		modellObject.setCarColor(v);
-	}
-	public StringProperty carColorProperty() {
-		return carColor;
-	}
 	
 	
 	

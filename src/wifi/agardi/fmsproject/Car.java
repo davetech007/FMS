@@ -8,7 +8,7 @@ public class Car {
 	private String carBrand;
 	private String carModel;
 	private Categorie carCategorie;
-	private String carColor;
+	private Color carColor;
 	private FuelType carFuelType;
 	private Transmission carTransmission;
 	private int carManufYear;
@@ -20,7 +20,6 @@ public class Car {
 	private boolean carIsOnRent;
 	private ArrayList<String> carExtras;
 	private ArrayList<String> carDamages;
-	private ArrayList<String> carNotes;
 	
 	
 	public Car() {
@@ -78,12 +77,12 @@ public class Car {
 	}
 
 
-	public String getCarColor() {
+	public Color getCarColor() {
 		return carColor;
 	}
 
 
-	public void setCarColor(String carColor) {
+	public void setCarColor(Color carColor) {
 		this.carColor = carColor;
 	}
 
@@ -195,16 +194,6 @@ public class Car {
 
 	public void setCarDamages(ArrayList<String> carDamages) {
 		this.carDamages = carDamages;
-	}
-
-
-	public ArrayList<String> getCarNotes() {
-		return carNotes;
-	}
-
-
-	public void setCarNotes(ArrayList<String> carNotes) {
-		this.carNotes = carNotes;
 	}
 
 	
