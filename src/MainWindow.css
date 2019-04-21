@@ -5,7 +5,7 @@
 
 .tab {
           
-    -fx-pref-width: 270
+    -fx-pref-width: 245
 } 
 .tab {
 
@@ -21,7 +21,7 @@
 }
 
 .tab-pane{
-    -fx-tab-min-width: 250.0px;
+    -fx-tab-min-width: 230.0px;
 }
 
 .tab .tab-label{
