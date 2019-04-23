@@ -1,12 +1,15 @@
 package wifi.agardi.fmsproject;
 
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -16,13 +19,15 @@ public class CarFX {
 	private StringProperty carLicensePlate;
 	private StringProperty carBrand;
 	private StringProperty carModel;
-	private IntegerProperty carManufYear;
-	private IntegerProperty carManufMonth;
+	private ObjectProperty<Categorie> carCategorie;
+	private ObjectProperty<FuelType> carFuelType;
+	private ObjectProperty<LocalDate> carManufDate;
 	private IntegerProperty carKM;
 	private IntegerProperty carEngineSize;
 	private IntegerProperty carEnginePower;
-	private DoubleProperty carPreisProDay;
 	private BooleanProperty carIsOnRent;
+	private ArrayList<Extras> carExtras = new ArrayList<>();
+	private ArrayList<String> carDamages = new ArrayList<>();
 	
 	
 	public CarFX(Car car) {
@@ -31,12 +36,12 @@ public class CarFX {
 		carLicensePlate = new SimpleStringProperty(car.getCarLicensePlate());
 		carBrand = new SimpleStringProperty(car.getCarBrand());
 		carModel = new SimpleStringProperty(car.getCarModel());
-		carManufYear = new SimpleIntegerProperty(car.getCarManufYear());
-		carManufMonth = new SimpleIntegerProperty(car.getCarManufMonth());;
+		carCategorie = new SimpleObjectProperty<>(car.getCarCategorie());
+		carFuelType = new SimpleObjectProperty<>(car.getCarFuelType());
+		carManufDate = new SimpleObjectProperty<>(car.getCarManufDate());
 		carKM = new SimpleIntegerProperty(car.getCarKM());
 		carEngineSize = new SimpleIntegerProperty(car.getCarEngineSize());
 		carEnginePower = new SimpleIntegerProperty(car.getCarEnginePower());
-		carPreisProDay = new SimpleDoubleProperty(car.getCarPreisProDay());
 		carIsOnRent = new SimpleBooleanProperty(car.isCarIsOnRent());
 	}
 	
@@ -107,31 +112,49 @@ public class CarFX {
 	
 	
 	
-	
-	public int getCarManufYear() {
-		return carManufYear.get();
+	public Categorie getCarCategorie() {
+		return carCategorie.get();
 	}
-	public void setCarManufYear(int v) {
-		carManufYear.set(v);
-		modellObject.setCarManufYear(v);
+	public void setCarCategorie(Categorie v) {
+		carCategorie.set(v);
+		modellObject.setCarCategorie(v);
 	}
-	public IntegerProperty carManufYearProperty() {
-		return carManufYear;
+	public ObjectProperty<Categorie> carCategorieProperty() {
+		return carCategorie;
 	}
-	
 	
 	
 	
-	public int getCarManufMonth() {
-		return carManufMonth.get();
+	
+	
+	public FuelType getCarFuelType() {
+		return carFuelType.get();
 	}
-	public void setCarManufMonth(int v) {
-		carManufMonth.set(v);
-		modellObject.setCarManufMonth(v);
+	public void setCarFuelType(FuelType v) {
+		carFuelType.set(v);
+		modellObject.setCarFuelType(v);
 	}
-	public IntegerProperty carManufMonthProperty() {
-		return carManufMonth;
+	public ObjectProperty<FuelType> carFuelTypeProperty() {
+		return carFuelType;
 	}
+	
+	
+	
+	
+	
+	
+	public LocalDate getCarManufDate() {
+		return carManufDate.get();
+	}
+	public void setCarManufDate(LocalDate v) {
+		carManufDate.set(v);
+		modellObject.setCarManufDate(v);
+	}
+	public ObjectProperty<LocalDate> carManufDateProperty() {
+		return carManufDate;
+	}
+	
+	
 	
 	
 	
@@ -178,19 +201,6 @@ public class CarFX {
 	
 	
 	
-	public double getCarPreisProDay() {
-		return carPreisProDay.get();
-	}
-	public void setCarPreisProDay(double v) {
-		carPreisProDay.set(v);
-		modellObject.setCarPreisProDay(v);
-	}
-	public DoubleProperty carPreisProDayProperty() {
-		return carPreisProDay;
-	}
-	
-	
-	
 	
 	public boolean isCarIsOnRent() {
 		return carIsOnRent.get();
@@ -201,6 +211,29 @@ public class CarFX {
 	}
 	public BooleanProperty carIsOnRentProperty() {
 		return carIsOnRent;
+	}
+
+
+	
+	
+
+	public ArrayList<Extras> getCarExtras() {
+		return carExtras;
+	}
+	public void setCarExtras(ArrayList<Extras> carExtras) {
+		this.carExtras = carExtras;
+	}
+
+
+	
+	
+	
+
+	public ArrayList<String> getCarDamages() {
+		return carDamages;
+	}
+	public void setCarDamages(ArrayList<String> carDamages) {
+		this.carDamages = carDamages;
 	}
 	
 	

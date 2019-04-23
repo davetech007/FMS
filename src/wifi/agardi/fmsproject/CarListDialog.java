@@ -4,12 +4,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.VBox;
 
-public class CarListeDialog extends Dialog<ButtonType> {
+public class CarListDialog extends Dialog<ButtonType> {
 	
-	public CarListeDialog(VBox carList) {
+	public CarListDialog(VBox carList) {
 		super();
 		this.setTitle("Car list");
-		this.setHeaderText("Car list");
+		this.setHeaderText("Search for a car");
 	
 	
 		

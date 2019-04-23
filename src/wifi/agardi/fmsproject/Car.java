@@ -1,5 +1,6 @@
 package wifi.agardi.fmsproject;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Car {
@@ -11,20 +12,43 @@ public class Car {
 	private Color carColor;
 	private FuelType carFuelType;
 	private Transmission carTransmission;
-	private int carManufYear;
-	private int carManufMonth;
+	private LocalDate carManufDate;
 	private int carKM;
 	private int carEngineSize;
 	private int carEnginePower;
-	private double carPreisProDay;
 	private boolean carIsOnRent;
-	private ArrayList<String> carExtras;
+	private ArrayList<Extras> carExtras;
 	private ArrayList<String> carDamages;
 	
 	
 	public Car() {
 		super();
 	}
+
+
+	
+
+
+	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, Categorie carCategorie,
+			Color carColor, FuelType carFuelType, Transmission carTransmission, LocalDate carManufDate, int carKM,
+			int carEngineSize, int carEnginePower) {
+		super();
+		this.carVinNumber = carVinNumber;
+		this.carLicensePlate = carLicensePlate;
+		this.carBrand = carBrand;
+		this.carModel = carModel;
+		this.carCategorie = carCategorie;
+		this.carColor = carColor;
+		this.carFuelType = carFuelType;
+		this.carTransmission = carTransmission;
+		this.carManufDate = carManufDate;
+		this.carKM = carKM;
+		this.carEngineSize = carEngineSize;
+		this.carEnginePower = carEnginePower;
+	}
+
+
+
 
 
 	public String getCarVinNumber() {
@@ -107,23 +131,13 @@ public class Car {
 	}
 
 
-	public int getCarManufYear() {
-		return carManufYear;
+	public LocalDate getCarManufDate() {
+		return carManufDate;
 	}
 
 
-	public void setCarManufYear(int carManufYear) {
-		this.carManufYear = carManufYear;
-	}
-
-
-	public int getCarManufMonth() {
-		return carManufMonth;
-	}
-
-
-	public void setCarManufMonth(int carManufMonth) {
-		this.carManufMonth = carManufMonth;
+	public void setCarManufDate(LocalDate carManufDate) {
+		this.carManufDate = carManufDate;
 	}
 
 
@@ -155,16 +169,7 @@ public class Car {
 	public void setCarEnginePower(int carEnginePower) {
 		this.carEnginePower = carEnginePower;
 	}
-
-
-	public double getCarPreisProDay() {
-		return carPreisProDay;
-	}
-
-
-	public void setCarPreisProDay(double carPreisProDay) {
-		this.carPreisProDay = carPreisProDay;
-	}
+	
 
 
 	public boolean isCarIsOnRent() {
@@ -177,12 +182,12 @@ public class Car {
 	}
 
 
-	public ArrayList<String> getCarExtras() {
+	public ArrayList<Extras> getCarExtras() {
 		return carExtras;
 	}
 
 
-	public void setCarExtras(ArrayList<String> carExtras) {
+	public void setCarExtras(ArrayList<Extras> carExtras) {
 		this.carExtras = carExtras;
 	}
 
