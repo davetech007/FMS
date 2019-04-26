@@ -1,16 +1,17 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
-
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -26,8 +27,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -59,6 +58,9 @@ public class Main extends Application {
 	Image iconRemoveDamage = new Image(Main.class.getResource("/Remove.png").toExternalForm(), 21, 21, true, true);	
 	Image iconPrintPdf = new Image(Main.class.getResource("/Printpdf.png").toExternalForm(), 30, 30, true, true);
 	Image iconReturnCar = new Image(Main.class.getResource("/ReturnCar.png").toExternalForm(), 30, 30, true, true);
+	
+	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
+	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -251,11 +253,23 @@ public class Main extends Application {
 	
 	
 	
+	public ArrayList<String> categoriesList(){
+		ArrayList<String> categoryNames = new ArrayList<>();
+		try {
+			for(String key: Database.readCarCategoriesTable().keySet()) {
+				categoryNames.add(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the reading of car categories table from database");
+			e.printStackTrace();
+		}
+		return categoryNames;
+	}
 	
+
 	
 	
 	public BorderPane openReserveMenu() {
-		
 			BorderPane reserveBP = new BorderPane();
 			
 			GridPane reserveGP = new GridPane();
@@ -369,7 +383,8 @@ public class Main extends Application {
 			});
 			reserveGP.add(searchCarButton, 3, 0);
 					
-			ComboBox<Categorie> carComboBox = new ComboBox<>(FXCollections.observableArrayList(Categorie.values()));
+			ComboBox<String> carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
+			
 			carComboBox.setPrefWidth(195);
 			carComboBox.setPromptText("Reserve only a category");
 			reserveGP.add(carComboBox, 4, 0);
@@ -485,6 +500,23 @@ public class Main extends Application {
 			saveCustomerButton.setPrefSize(110, 40);
 			saveCustomerButton.setGraphic(new ImageView(iconSave));
 			
+			ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
+					.or(lastNameTF.textProperty().isEmpty())
+					.or(dateBornPicker.valueProperty().isNull())
+					.or(landComboBox.valueProperty().isNull())
+					.or(passportTF.textProperty().isEmpty())
+					.or(dLicenseTF.textProperty().isEmpty())
+					.or(telefonTF.textProperty().isEmpty())
+					.or(emailTF.textProperty().isEmpty())
+					.or(landTF.textProperty().isEmpty())
+					.or(cityTF.textProperty().isEmpty())
+					.or(streetTF.textProperty().isEmpty())
+					.or(housenrTF.textProperty().isEmpty())
+					.or(postCodeTF.textProperty().isEmpty());
+					
+			saveCustomerButton.disableProperty().bind(custObs);
+			
+			
 			Button clearPageButton = new Button("Clear");
 			clearPageButton.setPrefSize(110, 40);
 			clearPageButton.setGraphic(new ImageView(iconClearPage));
@@ -496,6 +528,10 @@ public class Main extends Application {
 			Button reserveButton = new Button("Reserve");
 			reserveButton.setPrefSize(110, 40);
 			reserveButton.setGraphic(new ImageView(iconReserve));
+//Res Button Binding			
+			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull();
+			reserveButton.disableProperty().bind(custObs);
+			reserveButton.disableProperty().bind(resObs);
 			
 			
 			HBox bottomHBoxCustomer = new HBox();
@@ -517,11 +553,10 @@ public class Main extends Application {
 	
 	
 	
-	
-	
 	public BorderPane openCarsMenu() {
+		Label basePriceLB = new Label("Base price = ");
 		    BorderPane carsBP = new BorderPane();
-		  
+		 
 		    GridPane carsGP = new GridPane();
 		    carsGP.setAlignment(Pos.CENTER_RIGHT);
 		    carsGP.setHgap(15);
@@ -576,12 +611,25 @@ public class Main extends Application {
 		    
 		    
 //ComboB
-		    ComboBox<FuelType> carFuelBox = new ComboBox<>(FXCollections.observableArrayList(FuelType.values()));
+		    ComboBox<String> carFuelBox = new ComboBox<>();
+		    try {
+				carFuelBox.setItems(FXCollections.observableArrayList(Database.readCarFuelTypeTable()));
+			} catch (SQLException e1) {
+				System.out.println("Fuel types database to combobox adding failed...");
+				e1.printStackTrace();
+			}
 		    carFuelBox.setPrefWidth(195);
 		    carFuelBox.setPromptText("Fuel");
 		    carsGP.add(carFuelBox, 0, 5);
-		    
-		    ComboBox<Transmission> carTransmBox = new ComboBox<>(FXCollections.observableArrayList(Transmission.values()));
+
+		   
+		    ComboBox<String> carTransmBox = new ComboBox<>();
+		    try {
+		    	carTransmBox.setItems(FXCollections.observableArrayList(Database.readCarTransmissionTypeTable()));
+		    } catch (SQLException e1) {
+				System.out.println("Transmission types database to combobox adding failed...");
+				e1.printStackTrace();
+			}
 		    carTransmBox.setPrefWidth(195);
 		    carTransmBox.setPromptText("Transmission");
 		    carsGP.add(carTransmBox, 0, 6);
@@ -613,10 +661,29 @@ public class Main extends Application {
     
 		
 //Right side		
-		    ComboBox<Categorie> carCategorieBox = new ComboBox<>(FXCollections.observableArrayList(Categorie.values()));
+		    ComboBox<String> carCategorieBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 		    carCategorieBox.setPrefWidth(195);
 		    carCategorieBox.setPromptText("Category");
 		    carsGP.add(carCategorieBox, 1, 1);
+		    
+
+		    carCategorieBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					int price = 0;
+					try {
+						for(String key: Database.readCarCategoriesTable().keySet()) {
+							if(newValue.equals(key))
+							price = Database.readCarCategoriesTable().get(key);
+						}
+						basePriceLB.setText("Base price = " + price + " EUR / Day");
+					} catch (SQLException e) {
+						System.out.println("Something is wrong with the reading of car categories table price from database");
+						e.printStackTrace();
+					}
+				}
+			});
+		   
 		    
 		    TextField licPlateTF = new TextField();
 		    licPlateTF.setPromptText("License plate nr.");
@@ -625,8 +692,17 @@ public class Main extends Application {
 		    TextField vinNumTF = new TextField();
 		    vinNumTF.setPromptText("VIN number");
 		    carsGP.add(vinNumTF, 1, 3);
+
 		    
-		    ComboBox<Color> carColorBox = new ComboBox<>(FXCollections.observableArrayList(Color.values()));
+		    ComboBox<String> carColorBox = new ComboBox<>();
+		    try {
+		    	carColorBox.setItems(FXCollections.observableArrayList(Database.readCarColorsTable()));
+		    } catch (SQLException e1) {
+				System.out.println("Color types database to combobox adding failed...");
+				e1.printStackTrace();
+			}
+		    
+		    
 		    carColorBox.setPrefWidth(195);
 		    carColorBox.setPromptText("Color");
 		    carsGP.add(carColorBox, 1, 4);
@@ -648,6 +724,7 @@ public class Main extends Application {
 		    Label powerLB = new Label("KW"); 
 		    engineHB.getChildren().addAll(engineSizeTF,ccmLB,enginePowerTF,powerLB);
 		    carsGP.add(engineHB, 1, 6);
+		    
 		    //Only numbers for engine    
 		    engineSizeTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
@@ -668,26 +745,28 @@ public class Main extends Application {
 		    
 		    
 	
-//Extras TODO		
+//Extras LISVIEW CHECKBOX		
 		    Label extrasLB = new Label("Extras");
 		    carsGP.add(extrasLB, 1, 7);
 		    
-		    ListView<Extras> extrasLV = new ListView<>();
+		    HashMap<String, ObservableValue<Boolean>> extrasMap = new HashMap<>();
+		    for(Extras e : Extras.values()) {
+		    extrasMap.put(e.getName(), new SimpleBooleanProperty(false));
+		    }
 		    
-//		    Callback<Extras, ObservableValue<Boolean>> itemToBoolean = (Extras item) -> Extras.values());
-//		    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
- 
-		    extrasLV.setItems(FXCollections.observableArrayList(Extras.values()));
-		    extrasLV.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		    ListView<String> extrasLV = new ListView<>();
+		    extrasLV.setEditable(true);
+		    extrasLV.getItems().addAll(extrasMap.keySet());
+		    
+		    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> extrasMap.get(item);
+		    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
 		    extrasLV.setPrefSize(195, 130);
 		    carsGP.add(extrasLV, 1, 8);
 		    
 //Price		    
-		    Label basePriceLB = new Label("Base price/day = ");
 		    carsGP.add(basePriceLB, 1, 9);
 		    
-		    
-		    
+	
 //ACTION		    
 		    
 //		    name.setOnKeyTyped(e -> login.setDisable(name.getText().length() > 0 ? false : true));
@@ -735,13 +814,14 @@ public class Main extends Application {
 	
 	
 	
+	
 	public VBox showCarsTableView() {
 				VBox carsLeftVBox = new VBox();
 				carsLeftVBox.setSpacing(5);
 //Searching		
 				Label carSearchLB = new Label("Search for a car"); 
 				
-				ComboBox<Categorie> carSearchBox = new ComboBox<>(FXCollections.observableArrayList(Categorie.values()));
+				ComboBox<String> carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 				carSearchBox.setPrefWidth(170);
 				carSearchBox.setPromptText("Choose category");
 				
@@ -766,12 +846,13 @@ public class Main extends Application {
 	
 	
 	
+	
 	public TableView<CarFX> carsTableView() {
 //TableView			
 			TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
 			categorieCol.setPrefWidth(80);
 			categorieCol.setMinWidth(30);
-		    categorieCol.setCellValueFactory(new PropertyValueFactory<>("carCategorie"));
+		    categorieCol.setCellValueFactory(new PropertyValueFactory<>("carCategory"));
 		
 			TableColumn<CarFX, String> markeCol = new TableColumn<>("Brand");
 			markeCol.setPrefWidth(110);
@@ -799,7 +880,7 @@ public class Main extends Application {
 		    onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
 		    
 		   
-		    TableView<CarFX> carsTableView = new TableView<>();
+		    TableView<CarFX> carsTableView = new TableView<>(observCar);
 			carsTableView.setPrefHeight(570);
 			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 			carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -807,6 +888,7 @@ public class Main extends Application {
 			return carsTableView;
 		
 	}
+	
 	
 	
 	public BorderPane openReservationsMenu() {
@@ -923,7 +1005,17 @@ public class Main extends Application {
 		try {
 			Database.createUsersTable();
 			System.out.println("Created users table, or already exists");
+			Database.createCarCategoriesTable();
+			System.out.println("Created car categories table, or alresy exists");
+			Database.createCarFuelTypeTable();
+			System.out.println("Created car fuel types table, or already exists");
+			Database.createCarTransmissionTypeTable();
+			System.out.println("Created car transmission types table, or already exists");
+			Database.createCarColorsTable();
+			System.out.println("Created car color types table, or already exists");
+		
 		} catch (SQLException e) {
+			System.out.println(e);
 			e.printStackTrace();
 		}
 	

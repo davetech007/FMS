@@ -19,8 +19,10 @@ public class CarFX {
 	private StringProperty carLicensePlate;
 	private StringProperty carBrand;
 	private StringProperty carModel;
-	private ObjectProperty<Categorie> carCategorie;
-	private ObjectProperty<FuelType> carFuelType;
+	private StringProperty carCategory;
+	private StringProperty carColor;
+	private StringProperty carFuelType;
+	private StringProperty carTransmission;
 	private ObjectProperty<LocalDate> carManufDate;
 	private IntegerProperty carKM;
 	private IntegerProperty carEngineSize;
@@ -36,8 +38,10 @@ public class CarFX {
 		carLicensePlate = new SimpleStringProperty(car.getCarLicensePlate());
 		carBrand = new SimpleStringProperty(car.getCarBrand());
 		carModel = new SimpleStringProperty(car.getCarModel());
-		carCategorie = new SimpleObjectProperty<>(car.getCarCategorie());
-		carFuelType = new SimpleObjectProperty<>(car.getCarFuelType());
+		carCategory = new SimpleStringProperty(car.getCarCategory());
+		carColor = new SimpleStringProperty(car.getCarColor());
+		carFuelType = new SimpleStringProperty(car.getCarFuelType());
+		carTransmission = new SimpleStringProperty(car.getCarTransmission());
 		carManufDate = new SimpleObjectProperty<>(car.getCarManufDate());
 		carKM = new SimpleIntegerProperty(car.getCarKM());
 		carEngineSize = new SimpleIntegerProperty(car.getCarEngineSize());
@@ -110,32 +114,61 @@ public class CarFX {
 	
 	
 	
-	
-	
-	public Categorie getCarCategorie() {
-		return carCategorie.get();
+	public String getCarCategory() {
+		return carCategory.get();
 	}
-	public void setCarCategorie(Categorie v) {
-		carCategorie.set(v);
-		modellObject.setCarCategorie(v);
+	public void setCarCategory(String v) {
+		carCategory.set(v);
+		modellObject.setCarCategory(v);
 	}
-	public ObjectProperty<Categorie> carCategorieProperty() {
-		return carCategorie;
+	public StringProperty carCategoryProperty() {
+		return carCategory;
 	}
 	
 	
 	
 	
 	
-	public FuelType getCarFuelType() {
+	public String getCarColor() {
+		return carColor.get();
+	}
+	public void setCarColor(String v) {
+		carColor.set(v);
+		modellObject.setCarColor(v);
+	}
+	public StringProperty carColorProperty() {
+		return carColor;
+	}
+	
+	
+	
+	
+	
+	public String getCarFuelType() {
 		return carFuelType.get();
 	}
-	public void setCarFuelType(FuelType v) {
+	public void setCarFuelType(String v) {
 		carFuelType.set(v);
 		modellObject.setCarFuelType(v);
 	}
-	public ObjectProperty<FuelType> carFuelTypeProperty() {
+	public StringProperty carFuelTypeProperty() {
 		return carFuelType;
+	}
+	
+	
+	
+	
+	
+	
+	public String getCarTransmission() {
+		return carTransmission.get();
+	}
+	public void setCarTransmission(String v) {
+		carTransmission.set(v);
+		modellObject.setCarTransmission(v);
+	}
+	public StringProperty carTransmissionProperty() {
+		return carTransmission;
 	}
 	
 	

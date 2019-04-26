@@ -8,10 +8,10 @@ public class Car {
 	private String carLicensePlate;
 	private String carBrand;
 	private String carModel;
-	private Categorie carCategorie;
-	private Color carColor;
-	private FuelType carFuelType;
-	private Transmission carTransmission;
+	private String carCategory;
+	private String carColor;
+	private String carFuelType;
+	private String carTransmission;
 	private LocalDate carManufDate;
 	private int carKM;
 	private int carEngineSize;
@@ -29,15 +29,15 @@ public class Car {
 	
 
 
-	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, Categorie carCategorie,
-			Color carColor, FuelType carFuelType, Transmission carTransmission, LocalDate carManufDate, int carKM,
+	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
+			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
 			int carEngineSize, int carEnginePower) {
 		super();
 		this.carVinNumber = carVinNumber;
 		this.carLicensePlate = carLicensePlate;
 		this.carBrand = carBrand;
 		this.carModel = carModel;
-		this.carCategorie = carCategorie;
+		this.carCategory = carCategory;
 		this.carColor = carColor;
 		this.carFuelType = carFuelType;
 		this.carTransmission = carTransmission;
@@ -91,42 +91,42 @@ public class Car {
 	}
 
 
-	public Categorie getCarCategorie() {
-		return carCategorie;
+	public String getCarCategory() {
+		return carCategory;
 	}
 
 
-	public void setCarCategorie(Categorie carCategorie) {
-		this.carCategorie = carCategorie;
+	public void setCarCategory(String carCategory) {
+		this.carCategory = carCategory;
 	}
 
 
-	public Color getCarColor() {
+	public String getCarColor() {
 		return carColor;
 	}
 
 
-	public void setCarColor(Color carColor) {
+	public void setCarColor(String carColor) {
 		this.carColor = carColor;
 	}
 
 
-	public FuelType getCarFuelType() {
+	public String getCarFuelType() {
 		return carFuelType;
 	}
 
 
-	public void setCarFuelType(FuelType carFuelType) {
+	public void setCarFuelType(String carFuelType) {
 		this.carFuelType = carFuelType;
 	}
 
 
-	public Transmission getCarTransmission() {
+	public String getCarTransmission() {
 		return carTransmission;
 	}
 
 
-	public void setCarTransmission(Transmission carTransmission) {
+	public void setCarTransmission(String carTransmission) {
 		this.carTransmission = carTransmission;
 	}
 
