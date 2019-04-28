@@ -13,10 +13,11 @@ import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew";
+	public static final String DBlocation = "DatabaseTestNew2";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
 	public static final String usersTable = "UsersNew";
+	public static final String userIDCol = "User_ID";
 	public static final String userNameCol = "Username";
 	public static final String passwordCol = "Password";
 	
@@ -44,12 +45,38 @@ public class Database {
 	
 	
 	
+	public static final String featuresTable = "Features";
+	public static final String featureIDCol = "Feature_ID";
+	public static final String featureNameCol = "FeatureName";
+	
+	public static final String carFeaturesTable = "CarFeatures";
+	public static final String carFeaturesIDCol = "CarFeatures_ID";
+	
+	
+	public static final String carsTable = "Cars";
+	public static final String vinNumberIDCol = "VinNumber_ID";
+	public static final String licensePlateCol = "LicensePlate";
+	public static final String brandCol = "Brand";
+	public static final String modelCol = "Model";
+	public static final String categoryCol = "Category_ID";
+	public static final String colorCol = "Color_ID";
+	public static final String fuelTypeCol = "FuelType_ID";
+	public static final String transmissionCol = "Transmission_ID";
+	public static final String manufactureDateCol = "ManufactureDate";
+	public static final String actualKMCol = "ActualKM";
+	public static final String engineSizeCol = "EngineSize";
+	public static final String enginePowerCol = "EnginePower";
+	public static final String isOnRentCol = "IsOnRent";
+	
+	
+	
 //USERS TABLE	
 	public static void createUsersTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + usersTable + "(" +
+						 userIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
 				         userNameCol + " VARCHAR(50), " +
 				         passwordCol + " VARCHAR(50))";
 		try {
@@ -201,7 +228,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + categoriesTable + "(" +
 						categoryIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						categoryNameCol + " VARCHAR(50), "+ categoryPriceCol +" INTEGER)";
+						categoryNameCol + " VARCHAR(30), "+ categoryPriceCol +" INTEGER)";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, categoriesTable.toUpperCase(), new String[] {"TABLE"});
@@ -312,7 +339,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + fuelTypesTable + "(" +
 						fuelTypeIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						fuelTypeNameCol + " VARCHAR(50))";
+						fuelTypeNameCol + " VARCHAR(30))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, fuelTypesTable.toUpperCase(), new String[] {"TABLE"});
@@ -410,7 +437,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + transmissionsTable + "(" +
 						transmissionIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						transmissionTypeCol + " VARCHAR(50))";
+						transmissionTypeCol + " VARCHAR(30))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, transmissionsTable.toUpperCase(), new String[] {"TABLE"});
@@ -508,7 +535,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + colorsTable + "(" +
 						colorIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						colorNameCol + " VARCHAR(50))";
+						colorNameCol + " VARCHAR(30))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, colorsTable.toUpperCase(), new String[] {"TABLE"});
@@ -597,6 +624,138 @@ public class Database {
 	   }
 	
 	
+	
+	
+	
+	
+	
+	
+	public static void createFeaturesTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + featuresTable + "(" +
+						featureIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+						featureNameCol + " VARCHAR(40))";
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, featuresTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createFeaturesTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	
+	
+	public static void createCarFeaturesTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + carFeaturesTable + "(" +
+						carFeaturesIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+						vinNumberIDCol + " INTEGER, "+
+						featureIDCol + " INTEGER, " +
+						"CONSTRAINT FK_" + carFeaturesTable + "_" + carsTable + " FOREIGN KEY (" + vinNumberIDCol + 
+											") REFERENCES " + carsTable + "(" + vinNumberIDCol +"), "+
+						"CONSTRAINT FK_" + carFeaturesTable + "_" + featuresTable + " FOREIGN KEY (" + featureIDCol + 
+											") REFERENCES " + featuresTable + "(" + featureIDCol +"))";
+						
+		
+//		String create = "CREATE TABLE " + carFeaturesTable + "(" +
+//				vinNumberIDCol + " INTEGER NOT NULL, " +
+//				featureIDCol + " INTEGER NOT NULL, " +
+//				"CONSTRAINT PK_" + 
+//				carFeaturesTable + " PRIMARY KEY (" +
+//				vinNumberIDCol + ", " +
+//				featureIDCol + 
+//				"), FOREIGN KEY (" + vinNumberIDCol + ") REFERENCES " + carsTable +" (" + vinNumberIDCol + "), "+
+//				   "FOREIGN KEY (" + featureIDCol + ") REFERENCES " + featuresTable +" (" + featureIDCol + "))";
+								
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, carFeaturesTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createCarFeaturesTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+
+	
+	public static void createCarsTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + carsTable + "(" +
+						vinNumberIDCol + " VARCHAR(17) PRIMARY KEY NOT NULL, " +
+						licensePlateCol + " VARCHAR(10), " +
+						brandCol + " VARCHAR(20), " +
+						modelCol + " VARCHAR(20), " +
+						categoryCol + " INTEGER, " +
+						colorCol + " INTEGER, " +
+						fuelTypeCol + " INTEGER, " +
+						transmissionCol + " INTEGER, " +
+						manufactureDateCol + " DATE, " + 
+						actualKMCol + " INTEGER, " +
+						engineSizeCol + " INTEGER, " +
+						enginePowerCol + " INTEGER, " +
+						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, carsTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createCarsTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
 	
 	
 	

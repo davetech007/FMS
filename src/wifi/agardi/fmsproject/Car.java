@@ -17,7 +17,7 @@ public class Car {
 	private int carEngineSize;
 	private int carEnginePower;
 	private boolean carIsOnRent;
-	private ArrayList<Extras> carExtras;
+	private ArrayList<String> carExtras;
 	private ArrayList<String> carDamages;
 	
 	
@@ -182,12 +182,12 @@ public class Car {
 	}
 
 
-	public ArrayList<Extras> getCarExtras() {
+	public ArrayList<String> getCarExtras() {
 		return carExtras;
 	}
 
 
-	public void setCarExtras(ArrayList<Extras> carExtras) {
+	public void setCarExtras(ArrayList<String> carExtras) {
 		this.carExtras = carExtras;
 	}
 

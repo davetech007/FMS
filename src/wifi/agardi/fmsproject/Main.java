@@ -692,6 +692,12 @@ public class Main extends Application {
 		    TextField vinNumTF = new TextField();
 		    vinNumTF.setPromptText("VIN number");
 		    carsGP.add(vinNumTF, 1, 3);
+		    //All the VIN numbers are max 17 characters
+		    vinNumTF.setOnKeyTyped(e -> {
+		    	int maxChar = 17;
+		    	if(vinNumTF.getText().length() == maxChar) 
+		    	e.consume();
+		    });
 
 		    
 		    ComboBox<String> carColorBox = new ComboBox<>();
@@ -745,23 +751,23 @@ public class Main extends Application {
 		    
 		    
 	
-//Extras LISVIEW CHECKBOX		
-		    Label extrasLB = new Label("Extras");
-		    carsGP.add(extrasLB, 1, 7);
+//Features LISVIEW CHECKBOX		
+		    Label featuresLB = new Label("Features");
+		    carsGP.add(featuresLB, 1, 7);
 		    
-		    HashMap<String, ObservableValue<Boolean>> extrasMap = new HashMap<>();
+		    HashMap<String, ObservableValue<Boolean>> featuresMap = new HashMap<>();
 		    for(Extras e : Extras.values()) {
-		    extrasMap.put(e.getName(), new SimpleBooleanProperty(false));
+		    featuresMap.put(e.getName(), new SimpleBooleanProperty(false));
 		    }
 		    
-		    ListView<String> extrasLV = new ListView<>();
-		    extrasLV.setEditable(true);
-		    extrasLV.getItems().addAll(extrasMap.keySet());
+		    ListView<String> featuresLV = new ListView<>();
+		    featuresLV.setEditable(true);
+		    featuresLV.getItems().addAll(featuresMap.keySet());
 		    
-		    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> extrasMap.get(item);
-		    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
-		    extrasLV.setPrefSize(195, 130);
-		    carsGP.add(extrasLV, 1, 8);
+		    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> featuresMap.get(item);
+		    featuresLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
+		    featuresLV.setPrefSize(195, 130);
+		    carsGP.add(featuresLV, 1, 8);
 		    
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
@@ -1013,7 +1019,12 @@ public class Main extends Application {
 			System.out.println("Created car transmission types table, or already exists");
 			Database.createCarColorsTable();
 			System.out.println("Created car color types table, or already exists");
-		
+			Database.createCarsTable();
+			System.out.println("Created cars table, or already exists");
+			Database.createFeaturesTable();
+			System.out.println("Created features table, or already exists");
+		   // Database.createCarFeaturesTable();
+			//System.out.println("Created car features junction table, or already exists");
 		} catch (SQLException e) {
 			System.out.println(e);
 			e.printStackTrace();
