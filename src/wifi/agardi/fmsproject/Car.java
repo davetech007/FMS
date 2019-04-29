@@ -31,7 +31,7 @@ public class Car {
 
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
 			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
-			int carEngineSize, int carEnginePower) {
+			int carEngineSize, int carEnginePower, boolean carIsOnRent) {
 		super();
 		this.carVinNumber = carVinNumber;
 		this.carLicensePlate = carLicensePlate;
@@ -45,6 +45,7 @@ public class Car {
 		this.carKM = carKM;
 		this.carEngineSize = carEngineSize;
 		this.carEnginePower = carEnginePower;
+		this.carIsOnRent = carIsOnRent;
 	}
 
 

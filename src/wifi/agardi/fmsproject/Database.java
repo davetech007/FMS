@@ -2,21 +2,25 @@ package wifi.agardi.fmsproject;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew2";
+	public static final String DBlocation = "DatabaseTestNew5";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
-	public static final String usersTable = "UsersNew";
+	public static final String usersTable = "Users";
 	public static final String userIDCol = "User_ID";
 	public static final String userNameCol = "Username";
 	public static final String passwordCol = "Password";
@@ -42,7 +46,6 @@ public class Database {
 	public static final String colorNameCol = "ColorName";
 	private static final String[] colors = {"Beige", "Black", "Blue", "Gold", "Gray", "Green", "Orange", 
 											"Purple", "Red", "Silver", "Yellow", "White" };
-	
 	
 	
 	public static final String featuresTable = "Features";
@@ -219,7 +222,8 @@ public class Database {
 		return false;
 	}
 	
-
+    
+	
 	
 //CATEGORIES TABLE	
 	public static void createCarCategoriesTable() throws SQLException {
@@ -238,17 +242,17 @@ public class Database {
 			stmt = conn.createStatement();
 			stmt.executeUpdate(create);
 			LinkedHashMap<String, Integer> categories = new LinkedHashMap<>();
-				categories.put("M-Mini", 30);
-				categories.put("A-Small", 40);
-				categories.put("B-Economy", 50);
-				categories.put("C-Midsize", 60);
-				categories.put("D-Fullsize", 75);
-				categories.put("F-Premium", 95);
-				categories.put("P-Luxus", 125);
-				categories.put("S-Minivan", 105);
-				categories.put("V-FullsizeVan", 125);
-				categories.put("R-Convertible", 150);
-				categories.put("X-SUV", 140);
+				categories.put("M_Mini", 30);
+				categories.put("A_Small", 40);
+				categories.put("B_Economy", 50);
+				categories.put("C_Midsize", 60);
+				categories.put("D_Fullsize", 75);
+				categories.put("F_Premium", 95);
+				categories.put("P_Luxus", 125);
+				categories.put("S_Minivan", 105);
+				categories.put("V_FullsizeVan", 125);
+				categories.put("R_Convertible", 150);
+				categories.put("X_SUV", 140);
 			for(String key: categories.keySet()) {
 				Integer price = categories.get(key);
 				addCarCategory(key, price);
@@ -330,6 +334,76 @@ public class Database {
 		  }
 		  return categories;
 	   }
+	
+
+	public static int readCarCategoriesID(String catName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int categoryID =  0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + categoryIDCol + " FROM " +
+									categoriesTable + " WHERE " + categoryNameCol + " = '" + catName + "'");
+			if(rs.next()) {
+				categoryID = rs.getInt(categoryIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarCategoriesID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return categoryID;
+	   }
+	
+	
+	public static String readCarCategoryName(int catID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String catName =  "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + categoryNameCol + " FROM " +
+									categoriesTable + " WHERE " + categoryIDCol + " = " + catID);
+			if(rs.next()) {
+				catName = rs.getString(categoryNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarCategoryName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return catName;
+	   }
+	
+	
 	
 	
 //FUEL TYPE TABLE	
@@ -429,6 +503,74 @@ public class Database {
 	   }
 	
 	
+	public static int readFuelTypeID(String fuelName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int fuelID =  0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + fuelTypeIDCol + " FROM " +
+									fuelTypesTable + " WHERE " + fuelTypeNameCol + " = '" + fuelName + "'");
+			if(rs.next()) {
+				fuelID = rs.getInt(fuelTypeIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readFuelTypeID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return fuelID;
+	   }
+	
+	
+	public static String readFuelTypeName(int fuelID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String fuelName =  "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + fuelTypeNameCol + " FROM " +
+									fuelTypesTable + " WHERE " + fuelTypeIDCol + " = " + fuelID);
+			if(rs.next()) {
+				fuelName = rs.getString(fuelTypeNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readFuelTypeName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return fuelName;
+	   }
+
+	
 	
 //TRANSMISSION TYPE TABLE	
 	public static void createCarTransmissionTypeTable() throws SQLException {
@@ -527,6 +669,75 @@ public class Database {
 	   }
 		
 	
+	public static int readTransmissionID(String transmName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int transmID =  0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + transmissionIDCol + " FROM " +
+									transmissionsTable + " WHERE " + transmissionTypeCol + " = '" + transmName + "'");
+			if(rs.next()) {
+				transmID = rs.getInt(transmissionIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readTransmissionID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return transmID;
+	   }
+
+	
+	public static String readTransmissionName(int transID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String transName =  "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + transmissionTypeCol + " FROM " +
+									transmissionsTable + " WHERE " + transmissionIDCol + " = " + transID);
+			if(rs.next()) {
+				transName = rs.getString(transmissionTypeCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readTransmissionName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return transName;
+	   }
+	
+	
+	
 	
 //COLORS TABLE	
 	public static void createCarColorsTable() throws SQLException {
@@ -624,12 +835,76 @@ public class Database {
 	   }
 	
 	
+	public static int readColorID(String colorName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int colorID =  0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + colorIDCol + " FROM " +
+									colorsTable + " WHERE " + colorNameCol + " = '" + colorName + "'");
+			if(rs.next()) {
+				colorID = rs.getInt(colorIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readTColorID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return colorID;
+	   }
+	
+	
+	public static String readColorName(int colorID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String colorName =  "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + colorNameCol + " FROM " +
+									colorsTable + " WHERE " + colorIDCol + " = " + colorID);
+			if(rs.next()) {
+				colorName = rs.getString(colorNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readColorName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return colorName;
+	   }
 	
 	
 	
-	
-	
-	
+//FEATURES TABLE	
 	public static void createFeaturesTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
@@ -662,31 +937,17 @@ public class Database {
 	}
 	
 	
-	
-	
+//FEATURES JUNCTION TABLE	
 	public static void createCarFeaturesTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + carFeaturesTable + "(" +
-						carFeaturesIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						vinNumberIDCol + " INTEGER, "+
-						featureIDCol + " INTEGER, " +
-						"CONSTRAINT FK_" + carFeaturesTable + "_" + carsTable + " FOREIGN KEY (" + vinNumberIDCol + 
-											") REFERENCES " + carsTable + "(" + vinNumberIDCol +"), "+
-						"CONSTRAINT FK_" + carFeaturesTable + "_" + featuresTable + " FOREIGN KEY (" + featureIDCol + 
-											") REFERENCES " + featuresTable + "(" + featureIDCol +"))";
-						
-		
-//		String create = "CREATE TABLE " + carFeaturesTable + "(" +
-//				vinNumberIDCol + " INTEGER NOT NULL, " +
-//				featureIDCol + " INTEGER NOT NULL, " +
-//				"CONSTRAINT PK_" + 
-//				carFeaturesTable + " PRIMARY KEY (" +
-//				vinNumberIDCol + ", " +
-//				featureIDCol + 
-//				"), FOREIGN KEY (" + vinNumberIDCol + ") REFERENCES " + carsTable +" (" + vinNumberIDCol + "), "+
-//				   "FOREIGN KEY (" + featureIDCol + ") REFERENCES " + featuresTable +" (" + featureIDCol + "))";
+				carFeaturesIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+				vinNumberIDCol + " VARCHAR(17), "+
+				featureIDCol + " INTEGER, " +
+				"FOREIGN KEY (" + vinNumberIDCol + ") REFERENCES " + carsTable +" (" + vinNumberIDCol + "), " +
+				"FOREIGN KEY (" + featureIDCol + ") REFERENCES " + featuresTable +" (" + featureIDCol + "))";
 								
 		try {
 			conn = DriverManager.getConnection(connString);
@@ -711,16 +972,15 @@ public class Database {
 			}
 	    }
 	}
-	
-	
 
 	
+//CARS TABLE	
 	public static void createCarsTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + carsTable + "(" +
-						vinNumberIDCol + " VARCHAR(17) PRIMARY KEY NOT NULL, " +
+						vinNumberIDCol + " VARCHAR(17), " +
 						licensePlateCol + " VARCHAR(10), " +
 						brandCol + " VARCHAR(20), " +
 						modelCol + " VARCHAR(20), " +
@@ -732,7 +992,13 @@ public class Database {
 						actualKMCol + " INTEGER, " +
 						engineSizeCol + " INTEGER, " +
 						enginePowerCol + " INTEGER, " +
-						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL)";
+						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, "+ 
+						"PRIMARY KEY (" + vinNumberIDCol + "), " +
+						"FOREIGN KEY (" + categoryCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
+						"FOREIGN KEY (" + colorCol + ") REFERENCES " + colorsTable + "(" + colorIDCol + "), " +
+						"FOREIGN KEY (" + fuelTypeCol + ") REFERENCES " + fuelTypesTable + "(" + fuelTypeIDCol + "), " +
+						"FOREIGN KEY (" + transmissionCol + ") REFERENCES " + transmissionsTable + "(" + transmissionIDCol + "))";
+					
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, carsTable.toUpperCase(), new String[] {"TABLE"});
@@ -759,9 +1025,115 @@ public class Database {
 	
 	
 	
+	public static void addNewCar(Car car) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+//		String add = "INSERT INTO " + carsTable + " (" + 
+//					vinNumberIDCol + 
+//					licensePlateCol +
+//					brandCol +
+//					modelCol +
+//					categoryCol +
+//					colorCol +
+//					fuelTypeCol +
+//					transmissionCol +
+//					manufactureDateCol +
+//					actualKMCol +
+//					engineSizeCol +
+//					enginePowerCol + 
+//					isOnRentCol + 
+//					") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		
+		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			
+			pstmt.setString(1, car.getCarVinNumber());
+			pstmt.setString(2, car.getCarLicensePlate());
+			pstmt.setString(3, car.getCarBrand());
+			pstmt.setString(4, car.getCarModel());
+			pstmt.setInt(5, readCarCategoriesID(car.getCarCategory()));
+			pstmt.setInt(6, readColorID(car.getCarColor()));
+			pstmt.setInt(7, readFuelTypeID(car.getCarFuelType()));
+			pstmt.setInt(8, readTransmissionID(car.getCarTransmission()));
+			LocalDateTime date = LocalDateTime.of(car.getCarManufDate().getYear(),
+												  car.getCarManufDate().getMonth(),
+												  car.getCarManufDate().getDayOfMonth(),0,0,0,0);
+			java.sql.Date sqldate = new java.sql.Date(date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setDate(9, sqldate);
+			pstmt.setInt(10, car.getCarKM());
+			pstmt.setInt(11, car.getCarEngineSize());
+			pstmt.setInt(12, car.getCarEnginePower());
+			pstmt.setBoolean(13, false);
+			
+			pstmt.executeUpdate();
+			System.out.println("Car added successfully");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addNewCar database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
 	
 	
 	
+	public static ArrayList<Car> readCarCarsTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<Car> cars = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + carsTable);
+			while(rs.next()) {
+				java.sql.Date sqlDate = rs.getDate(manufactureDateCol);
+				java.time.LocalDate locDate = sqlDate.toLocalDate();
 	
+				Car car = new Car(rs.getString(vinNumberIDCol), 
+								  rs.getString(licensePlateCol),
+								  rs.getString(brandCol),
+								  rs.getString(modelCol),
+								  readCarCategoryName(rs.getInt(categoryIDCol)),
+								  readColorName(rs.getInt(colorIDCol)),
+								  readFuelTypeName(rs.getInt(fuelTypeIDCol)),
+								  readTransmissionName(rs.getInt(transmissionIDCol)),
+								  locDate,
+								  rs.getInt(actualKMCol),
+								  rs.getInt(engineSizeCol),
+								  rs.getInt(enginePowerCol),
+								  rs.getBoolean(isOnRentCol));
+				cars.add(car);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarsTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return cars;
+	   }
 	
 }

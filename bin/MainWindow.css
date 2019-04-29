@@ -1,6 +1,14 @@
 
-.root{
-	-fx-background-image: url("EverlastingSky.png");
+.root *{
+	-fx-font-family: "Segoe UI Light";
+}
+
+.button {
+    -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+}
+
+.root {
+	-fx-background-image: url("PremiumWhite.png");
 	-fx-background-size: cover;
 }
 
@@ -25,10 +33,29 @@
     -fx-tab-min-width: 230.0px;
 }
 
+
+
+.tab-pane .tab {
+    -fx-background-color: transparent
+}
+
 .tab .tab-label{
-    -fx-text-fill: #015363;
+    -fx-text-fill: #1e1003;
     -fx-alignment: center;
 }
+
+.tab:selected .focus-indicator {
+	-fx-border-color: transparent
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+      
+}
+.tab:selected .tab-label {
+     -fx-text-fill: #1e1003;
+}
+
 
 .tab-label { 
     -fx-pref-width:200; 
@@ -36,9 +63,9 @@
 
 #mainTitle{
 	-fx-font-size: 26px;
-	-fx-font-family: "Arial Black", Gadget, sans-serif;
-    -fx-font-weight: bold;
-    -fx-text-fill: #156b7c;
+	-fx-font-family: "Segoe UI Light";
+	-fx-opacity: 1;
+    -fx-text-fill: #1e1003;
     -fx-effect: dropshadow( gaussian , rgba(255, 255, 255) , 0,0,1,1 );
 }
 

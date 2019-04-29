@@ -61,6 +61,8 @@ public class Main extends Application {
 	
 	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
 	
+	private CarFX car;
+	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -137,7 +139,7 @@ public class Main extends Application {
 				@Override
 				public void handle(ActionEvent event) {
 					try {
-						if((userNameTField.getText().length() > 2) && (passwordField.getText().length() > 2)) {
+						if((userNameTField.getText().length() > 0) && (passwordField.getText().length() > 0)) {
 						SignUpDialog signUpDialog = new SignUpDialog(userNameTField.getText(), passwordField.getText());
 						
 						if(Database.checkUser(userNameTField.getText())) {
@@ -782,7 +784,7 @@ public class Main extends Application {
 			Button deleteCarButton = new Button("Delete");
 			deleteCarButton.setPrefSize(110, 40);
 			deleteCarButton.setGraphic(new ImageView(iconDelete));
-			deleteCarButton.setDisable(true);
+			
 				
 			Button updateCarButton = new Button("Update");
 			updateCarButton.setPrefSize(110, 40);	
@@ -805,7 +807,29 @@ public class Main extends Application {
 											.or(engineSizeTF.textProperty().isEmpty())
 											.or(enginePowerTF.textProperty().isEmpty()));
 			
+			addCarButton.setOnAction(e -> {
+				try {
+					String category = carCategorieBox.getSelectionModel().getSelectedItem().toString();
+					String color = carColorBox.getSelectionModel().getSelectedItem().toString();
+					String fuel = carFuelBox.getSelectionModel().getSelectedItem().toString();
+					String transm = carTransmBox.getSelectionModel().getSelectedItem().toString();
+					int carKM = Integer.parseInt(kmTF.getText());
+					int engSize = Integer.parseInt(engineSizeTF.getText());
+					int engPower = Integer.parseInt(enginePowerTF.getText());
+					
+					car = new CarFX(new Car(vinNumTF.getText(), licPlateTF.getText(), brandTF.getText(), 
+							modellTF.getText(), category, color, fuel, transm, yearPicker.getValue(), 
+							carKM, engSize, engPower, false));
+					
+					Database.addNewCar(car.getModellObject());
+					
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+			});
 			
+			FillCarsObservableList();
 		    
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(15, 0, 0, 0));
@@ -819,6 +843,17 @@ public class Main extends Application {
 	}
 	
 	
+	public void FillCarsObservableList() {
+	  ArrayList<Car> cars = new ArrayList<>();
+		try {
+			cars = Database.readCarCarsTable();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	    for(Car c : cars) {
+	    	observCar.add(new CarFX(c));
+	    }
+	}
 	
 	
 	public VBox showCarsTableView() {
@@ -885,7 +920,7 @@ public class Main extends Application {
 		    onRentCol.setMinWidth(30);
 		    onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
 		    
-		   
+		  
 		    TableView<CarFX> carsTableView = new TableView<>(observCar);
 			carsTableView.setPrefHeight(570);
 			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
@@ -894,6 +929,9 @@ public class Main extends Application {
 			return carsTableView;
 		
 	}
+	
+	
+	
 	
 	
 	
@@ -1007,6 +1045,8 @@ public class Main extends Application {
 	
 	
 	
+	
+	
 	public static void main(String[] args) {
 		try {
 			Database.createUsersTable();
@@ -1023,8 +1063,10 @@ public class Main extends Application {
 			System.out.println("Created cars table, or already exists");
 			Database.createFeaturesTable();
 			System.out.println("Created features table, or already exists");
-		   // Database.createCarFeaturesTable();
-			//System.out.println("Created car features junction table, or already exists");
+		    Database.createCarFeaturesTable();
+			System.out.println("Created car features junction table, or already exists");
+			
+		
 		} catch (SQLException e) {
 			System.out.println(e);
 			e.printStackTrace();
