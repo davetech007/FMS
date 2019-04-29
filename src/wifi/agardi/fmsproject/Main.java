@@ -64,7 +64,7 @@ public class Main extends Application {
 	
 	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
 	
-	
+	TableView<CarFX> carsTableView;
 	
 	
 	@Override
@@ -260,6 +260,7 @@ public class Main extends Application {
 	
 	public ArrayList<String> categoriesList(){
 		ArrayList<String> categoryNames = new ArrayList<>();
+		categoryNames.add("All");
 		try {
 			for(String key: Database.readCarCategoriesTable().keySet()) {
 				categoryNames.add(key);
@@ -805,6 +806,18 @@ public class Main extends Application {
 			deleteCarButton.setPrefSize(110, 40);
 			deleteCarButton.setGraphic(new ImageView(iconDelete));
 			
+			
+
+			
+//			Car carN = carsTableView.getSelectionModel().getSelectedItem();
+//			
+//			deleteCarButton.setOnAction(e -> {
+//				if(carN != null) {
+//					Database.deleteCar(carN);
+//				}
+//			});
+			
+			
 				
 			Button updateCarButton = new Button("Update");
 			updateCarButton.setPrefSize(110, 40);	
@@ -954,7 +967,7 @@ public class Main extends Application {
 		    onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
 		    
 		  
-		    TableView<CarFX> carsTableView = new TableView<>(observCar);
+		    carsTableView = new TableView<>(observCar);
 			carsTableView.setPrefHeight(570);
 			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 			carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

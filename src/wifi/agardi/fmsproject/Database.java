@@ -1028,21 +1028,6 @@ public class Database {
 	public static void addNewCar(Car car) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-//		String add = "INSERT INTO " + carsTable + " (" + 
-//					vinNumberIDCol + 
-//					licensePlateCol +
-//					brandCol +
-//					modelCol +
-//					categoryCol +
-//					colorCol +
-//					fuelTypeCol +
-//					transmissionCol +
-//					manufactureDateCol +
-//					actualKMCol +
-//					engineSizeCol +
-//					enginePowerCol + 
-//					isOnRentCol + 
-//					") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
@@ -1170,38 +1155,25 @@ public class Database {
 	}
 	
 	
+
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public static String readCarTableOUT(String licPlateID) throws SQLException {
+	public static void deleteCar(Car car) throws SQLException {
 		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		String all = null;
+		PreparedStatement pstmt = null;
+		String delete = "DELETE FROM " + carsTable + " WHERE " + vinNumberIDCol + " = ?";
 		try {
 			conn = DriverManager.getConnection(connString);
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM "+ carsTable +
-								   " WHERE " + licensePlateCol + " = '" + licPlateID + "'");
-		    if(rs.next()) {
-		    	all = rs.getString(enginePowerCol);
-		    }
+			pstmt = conn.prepareStatement(delete);
+			pstmt.setString(1, car.getCarVinNumber());
+		    pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Something is wrong with checkExistingCar database connection");
+			System.out.println("Something is wrong with deleteCar database connection");
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null)
-				  stmt.close();
+				if(pstmt != null)
+					pstmt.close();
 				if(conn != null)
 				  conn.close();
 			}
@@ -1209,7 +1181,6 @@ public class Database {
 			throw e;
 		  }
 		}
-		return all;
 	}
 	
 	
