@@ -1088,7 +1088,7 @@ public class Database {
 	
 	
 	
-	public static ArrayList<Car> readCarCarsTable() throws SQLException{
+	public static ArrayList<Car> readCarsTable() throws SQLException{
 		  Connection conn = null;
 		  Statement stmt = null;
 		  ResultSet rs = null;
@@ -1135,5 +1135,83 @@ public class Database {
 		  }
 		  return cars;
 	   }
+	
+	
+	
+	
+	public static boolean checkExistingCar(String vinID, String licPlateID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ carsTable +
+								   " WHERE " + vinNumberIDCol + " = '" + vinID + "' OR " + 
+									licensePlateCol + " = '" + licPlateID + "'");
+		    if(rs.next()) {
+		    	return true;
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static String readCarTableOUT(String licPlateID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String all = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ carsTable +
+								   " WHERE " + licensePlateCol + " = '" + licPlateID + "'");
+		    if(rs.next()) {
+		    	all = rs.getString(enginePowerCol);
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return all;
+	}
+	
+	
 	
 }

@@ -1,6 +1,7 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
@@ -34,6 +35,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -61,7 +64,7 @@ public class Main extends Application {
 	
 	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
 	
-	private CarFX car;
+	
 	
 	
 	@Override
@@ -269,6 +272,21 @@ public class Main extends Application {
 	}
 	
 
+	
+	public void FillCarsObservableList() {
+		  ArrayList<Car> cars = new ArrayList<>();
+			try {
+				cars = Database.readCarsTable();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		    for(Car c : cars) {
+		    	observCar.add(new CarFX(c));
+		    }
+		}
+	
+	
+	
 	
 	
 	public BorderPane openReserveMenu() {
@@ -555,7 +573,11 @@ public class Main extends Application {
 	
 	
 	
+	
+	
 	public BorderPane openCarsMenu() {
+		FillCarsObservableList();
+		
 		Label basePriceLB = new Label("Base price = ");
 		    BorderPane carsBP = new BorderPane();
 		 
@@ -583,9 +605,9 @@ public class Main extends Application {
 		    brandTF.setPromptText("Brand");
 		    carsGP.add(brandTF, 0, 1);
 		    
-		    TextField modellTF = new TextField();
-		    modellTF.setPromptText("Modell");
-		    carsGP.add(modellTF, 0, 2);
+		    TextField modelTF = new TextField();
+		    modelTF.setPromptText("Modell");
+		    carsGP.add(modelTF, 0, 2);
 		    
 		    DatePicker yearPicker = new DatePicker();
 		    yearPicker.setPromptText("Manuf. date");
@@ -777,8 +799,6 @@ public class Main extends Application {
 	
 //ACTION		    
 		    
-//		    name.setOnKeyTyped(e -> login.setDisable(name.getText().length() > 0 ? false : true));
-		    
 	    
 //Bottom Buttons
 			Button deleteCarButton = new Button("Delete");
@@ -795,7 +815,7 @@ public class Main extends Application {
 			addCarButton.setPrefSize(110, 40);
 			addCarButton.setGraphic(new ImageView(iconAddCar));
 			addCarButton.disableProperty().bind(brandTF.textProperty().isEmpty()
-											.or(modellTF.textProperty().isEmpty())
+											.or(modelTF.textProperty().isEmpty())
 											.or(kmTF.textProperty().isEmpty())
 											.or(yearPicker.valueProperty().isNull())
 											.or(carFuelBox.valueProperty().isNull())
@@ -809,27 +829,45 @@ public class Main extends Application {
 			
 			addCarButton.setOnAction(e -> {
 				try {
+					String vinNumber = vinNumTF.getText();
+					String licPlate = licPlateTF.getText();
+					String brand = brandTF.getText(); 
+					String model = modelTF.getText();
 					String category = carCategorieBox.getSelectionModel().getSelectedItem().toString();
 					String color = carColorBox.getSelectionModel().getSelectedItem().toString();
 					String fuel = carFuelBox.getSelectionModel().getSelectedItem().toString();
 					String transm = carTransmBox.getSelectionModel().getSelectedItem().toString();
+					LocalDate manufDate = yearPicker.getValue();
 					int carKM = Integer.parseInt(kmTF.getText());
 					int engSize = Integer.parseInt(engineSizeTF.getText());
 					int engPower = Integer.parseInt(enginePowerTF.getText());
 					
-					car = new CarFX(new Car(vinNumTF.getText(), licPlateTF.getText(), brandTF.getText(), 
-							modellTF.getText(), category, color, fuel, transm, yearPicker.getValue(), 
-							carKM, engSize, engPower, false));
-					
-					Database.addNewCar(car.getModellObject());
-					
+					CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
+											category, color, fuel, transm, manufDate, 
+											carKM, engSize, engPower, false));
+//ALERT					
+					if(Database.checkExistingCar(vinNumber, licPlate)) {
+						new Alert(AlertType.INFORMATION, "VIN Number "+ vinNumber +
+										" or license plate " + licPlate + " already exists!").showAndWait();
+						return;
+					} else {
+						CarAddDialog carDialog = new CarAddDialog(brand, model, licPlate);
+						
+						Optional<ButtonType> result = carDialog.showAndWait();
+						if(result.isPresent())
+							if(result.get() == ButtonType.OK) {
+								Database.addNewCar(car.getModellObject());
+								observCar.add(car);
+							}
+					}	
 				} catch (SQLException e1) {
+					System.out.println("Something is wrong with the database - adding a new car");
 					e1.printStackTrace();
-				}
-				
+				}		
 			});
 			
-			FillCarsObservableList();
+			
+			    
 		    
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(15, 0, 0, 0));
@@ -843,17 +881,8 @@ public class Main extends Application {
 	}
 	
 	
-	public void FillCarsObservableList() {
-	  ArrayList<Car> cars = new ArrayList<>();
-		try {
-			cars = Database.readCarCarsTable();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	    for(Car c : cars) {
-	    	observCar.add(new CarFX(c));
-	    }
-	}
+	
+	
 	
 	
 	public VBox showCarsTableView() {
@@ -881,9 +910,12 @@ public class Main extends Application {
 					
 				carsLeftVBox.getChildren().add(carSearchHB);
 				carsLeftVBox.getChildren().add(carsTableView());
+				
+				
 			
 			return carsLeftVBox;	
 	}
+	
 	
 	
 	
@@ -894,6 +926,7 @@ public class Main extends Application {
 			categorieCol.setPrefWidth(80);
 			categorieCol.setMinWidth(30);
 		    categorieCol.setCellValueFactory(new PropertyValueFactory<>("carCategory"));
+		    categorieCol.setSortType(TableColumn.SortType.ASCENDING);
 		
 			TableColumn<CarFX, String> markeCol = new TableColumn<>("Brand");
 			markeCol.setPrefWidth(110);
@@ -912,8 +945,8 @@ public class Main extends Application {
 		    
 		    TableColumn<CarFX, String> fuelTypeCol = new TableColumn<>("Fuel Type");
 		    fuelTypeCol.setPrefWidth(90);
-		    licPlateCol.setMinWidth(30);
-		    licPlateCol.setCellValueFactory(new PropertyValueFactory<>("carFuelType"));
+		    fuelTypeCol.setMinWidth(30);
+		    fuelTypeCol.setCellValueFactory(new PropertyValueFactory<>("carFuelType"));
 		    
 		    TableColumn<CarFX, String> onRentCol = new TableColumn<>("OnRent");
 		    onRentCol.setPrefWidth(60);
@@ -925,6 +958,8 @@ public class Main extends Application {
 			carsTableView.setPrefHeight(570);
 			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 			carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			carsTableView.getSortOrder().add(categorieCol);
+			
 		
 			return carsTableView;
 		
@@ -1066,7 +1101,12 @@ public class Main extends Application {
 		    Database.createCarFeaturesTable();
 			System.out.println("Created car features junction table, or already exists");
 			
-		
+//			ArrayList<Car> cars= Database.readCarsTable();
+//			for(Car s : cars) {
+//				System.out.println(s.getCarEngineSize());
+//			}
+			
+			//System.out.println(Database.readCarTableOUT("W-20097F"));
 		} catch (SQLException e) {
 			System.out.println(e);
 			e.printStackTrace();
