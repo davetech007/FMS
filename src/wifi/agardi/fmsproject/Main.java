@@ -65,7 +65,10 @@ public class Main extends Application {
 	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
 	
 	TableView<CarFX> carsTableView;
+	CarFX selectedCar;
 	
+	int minEngineSize = 500;
+	int minEnginePower = 50;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -796,29 +799,54 @@ public class Main extends Application {
 		    
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
-		    
-	
-//ACTION		    
-		    
+ 
 	    
 //Bottom Buttons
 			Button deleteCarButton = new Button("Delete");
 			deleteCarButton.setPrefSize(110, 40);
 			deleteCarButton.setGraphic(new ImageView(iconDelete));
+			deleteCarButton.setDisable(true);
 			
 			
-
+			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
+				if (newS != null) {
+					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
+					deleteCarButton.setDisable(false);
+					
+					brandTF.setText(selectedCar.getModellObject().getCarBrand());
+					modelTF.setText(selectedCar.getModellObject().getCarModel());
+					kmTF.setText(String.valueOf(selectedCar.getModellObject().getCarKM()));
+					yearPicker.setValue(selectedCar.getModellObject().getCarManufDate());
+					carFuelBox.setValue(selectedCar.getModellObject().getCarFuelType());
+					carTransmBox.setValue(selectedCar.getModellObject().getCarTransmission());
+					carCategorieBox.setValue(selectedCar.getModellObject().getCarCategory());
+					licPlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
+					vinNumTF.setText(selectedCar.getModellObject().getCarVinNumber());
+					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
+					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
+					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
+				}
+			});
+			deleteCarButton.setOnAction(e -> {
+				Alert alertDelete = new Alert(AlertType.CONFIRMATION);
+				alertDelete.setTitle("Deleting a car");
+				alertDelete.setHeaderText("Please confirm!");
+				alertDelete.setContentText("Would you really want to delete the selected '" + selectedCar.getModellObject().getCarBrand() + 
+									" " + selectedCar.getModellObject().getCarModel() + "' with the license plate '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
+				Optional<ButtonType> result = alertDelete.showAndWait();
+				if(result.get() == ButtonType.OK) {
+					try {
+						Database.deleteCar(selectedCar.getModellObject().getCarVinNumber());
+						observCar.remove(selectedCar);
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the delete car database connection");
+						e1.printStackTrace();
+					}
+				}
+					
+			});
 			
-//			Car carN = carsTableView.getSelectionModel().getSelectedItem();
-//			
-//			deleteCarButton.setOnAction(e -> {
-//				if(carN != null) {
-//					Database.deleteCar(carN);
-//				}
-//			});
-			
-			
-				
+		
 			Button updateCarButton = new Button("Update");
 			updateCarButton.setPrefSize(110, 40);	
 			updateCarButton.setGraphic(new ImageView(iconUpdate));
@@ -842,10 +870,10 @@ public class Main extends Application {
 			
 			addCarButton.setOnAction(e -> {
 				try {
-					String vinNumber = vinNumTF.getText();
-					String licPlate = licPlateTF.getText();
-					String brand = brandTF.getText(); 
-					String model = modelTF.getText();
+					String vinNumber = vinNumTF.getText().toUpperCase();
+					String licPlate = licPlateTF.getText().toUpperCase();
+					String brand = brandTF.getText().substring(0, 1).toUpperCase() + brandTF.getText().substring(1);
+					String model = modelTF.getText().substring(0, 1).toUpperCase() + modelTF.getText().substring(1);;
 					String category = carCategorieBox.getSelectionModel().getSelectedItem().toString();
 					String color = carColorBox.getSelectionModel().getSelectedItem().toString();
 					String fuel = carFuelBox.getSelectionModel().getSelectedItem().toString();
@@ -860,15 +888,45 @@ public class Main extends Application {
 											carKM, engSize, engPower, false));
 //ALERT					
 					if(Database.checkExistingCar(vinNumber, licPlate)) {
-						new Alert(AlertType.INFORMATION, "VIN Number "+ vinNumber +
-										" or license plate " + licPlate + " already exists!").showAndWait();
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Adding a new car");
+						alertWarn.setHeaderText("Please check again, it's an existing car!");
+						alertWarn.setContentText("Car with the VIN number '"+ vinNumber +
+										"' and license plate '" + licPlate + "' already exists!");
+						alertWarn.showAndWait();
 						return;
-					} else {
-						CarAddDialog carDialog = new CarAddDialog(brand, model, licPlate);
+					} if(vinNumber.length() < 11) {
+						Alert alertWarn2= new Alert(AlertType.WARNING);
+						alertWarn2.setTitle("Adding a new car");
+						alertWarn2.setHeaderText("Please check again the VIN number!");
+						alertWarn2.setContentText("Car's VIN number should be at least 11 characters "
+												+ "(in cars made after 1981 every VIN number should be 17 characters)!");
+						alertWarn2.showAndWait();
+						return;
 						
-						Optional<ButtonType> result = carDialog.showAndWait();
-						if(result.isPresent())
-							if(result.get() == ButtonType.OK) {
+					} if(engSize < minEngineSize) {
+						Alert alertWarn3= new Alert(AlertType.WARNING);
+						alertWarn3.setTitle("Adding a new car");
+						alertWarn3.setHeaderText("Please check again the engine size!");
+						alertWarn3.setContentText("Is the engine size is really so small? Only " + engSize + " CCM?");
+						alertWarn3.showAndWait();
+						return;
+					} if(engPower < minEnginePower) {
+						Alert alertWarn4= new Alert(AlertType.WARNING);
+						alertWarn4.setTitle("Adding a new car");
+						alertWarn4.setHeaderText("Please check again the engine power!");
+						alertWarn4.setContentText("Is the engine so weak? Engine power only " + engPower + " KW?");
+						alertWarn4.showAndWait();
+						return;
+					}
+					else {
+						Alert alertAdd = new Alert(AlertType.CONFIRMATION);
+						alertAdd.setTitle("Adding a new car");
+						alertAdd.setHeaderText("Please confirm!");
+						alertAdd.setContentText("Would you really want to add this '" + brand + 
+											" " + model + "' with the license plate '" + licPlate + "'?");
+						Optional<ButtonType> result = alertAdd.showAndWait();
+						if(result.get() == ButtonType.OK) {
 								Database.addNewCar(car.getModellObject());
 								observCar.add(car);
 							}
@@ -879,8 +937,7 @@ public class Main extends Application {
 				}		
 			});
 			
-			
-			    
+
 		    
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(15, 0, 0, 0));

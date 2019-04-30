@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew5";
+	public static final String DBlocation = "DatabaseTestNew6";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
 	public static final String usersTable = "Users";
@@ -242,11 +242,11 @@ public class Database {
 			stmt = conn.createStatement();
 			stmt.executeUpdate(create);
 			LinkedHashMap<String, Integer> categories = new LinkedHashMap<>();
-				categories.put("M_Mini", 30);
-				categories.put("A_Small", 40);
-				categories.put("B_Economy", 50);
-				categories.put("C_Midsize", 60);
-				categories.put("D_Fullsize", 75);
+				categories.put("A_Mini", 30);
+				categories.put("B_Small", 40);
+				categories.put("C_Economy", 50);
+				categories.put("D_Midsize", 60);
+				categories.put("E_Fullsize", 75);
 				categories.put("F_Premium", 95);
 				categories.put("P_Luxus", 125);
 				categories.put("S_Minivan", 105);
@@ -974,6 +974,8 @@ public class Database {
 	}
 
 	
+	
+	
 //CARS TABLE	
 	public static void createCarsTable() throws SQLException {
 		Connection conn = null;
@@ -1156,16 +1158,14 @@ public class Database {
 	
 	
 
-	
-	
-	public static void deleteCar(Car car) throws SQLException {
+	public static void deleteCar(String vinNum) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		String delete = "DELETE FROM " + carsTable + " WHERE " + vinNumberIDCol + " = ?";
 		try {
 			conn = DriverManager.getConnection(connString);
 			pstmt = conn.prepareStatement(delete);
-			pstmt.setString(1, car.getCarVinNumber());
+			pstmt.setString(1, vinNum);
 		    pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with deleteCar database connection");

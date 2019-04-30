@@ -1,5 +1,6 @@
 package wifi.agardi.fmsproject;
 
+
 public enum Extras {
 	AIR_CONDITION("Air Condition"),
 	GPS_BUILTIN("GPS"),
