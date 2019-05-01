@@ -16,7 +16,6 @@ import javafx.scene.layout.VBox;
 
 
 public class CustomerListDialog extends Dialog<ButtonType> {
-	Image iconSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
 	
 	public CustomerListDialog() {
 		super();
@@ -24,16 +23,13 @@ public class CustomerListDialog extends Dialog<ButtonType> {
 		this.setHeaderText("Search for a customer");
 		
 		Label custSearchLB = new Label("Write a customer ID");
+		custSearchLB.setId("searchLB");
 		
 		TextField custIDTF = new TextField();
 		custIDTF.setPromptText("Customer ID");
-		custIDTF.setPrefWidth(150);
-		
-		Button custSearchBT = new Button("Search");
-		custSearchBT.setPrefWidth(115);
-		custSearchBT.setGraphic(new ImageView(iconSearch));
-		
-		HBox custHB= new HBox(custSearchLB, custIDTF, custSearchBT);
+		custIDTF.setId("searchTF");
+
+		HBox custHB= new HBox(custSearchLB, custIDTF);
 		custHB.setAlignment(Pos.CENTER);
 		custHB.setSpacing(5);
 
@@ -41,6 +37,7 @@ public class CustomerListDialog extends Dialog<ButtonType> {
 		custVB.setSpacing(5);
 		
 		this.getDialogPane().setContent(custVB);
+		custVB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 		this.setResizable(true);
 		ButtonType ok = ButtonType.OK; 
 		ButtonType cancel = ButtonType.CANCEL; 

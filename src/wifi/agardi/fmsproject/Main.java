@@ -5,12 +5,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
+
+import com.sun.media.jfxmedia.events.NewFrameEvent;
+
 import javafx.application.Application;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -50,22 +55,15 @@ import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
-	Image iconSearch = new Image(Main.class.getResource("/Search.png").toExternalForm(), 18, 18, true, true);
-	Image iconSave = new Image(Main.class.getResource("/SaveCustomer.png").toExternalForm(), 45, 45, true, true);
-	Image iconReserve = new Image(Main.class.getResource("/SaveRes.png").toExternalForm(), 30, 30, true, true);
-	Image iconDelete = new Image(Main.class.getResource("/Delete.png").toExternalForm(), 30, 30, true, true);
-	Image iconClearPage = new Image(Main.class.getResource("/ClearPage.png").toExternalForm(), 30, 30, true, true);
-	Image iconUpdate = new Image(Main.class.getResource("/Update.png").toExternalForm(), 30, 30, true, true);
-	Image iconAddCar = new Image(Main.class.getResource("/AddCar.png").toExternalForm(), 30, 30, true, true);
-	Image iconAddDamage = new Image(Main.class.getResource("/Add.png").toExternalForm(), 20, 20, true, true);
-	Image iconRemoveDamage = new Image(Main.class.getResource("/Remove.png").toExternalForm(), 21, 21, true, true);	
-	Image iconPrintPdf = new Image(Main.class.getResource("/Printpdf.png").toExternalForm(), 30, 30, true, true);
-	Image iconReturnCar = new Image(Main.class.getResource("/ReturnCar.png").toExternalForm(), 30, 30, true, true);
 	
 	private ObservableList<CarFX> observCar = FXCollections.observableArrayList();
 	
 	TableView<CarFX> carsTableView;
 	CarFX selectedCar;
+	
+	TabPane mainTabPane;
+	Tab carsTab;
+	
 	
 	int minEngineSize = 500;
 	int minEnginePower = 50;
@@ -174,7 +172,7 @@ public class Main extends Application {
 				
 			});
 					
-			Scene scene = new Scene(loginBP, 450, 450);
+			Scene scene = new Scene(loginBP, 600, 450);
 			primaryStage.setScene(scene);
 			loginBP.getStylesheets().add(Main.class.getResource("/Login.css").toExternalForm());
 			primaryStage.setTitle("Welcome");
@@ -188,13 +186,14 @@ public class Main extends Application {
 	public void mainMenu() {
 			Stage mainStage = new Stage();
 			HBox mainHB = new HBox();
-			mainHB.setPadding(new Insets(20, 20 ,20, 20));
+			mainHB.setPadding(new Insets(15, 20 ,20, 20));
 			mainHB.setAlignment(Pos.CENTER);
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
 			mainTitle.setId("mainTitle");
+			mainTitle.setPadding(new Insets(0, 0, 15, 0));
 			HBox mainTopHBox = new HBox();
-			mainTopHBox.setAlignment(Pos.TOP_CENTER);
+			mainTopHBox.setAlignment(Pos.CENTER);
 			mainTopHBox.getChildren().add(mainTitle);
 			
 			VBox mainTopVBox = new VBox();
@@ -206,28 +205,25 @@ public class Main extends Application {
 			Tab reserveTab = new Tab("Reserve");
 			reserveTab.setContent(openReserveMenu());
 			reserveTab.setClosable(false);
-			Image imageReserve = new Image(Main.class.getResource("/Reserve.png").toExternalForm(), 30, 30, true, true);
-			reserveTab.setGraphic(new ImageView(imageReserve));
+			reserveTab.setId("reserveTab");
 			
-			Tab carsTab = new Tab("Cars");
+			carsTab = new Tab("Cars");
 			carsTab.setContent(openCarsMenu());
 			carsTab.setClosable(false);
-			Image imageCars = new Image(Main.class.getResource("/Cars.png").toExternalForm(), 30, 30, true, true);
-			carsTab.setGraphic(new ImageView(imageCars));
+			carsTab.setId("carsTab");
 		
 			Tab reservationsTab = new Tab("Reservaitons");
 			reservationsTab.setContent(openReservationsMenu());
 			reservationsTab.setClosable(false);
-			Image imageRes = new Image(Main.class.getResource("/Reservations.png").toExternalForm(), 30, 30, true, true);
-			reservationsTab.setGraphic(new ImageView(imageRes));
+			reservationsTab.setId("reservationsTab");
 		
 			Tab dashboardTab = new Tab("Dashboard");
 			dashboardTab.setClosable(false);
-			Image imageDashboard = new Image(Main.class.getResource("/Dashboard.png").toExternalForm(), 30, 30, true, true);
-			dashboardTab.setGraphic(new ImageView(imageDashboard));
+			dashboardTab.setId("dashboardTab");
 	
-			TabPane mainTabPane = new TabPane();
+			mainTabPane = new TabPane();
 			mainTabPane.getTabs().addAll(reserveTab, carsTab, reservationsTab, dashboardTab);
+			
 	
 //Tab on Action		
 			reserveTab.setOnSelectionChanged(e -> {
@@ -253,8 +249,8 @@ public class Main extends Application {
 	
 //Main VBox Top second Child			
 			mainTopVBox.getChildren().add(mainTabPane);		
-			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 			Scene sceneMain = new Scene(mainHB, 1050, 750);
+			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 			mainStage.setScene(sceneMain);
 			mainStage.show();
 	  }
@@ -312,9 +308,8 @@ public class Main extends Application {
 //GRIDPANE			
 //Searching for a driver	
 //TODO
-			Button searchDriverButton = new Button("Search for a driver");
-			searchDriverButton.setPrefWidth(195);
-			searchDriverButton.setGraphic(new ImageView(iconSearch));
+			Button searchDriverButton = new Button("Choose a driver");
+			searchDriverButton.setId("searchDriverButton");
 			reserveGP.add(searchDriverButton, 0, 0);
 			searchDriverButton.setOnAction(e ->{
 				CustomerListDialog custList = new CustomerListDialog();
@@ -396,21 +391,16 @@ public class Main extends Application {
 //Grid 3. column
 //Searching for a car	
 			
-			Button searchCarButton = new Button("Search for a car");
-			searchCarButton.setPrefWidth(195);
-			searchCarButton.setGraphic(new ImageView(iconSearch));
-//TODO			
-			searchCarButton.setOnAction(e ->{
-				CarListDialog carLD = new CarListDialog(showCarsTableView());
-				carLD.setResizable(true);
-				carLD.showAndWait();
+			Button chooseCarButton = new Button("Choose a car  ");
+			chooseCarButton.setId("chooseCarButton");
+			reserveGP.add(chooseCarButton, 3, 0);
+			chooseCarButton.setOnAction(e ->{
+				mainTabPane.getSelectionModel().select(carsTab);
 			});
-			reserveGP.add(searchCarButton, 3, 0);
 					
 			ComboBox<String> carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
-			
-			carComboBox.setPrefWidth(195);
-			carComboBox.setPromptText("Reserve only a category");
+			carComboBox.setId("carSearchBox");
+			carComboBox.setPromptText("Reserve a category");
 			reserveGP.add(carComboBox, 4, 0);
 	
 			
@@ -520,9 +510,7 @@ public class Main extends Application {
 //Reserve BorderPane BOTTOM BUTTONS
 			
 			Button saveCustomerButton = new Button("Save");
-			saveCustomerButton.setAlignment(Pos.BOTTOM_LEFT);
-			saveCustomerButton.setPrefSize(110, 40);
-			saveCustomerButton.setGraphic(new ImageView(iconSave));
+			saveCustomerButton.setId("saveCustomerButton");
 			
 			ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
 					.or(lastNameTF.textProperty().isEmpty())
@@ -541,17 +529,11 @@ public class Main extends Application {
 			saveCustomerButton.disableProperty().bind(custObs);
 			
 			
-			Button clearPageButton = new Button("Clear");
-			clearPageButton.setPrefSize(110, 40);
-			clearPageButton.setGraphic(new ImageView(iconClearPage));
-			
 			Button updateResButton = new Button("Update");
-			updateResButton.setPrefSize(110, 40);	
-			updateResButton.setGraphic(new ImageView(iconUpdate));
+			updateResButton.setId("updateButton");
 			
 			Button reserveButton = new Button("Reserve");
-			reserveButton.setPrefSize(110, 40);
-			reserveButton.setGraphic(new ImageView(iconReserve));
+			reserveButton.setId("saveResButton");
 //Res Button Binding			
 			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull();
 			reserveButton.disableProperty().bind(custObs);
@@ -562,7 +544,7 @@ public class Main extends Application {
 			HBox bottomHBoxRes = new HBox();
 			HBox bottomHBox = new HBox();
 			bottomHBoxCustomer.getChildren().add(saveCustomerButton);
-			bottomHBoxRes.getChildren().addAll(clearPageButton, updateResButton, reserveButton);
+			bottomHBoxRes.getChildren().addAll(updateResButton, reserveButton);
 			bottomHBox.setPadding(new Insets(15, 0, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBox.setSpacing(40);
@@ -581,7 +563,6 @@ public class Main extends Application {
 	
 	public BorderPane openCarsMenu() {
 		FillCarsObservableList();
-		
 		Label basePriceLB = new Label("Base price = ");
 		    BorderPane carsBP = new BorderPane();
 		 
@@ -649,7 +630,6 @@ public class Main extends Application {
 		    carFuelBox.setPrefWidth(195);
 		    carFuelBox.setPromptText("Fuel");
 		    carsGP.add(carFuelBox, 0, 5);
-
 		   
 		    ComboBox<String> carTransmBox = new ComboBox<>();
 		    try {
@@ -661,9 +641,7 @@ public class Main extends Application {
 		    carTransmBox.setPrefWidth(195);
 		    carTransmBox.setPromptText("Transmission");
 		    carsGP.add(carTransmBox, 0, 6);
-		    
-		    
-		    
+	    
 //Damage buttons
 		    Label damagesLB = new Label("Damages");
 		    carsGP.add(damagesLB, 0, 7);
@@ -673,20 +651,17 @@ public class Main extends Application {
 		    damagesLV.setPrefSize(195, 130);
 		    
 		    Button listDamageButton = new Button("Remove");
-		    listDamageButton.setPrefSize(92, 30);
-		    listDamageButton.setGraphic(new ImageView(iconRemoveDamage));
+		    listDamageButton.setId("removeDamageButton");
 			
 		    Button addDamageButton = new Button("Add");
-		    addDamageButton.setPrefSize(92, 30);
-			addDamageButton.setGraphic(new ImageView(iconAddDamage));
+		    addDamageButton.setId("addDamageButton");
 					
 			HBox damageHBox = new HBox();
 			damageHBox.setAlignment(Pos.BASELINE_LEFT);
 			damageHBox.setSpacing(10);
 		    damageHBox.getChildren().addAll(listDamageButton, addDamageButton);
 		    carsGP.add(damageHBox, 0, 9);
-		    
-    
+		        
 		
 //Right side		
 		    ComboBox<String> carCategorieBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
@@ -711,8 +686,7 @@ public class Main extends Application {
 					}
 				}
 			});
-		   
-		    
+		   		    
 		    TextField licPlateTF = new TextField();
 		    licPlateTF.setPromptText("License plate nr.");
 		    carsGP.add(licPlateTF, 1, 2);
@@ -803,10 +777,8 @@ public class Main extends Application {
 	    
 //Bottom Buttons
 			Button deleteCarButton = new Button("Delete");
-			deleteCarButton.setPrefSize(110, 40);
-			deleteCarButton.setGraphic(new ImageView(iconDelete));
+			deleteCarButton.setId("deleteButton");
 			deleteCarButton.setDisable(true);
-			
 			
 			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
 				if (newS != null) {
@@ -827,6 +799,7 @@ public class Main extends Application {
 					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
 				}
 			});
+			
 			deleteCarButton.setOnAction(e -> {
 				Alert alertDelete = new Alert(AlertType.CONFIRMATION);
 				alertDelete.setTitle("Deleting a car");
@@ -848,13 +821,11 @@ public class Main extends Application {
 			
 		
 			Button updateCarButton = new Button("Update");
-			updateCarButton.setPrefSize(110, 40);	
-			updateCarButton.setGraphic(new ImageView(iconUpdate));
+			updateCarButton.setId("updateButton");
 			updateCarButton.setDisable(true);
 	
 			Button addCarButton = new Button("Add");
-			addCarButton.setPrefSize(110, 40);
-			addCarButton.setGraphic(new ImageView(iconAddCar));
+			addCarButton.setId("addCarButton");
 			addCarButton.disableProperty().bind(brandTF.textProperty().isEmpty()
 											.or(modelTF.textProperty().isEmpty())
 											.or(kmTF.textProperty().isEmpty())
@@ -936,9 +907,7 @@ public class Main extends Application {
 					e1.printStackTrace();
 				}		
 			});
-			
-
-		    
+				    
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(15, 0, 0, 0));
 			bottomHBox.setSpacing(10);
@@ -959,39 +928,50 @@ public class Main extends Application {
 				VBox carsLeftVBox = new VBox();
 				carsLeftVBox.setSpacing(5);
 //Searching		
-				Label carSearchLB = new Label("Search for a car"); 
+				Label carSearchLB = new Label("Search for a car");
+				carSearchLB.setId("searchLB");
 				
 				ComboBox<String> carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
-				carSearchBox.setPrefWidth(170);
+				carSearchBox.setId("carSearchBox");
 				carSearchBox.setPromptText("Choose category");
 				
-				TextField licPlateTF = new TextField();
-				licPlateTF.setPromptText("or license plate nr.");
-				licPlateTF.setPrefWidth(150);
+				TextField searchTF = new TextField();
+				searchTF.setId("searchTF");
+				searchTF.setPromptText("License plate nr.");
+
 				
-				Button carSearchBT = new Button("Search");
-				carSearchBT.setPrefWidth(115);
-				carSearchBT.setGraphic(new ImageView(iconSearch));
-				
+				searchTF.textProperty().addListener(new ChangeListener<String>() {
+					//Wrapping ObservableList
+					FilteredList<CarFX> filtered = new FilteredList<>(observCar, p -> true);
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldValue,
+							String newValue) {
+						if(newValue == null || newValue.length() == 0) {
+							filtered.setPredicate(s -> true);
+						}
+						else {
+							filtered.setPredicate(s -> s.getModellObject().getCarLicensePlate().toLowerCase().contains(newValue));
+						}
+						SortedList<CarFX> sortedList = new SortedList<>(filtered);
+						sortedList.comparatorProperty().bind(carsTableView.comparatorProperty());
+						carsTableView.setItems(sortedList);
+						}
+				});
+					
 				HBox carSearchHB = new HBox();
 				carSearchHB.setAlignment(Pos.CENTER_LEFT);
 				carSearchHB.setSpacing(5);	
-				carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, licPlateTF, carSearchBT);
+				carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, searchTF);
 					
 				carsLeftVBox.getChildren().add(carSearchHB);
-				carsLeftVBox.getChildren().add(carsTableView());
-				
-				
+				carsLeftVBox.getChildren().add(carsTableView());	
 			
 			return carsLeftVBox;	
 	}
 	
 	
 	
-	
-	
-	public TableView<CarFX> carsTableView() {
-//TableView			
+	public TableView<CarFX> carsTableView() {		
 			TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
 			categorieCol.setPrefWidth(80);
 			categorieCol.setMinWidth(30);
@@ -1029,8 +1009,7 @@ public class Main extends Application {
 			carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 			carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			carsTableView.getSortOrder().add(categorieCol);
-			
-		
+				
 			return carsTableView;
 		
 	}
@@ -1044,16 +1023,13 @@ public class Main extends Application {
 		BorderPane reservationsBP = new BorderPane();			
 //Search		
 		Label resSearchLB = new Label("Search for a reservation"); 
+		resSearchLB.setId("searchLB");
 		
 		TextField resNumTF = new TextField();
+		resNumTF.setId("searchTF");
 		resNumTF.setPromptText("Reservation nr.");
-		resNumTF.setPrefWidth(200);
-	
-		Button resSearchBT = new Button("Search");
-		resSearchBT.setPrefWidth(115);
-		resSearchBT.setGraphic(new ImageView(iconSearch));
 		
-		HBox resSearchHB = new HBox(resSearchLB, resNumTF, resSearchBT);
+		HBox resSearchHB = new HBox(resSearchLB, resNumTF);
 		resSearchHB.setPadding(new Insets(15, 0, 5, 0));
 		resSearchHB.setAlignment(Pos.CENTER);
 		resSearchHB.setSpacing(5);	
@@ -1118,20 +1094,16 @@ public class Main extends Application {
 //Bottom Buttons		
 			
 		Button printPdfButton = new Button("Print PDF");
-		printPdfButton.setPrefSize(110, 40);
-		printPdfButton.setGraphic(new ImageView(iconPrintPdf));
+		printPdfButton.setId("printPdfButton");
 		
 		Button deleteResButton = new Button("Delete");
-		deleteResButton.setPrefSize(110, 40);
-		deleteResButton.setGraphic(new ImageView(iconDelete));
+		deleteResButton.setId("deleteButton");
 		
 		Button updateResButton = new Button("Update");
-		updateResButton.setPrefSize(110, 40);	
-		updateResButton.setGraphic(new ImageView(iconUpdate));
+		updateResButton.setId("updateButton");
 		
 		Button returnCarButton = new Button("Return car");
-		returnCarButton.setPrefSize(110, 40);
-		returnCarButton.setGraphic(new ImageView(iconReturnCar));
+		returnCarButton.setId("returnCarButton");
 	    
 	    HBox bottomHBox = new HBox();
 		bottomHBox.setPadding(new Insets(15, 0, 0, 0));
@@ -1171,12 +1143,6 @@ public class Main extends Application {
 		    Database.createCarFeaturesTable();
 			System.out.println("Created car features junction table, or already exists");
 			
-//			ArrayList<Car> cars= Database.readCarsTable();
-//			for(Car s : cars) {
-//				System.out.println(s.getCarEngineSize());
-//			}
-			
-			//System.out.println(Database.readCarTableOUT("W-20097F"));
 		} catch (SQLException e) {
 			System.out.println(e);
 			e.printStackTrace();

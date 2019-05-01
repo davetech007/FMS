@@ -8,7 +8,7 @@
 }
 
 .root {
-	-fx-background-image: url("PremiumWhite.png");
+	-fx-background-image: url("EverlastingSky.png");
 	-fx-background-size: cover;
 }
 
@@ -33,15 +33,12 @@
     -fx-tab-min-width: 230.0px;
 }
 
-
-
 .tab-pane .tab {
-      -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+      -fx-background-color: linear-gradient(#efefef, #e8ddd5);
 }
 
 .tab .tab-label{
     -fx-text-fill: #1e1003;
-    -fx-alignment: center;
 }
 
 .tab:selected .focus-indicator {
@@ -57,9 +54,32 @@
 }
 
 
-.tab-label { 
-    -fx-pref-width:200; 
+#reserveTab {
+  -fx-background-image:url("MenuReserve.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 35px;
+  -fx-background-position: 25%;
+  
 }
+#carsTab {
+  -fx-background-image:url("MenuCars.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 40px;
+  -fx-background-position: 25%;	
+}
+#reservationsTab {
+  -fx-background-image:url("MenuReservations.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 35px;
+  -fx-background-position: 20%;	
+}
+#dashboardTab {
+  -fx-background-image:url("MenuDashboard.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 35px;
+  -fx-background-position: 20%;	
+}
+
 
 #mainTitle{
 	-fx-font-size: 26px;
@@ -71,5 +91,146 @@
 
 .table-view {
 	-fx-opacity: 0.8;
+}
+
+#searchTF {
+  -fx-background-image:url("IconSearch.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 30px;
+  -fx-background-position: right center;
+  -fx-font-size: 15px;
+  -fx-pref-width: 220px;
+}
+
+#searchLB {
+  -fx-font-size: 15px;
+}
+
+#carSearchBox {
+  -fx-font-size: 14px;
+  -fx-pref-width: 195px;
+  -fx-pref-height: 30px;
+}
+
+#chooseCarButton {
+  -fx-background-image:url("ChooseCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 50px;
+  -fx-background-position: right center;
+  -fx-font-size: 15px;
+  -fx-pref-height: 30px;
+  -fx-pref-width: 195px;
+}
+
+#searchDriverButton {
+  -fx-background-image:url("ChooseCustomer.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-background-position: right center;
+  -fx-font-size: 15px;
+  -fx-pref-height: 30px;
+  -fx-pref-width: 195px;
+}
+
+
+
+#updateButton {
+  -fx-background-image:url("IconUpdate.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#ffeed1, #FFA500);
+}
+
+#deleteButton {
+  -fx-background-image:url("IconDelete.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #ff7272);	
+}
+
+#addCarButton {
+  -fx-background-image:url("IconAddCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #96d666);	
+}
+
+#saveCustomerButton {
+  -fx-background-image:url("IconSaveCustomer.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 40px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #C0C0C0);	
+}
+
+#saveResButton {
+  -fx-background-image:url("IconSaveRes.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 35px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #96d666);	
+}
+
+#printPdfButton {
+  -fx-background-image:url("IconPrintPdf.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 37px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
+}
+
+#returnCarButton {
+  -fx-background-image:url("IconReturnCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 37px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #96d666);		
+}
+
+#addDamageButton {
+  -fx-background-image:url("IconAddDamage.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 25px;
+  -fx-pref-width: 92px;
+  -fx-pref-height: 30px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #96d666);	
+}
+
+#removeDamageButton {
+  -fx-background-image:url("IconDelete.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 25px;
+  -fx-pref-width: 92px;
+  -fx-pref-height: 30px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #ff7272);
+  
 }
 
