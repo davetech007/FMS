@@ -87,7 +87,7 @@ public class CustomerListDialog extends Dialog<ButtonType> {
     TableView<String> customersTableView = new TableView<>();
     customersTableView.setPrefHeight(570);
     customersTableView.getColumns().addAll(custIDCol, firstNameCol, lastNameCol, nationalCol,dateOfBornCol, passportCol, driversLCol);
-
+    customersTableView.setPlaceholder(new Label("Customer not found!"));
 	
 	return customersTableView;
 	

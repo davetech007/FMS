@@ -18,14 +18,14 @@
 }
 
 #actionTarget{
-	 -fx-font-size: 12px;
-    -fx-text-fill: #ff0000;
+	-fx-font-size: 12px;
+    -fx-text-fill: #ff0d00;
   	-fx-font-weight: bold;
   	-fx-effect: dropshadow( gaussian , rgba(255,255,255, 0.5) , 0,0,0,0 );
 }
 
 #actionTargetSuccess {
-	 -fx-font-size: 12px;
+	 -fx-font-size: 14px;
 	-fx-text-fill: #30ff02;
   	-fx-font-weight: bold;
   	-fx-effect: dropshadow( gaussian , rgba(0, 0, 0, 0.5) , 0,0,0,0 );

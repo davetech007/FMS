@@ -51,6 +51,8 @@ public class Database {
 	public static final String featuresTable = "Features";
 	public static final String featureIDCol = "Feature_ID";
 	public static final String featureNameCol = "FeatureName";
+	private static final String[] features = {"Air Condition", "Bluetooth", "Digital Cockpit", "Head-up display", "Heated seats", "Heated s.wheel", "Isofix", 
+			"Navigation", "Rain sensor", "Seat ventillation", "Start-stop", "USB", "WIFI", "Xenon", "LED-light", "Laser-light"};
 	
 	public static final String carFeaturesTable = "CarFeatures";
 	public static final String carFeaturesIDCol = "CarFeatures_ID";
@@ -920,6 +922,10 @@ public class Database {
 			}
 			stmt = conn.createStatement();
 			stmt.executeUpdate(create);
+			for(String ft : features) {
+				addFeature(ft);
+			}
+			System.out.println("Adding basic features completed");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the createFeaturesTable database connection...");
 			e.printStackTrace();
@@ -935,6 +941,65 @@ public class Database {
 			}
 	    }
 	}
+
+	
+	public static void addFeature(String feature) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "INSERT INTO " + featuresTable + " (" + featureNameCol + ") VALUES(?)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, feature);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addCarFeature database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+
+	
+	public static ArrayList<String> readFeaturesTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<String> features = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + featuresTable);
+			while(rs.next()) {
+				features.add(rs.getString(featureNameCol));
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarFeaturesTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return features;
+	   }
 	
 	
 //FEATURES JUNCTION TABLE	

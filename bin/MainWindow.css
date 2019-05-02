@@ -132,7 +132,16 @@
   -fx-pref-width: 195px;
 }
 
-
+#makeResButton {
+  -fx-background-image:url("IconReserveCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
+}
 
 #updateButton {
   -fx-background-image:url("IconUpdate.png");
@@ -153,7 +162,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #ff7272);	
+  -fx-background-color: linear-gradient(#efefef, #ffafaf);	
 }
 
 #addCarButton {
@@ -203,7 +212,7 @@
 #returnCarButton {
   -fx-background-image:url("IconReturnCar.png");
   -fx-background-repeat: no-repeat;
-  -fx-background-size: 37px;
+  -fx-background-size: 33px;
   -fx-pref-width: 120px;
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
@@ -211,26 +220,5 @@
   -fx-background-color: linear-gradient(#efefef, #96d666);		
 }
 
-#addDamageButton {
-  -fx-background-image:url("IconAddDamage.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 25px;
-  -fx-pref-width: 92px;
-  -fx-pref-height: 30px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #96d666);	
-}
 
-#removeDamageButton {
-  -fx-background-image:url("IconDelete.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 25px;
-  -fx-pref-width: 92px;
-  -fx-pref-height: 30px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #ff7272);
-  
-}
 
