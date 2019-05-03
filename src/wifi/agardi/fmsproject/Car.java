@@ -17,8 +17,7 @@ public class Car {
 	private int carEngineSize;
 	private int carEnginePower;
 	private boolean carIsOnRent;
-	private ArrayList<String> carExtras;
-	private ArrayList<String> carDamages;
+	private ArrayList<String> carFeatures;
 	
 	
 	public Car() {
@@ -31,7 +30,7 @@ public class Car {
 
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
 			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
-			int carEngineSize, int carEnginePower, boolean carIsOnRent) {
+			int carEngineSize, int carEnginePower, boolean carIsOnRent, ArrayList<String> carFeatures) {
 		super();
 		this.carVinNumber = carVinNumber;
 		this.carLicensePlate = carLicensePlate;
@@ -46,6 +45,7 @@ public class Car {
 		this.carEngineSize = carEngineSize;
 		this.carEnginePower = carEnginePower;
 		this.carIsOnRent = carIsOnRent;
+		this.carFeatures = carFeatures;
 	}
 
 
@@ -183,27 +183,15 @@ public class Car {
 	}
 
 
-	public ArrayList<String> getCarExtras() {
-		return carExtras;
+	public ArrayList<String> getCarFeatures() {
+		return carFeatures;
 	}
 
 
-	public void setCarExtras(ArrayList<String> carExtras) {
-		this.carExtras = carExtras;
+	public void setCarFeatures(ArrayList<String> carFeatures) {
+		this.carFeatures = carFeatures;
 	}
 
-
-	public ArrayList<String> getCarDamages() {
-		return carDamages;
-	}
-
-
-	public void setCarDamages(ArrayList<String> carDamages) {
-		this.carDamages = carDamages;
-	}
-
-	
-	
 	
 
 }

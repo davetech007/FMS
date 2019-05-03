@@ -28,8 +28,7 @@ public class CarFX {
 	private IntegerProperty carEngineSize;
 	private IntegerProperty carEnginePower;
 	private BooleanProperty carIsOnRent;
-	private ArrayList<String> carExtras = new ArrayList<>();
-	private ArrayList<String> carDamages = new ArrayList<>();
+	private ArrayList<String> carFeatures = new ArrayList<>();
 	
 	
 	public CarFX(Car car) {
@@ -251,23 +250,14 @@ public class CarFX {
 	
 
 	public ArrayList<String> getCarExtras() {
-		return carExtras;
+		return carFeatures;
 	}
-	public void setCarExtras(ArrayList<String> carExtras) {
-		this.carExtras = carExtras;
+	public void setCarExtras(ArrayList<String> carFeatures) {
+		this.carFeatures = carFeatures;
 	}
 
 
 	
-	
-	
-
-	public ArrayList<String> getCarDamages() {
-		return carDamages;
-	}
-	public void setCarDamages(ArrayList<String> carDamages) {
-		this.carDamages = carDamages;
-	}
 	
 	
 

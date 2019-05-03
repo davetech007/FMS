@@ -1,5 +1,6 @@
 package wifi.agardi.fmsproject;
 
+import java.beans.FeatureDescriptor;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,16 +10,19 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.sun.javafx.collections.MappingChange.Map;
 import com.sun.media.jfxmedia.events.NewFrameEvent;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -49,8 +53,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -60,6 +66,7 @@ import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
+	DropShadow shadow = new DropShadow();
 	
 	private ObservableList<CarFX> observCar;
 	private FilteredList<CarFX> filteredListCars;
@@ -117,6 +124,7 @@ public class Main extends Application {
 			logInHBox.setAlignment(Pos.BOTTOM_CENTER);
 			logInHBox.getChildren().add(logInButton);
 			loginGP.add(logInHBox, 0, 6);
+			
 //ActionTarget			
 			Label actionTarget = new Label();
 			actionTarget.setId("actionTarget");
@@ -145,10 +153,13 @@ public class Main extends Application {
 //Sign up BORDER PANE BOTTOM
 			Label signUpLabel = new Label("You don't have an account?");
 			Button signUpButton = new Button("Sign up");
+			
 			VBox signUpVBox = new VBox(10);
-			signUpVBox.setAlignment(Pos.BOTTOM_CENTER);
+			signUpVBox.setAlignment(Pos.BOTTOM_CENTER);	
+			
 			signUpVBox.getChildren().addAll(signUpLabel, signUpButton);
 			loginBP.setBottom(signUpVBox);
+			
 			
 //SignUp on action			
 			signUpButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -160,7 +171,7 @@ public class Main extends Application {
 							actionTarget.setText("User already exists!");
 							return;
 						}
-						if((userNameTField.getText().length() > 2) && (passwordField.getText().length() > 2)) {
+						if((userNameTField.getText().length() > 0) && (passwordField.getText().length() > 0)) {
 							Alert alertSignUp = new Alert(AlertType.CONFIRMATION);
 							alertSignUp.setTitle("Sign up");
 							alertSignUp.setHeaderText("Please confirm!");
@@ -185,7 +196,7 @@ public class Main extends Application {
 				
 			});
 					
-			Scene scene = new Scene(loginBP, 600, 450);
+			Scene scene = new Scene(loginBP, 700, 500);
 			primaryStage.setScene(scene);
 			loginBP.getStylesheets().add(Main.class.getResource("/Login.css").toExternalForm());
 			primaryStage.setTitle("Welcome");
@@ -198,7 +209,7 @@ public class Main extends Application {
 	public void mainMenu() {
 			Stage mainStage = new Stage();
 			HBox mainHB = new HBox();
-			mainHB.setPadding(new Insets(15, 20 ,20, 20));
+			mainHB.setPadding(new Insets(15, 15 , 15, 15));
 			mainHB.setAlignment(Pos.CENTER);
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
@@ -306,6 +317,22 @@ public class Main extends Application {
 	
 	
 	
+	public void FillCarsObservableListDeactivedCars() {
+		  observCar = FXCollections.observableArrayList();
+		  ArrayList<Car> cars = new ArrayList<>();
+			try {
+				cars = Database.readDeactiveCarsTable();
+			} catch (SQLException e) {
+				System.out.println("Something is wrong with the filling observable list with deactive cars database");
+				e.printStackTrace();
+			}
+		    for(Car c : cars) {
+		    	observCar.add(new CarFX(c));
+		    }
+		    filteredListCars = new FilteredList<>(observCar, p -> true);
+		    sortedListCars = new SortedList<>(filteredListCars);
+		}
+	
 	
 	
 //RESERVE MENU	
@@ -335,6 +362,21 @@ public class Main extends Application {
 				CustomerListDialog custList = new CustomerListDialog();
 				custList.showAndWait();
 			});
+			
+			searchDriverButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  searchDriverButton.setEffect(shadow);
+			          }
+			        });
+			searchDriverButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  searchDriverButton.setEffect(null);
+			          }
+			        });
 			
 //Grid 0. column			
 			Label driverLabel = new Label("Driver details");
@@ -416,6 +458,21 @@ public class Main extends Application {
 			chooseCarButton.setOnAction(e ->{
 				mainTabPane.getSelectionModel().select(carsTab);
 			});
+			
+			chooseCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  chooseCarButton.setEffect(shadow);
+			          }
+			        });
+			chooseCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  chooseCarButton.setEffect(null);
+			          }
+			        });
 					
 			carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 			carComboBox.setId("carSearchBox");
@@ -546,18 +603,65 @@ public class Main extends Application {
 			Button saveCustomerButton = new Button("Save");
 			saveCustomerButton.setId("saveCustomerButton");	
 			saveCustomerButton.disableProperty().bind(custObs);
+			
+			saveCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  saveCustomerButton.setEffect(shadow);
+			          }
+			        });
+			saveCustomerButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  saveCustomerButton.setEffect(null);
+			          }
+			        });
+			
+			
 //UPDATE RES			
 			Button updateResButton = new Button("Update");
 			updateResButton.setId("updateButton");
 			updateResButton.setDisable(true);
+			
+			updateResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateResButton.setEffect(shadow);
+			          }
+			        });
+			updateResButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateResButton.setEffect(null);
+			          }
+			        });
 //RESERVE			
 			Button reserveButton = new Button("Reserve");
 			reserveButton.setId("saveResButton");
 			reserveButton.disableProperty().bind(resObs);
 			
+			reserveButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  reserveButton.setEffect(shadow);
+			          }
+			        });
+			reserveButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  reserveButton.setEffect(null);
+			          }
+			        });
+			
 			HBox bottomHBoxRes = new HBox();
 			bottomHBoxRes.getChildren().addAll(saveCustomerButton, updateResButton, reserveButton);
-			bottomHBoxRes.setPadding(new Insets(15, 0, 0, 0));
+			bottomHBoxRes.setPadding(new Insets(10, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
 			reserveBP.setBottom(bottomHBoxRes);
@@ -861,7 +965,7 @@ public class Main extends Application {
 		    	Collections.sort(features);
 				 for(String e : features) {
 					    featuresMap.put(e, new SimpleBooleanProperty(false));
-					    }
+					    }			 
 			} catch (SQLException e2) {
 				System.out.println("Something is wrong with creating list view from features database");
 				e2.printStackTrace();
@@ -875,7 +979,8 @@ public class Main extends Application {
 		    featuresLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
 		    featuresLV.setPrefSize(195, 130);
 		    carsGP.add(featuresLV, 1, 8);
-		    
+		   
+
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
  
@@ -883,6 +988,23 @@ public class Main extends Application {
 //Bottom BUTTONS
 //RESERVE
 			Button makeResButton = new Button("Reserve");
+
+			makeResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+				        new EventHandler<MouseEvent>() {
+				          @Override
+				          public void handle(MouseEvent e) {
+				        	  makeResButton.setEffect(shadow);
+				          }
+				        });
+			makeResButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+				        new EventHandler<MouseEvent>() {
+				          @Override
+				          public void handle(MouseEvent e) {
+				        	  makeResButton.setEffect(null);
+				          }
+				        });
+			
+			
 			makeResButton.setId("makeResButton");
 			makeResButton.setDisable(true);
 			makeResButton.setOnAction(e -> {
@@ -898,6 +1020,21 @@ public class Main extends Application {
 			Button deleteCarButton = new Button("Delete");
 			deleteCarButton.setId("deleteButton");
 			deleteCarButton.setDisable(true);
+			
+			deleteCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deleteCarButton.setEffect(shadow);
+			          }
+			        });
+			deleteCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deleteCarButton.setEffect(null);
+			          }
+			        });
 		   //Filling text fields from table view selected items
 			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
 				if (newS != null) {
@@ -917,6 +1054,17 @@ public class Main extends Application {
 					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
 					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
 					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
+					
+					
+					for(String key : featuresMap.keySet()) {
+						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
+						for(String s: selectedCar.getModellObject().getCarFeatures()) {
+							if(key.equals(s))
+							featuresCheckedValue.getValue();
+							
+						}
+					}
+					
 				}
 			});
 			
@@ -943,11 +1091,42 @@ public class Main extends Application {
 //UPDATE			
 			Button updateCarButton = new Button("Update");
 			updateCarButton.setId("updateButton");
-			updateCarButton.setDisable(true);
+			//updateCarButton.setDisable(true);
+			
+			updateCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateCarButton.setEffect(shadow);
+			          }
+			        });
+			updateCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateCarButton.setEffect(null);
+			          }
+			        });
 			
 //ADD NEW CAR	
 			Button addCarButton = new Button("Add");
 			addCarButton.setId("addCarButton");
+			
+			addCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  addCarButton.setEffect(shadow);
+			          }
+			        });
+			addCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  addCarButton.setEffect(null);
+			          }
+			        });
+			
 			addCarButton.disableProperty().bind(brandTF.textProperty().isEmpty()
 											.or(modelTF.textProperty().isEmpty())
 											.or(kmTF.textProperty().isEmpty())
@@ -966,7 +1145,7 @@ public class Main extends Application {
 					String vinNumber = vinNumTF.getText().toUpperCase();
 					String licPlate = licPlateTF.getText().toUpperCase();
 					String brand = brandTF.getText().substring(0, 1).toUpperCase() + brandTF.getText().substring(1);
-					String model = modelTF.getText().substring(0, 1).toUpperCase() + modelTF.getText().substring(1);;
+					String model = modelTF.getText().substring(0, 1).toUpperCase() + modelTF.getText().substring(1);
 					String category = carCategorieBox.getSelectionModel().getSelectedItem().toString();
 					String color = carColorBox.getSelectionModel().getSelectedItem().toString();
 					String fuel = carFuelBox.getSelectionModel().getSelectedItem().toString();
@@ -976,9 +1155,17 @@ public class Main extends Application {
 					int engSize = Integer.parseInt(engineSizeTF.getText());
 					int engPower = Integer.parseInt(enginePowerTF.getText());
 					
+					ArrayList<String> features = new ArrayList<>();
+					for(String key : featuresMap.keySet()) {
+						ObservableValue<Boolean> val = featuresMap.get(key);
+						if(val.getValue()) {
+							features.add(key);
+						}
+					}
+					
 					CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 											category, color, fuel, transm, manufDate, 
-											carKM, engSize, engPower, false));
+											carKM, engSize, engPower, false, features));
 //ALERT					
 					if(Database.checkExistingCar(vinNumber, licPlate)) {
 						Alert alertWarn= new Alert(AlertType.WARNING);
@@ -1029,9 +1216,14 @@ public class Main extends Application {
 					e1.printStackTrace();
 				}		
 			});
+			
+			updateCarButton.setOnAction(e -> {
+				System.out.println(carsTableView.getSelectionModel().getSelectedItem().getModellObject().getCarFeatures());
+	
+			});
 				    
 		    HBox bottomHBox = new HBox();
-			bottomHBox.setPadding(new Insets(15, 0, 0, 0));
+			bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 			bottomHBox.setSpacing(10);
 			bottomHBox.getChildren().addAll(makeResButton, deleteCarButton, updateCarButton, addCarButton);
 			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
@@ -1123,18 +1315,80 @@ public class Main extends Application {
 //PRINT PDF			
 		Button printPdfButton = new Button("Print PDF");
 		printPdfButton.setId("printPdfButton");
+		
+		printPdfButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  printPdfButton.setEffect(shadow);
+		          }
+		        });
+		printPdfButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  printPdfButton.setEffect(null);
+		          }
+		        });
 //DELETE		
 		Button deleteResButton = new Button("Delete");
 		deleteResButton.setId("deleteButton");
+		
+		deleteResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  deleteResButton.setEffect(shadow);
+		          }
+		        });
+		deleteResButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  deleteResButton.setEffect(null);
+		          }
+		        });
 //UPDATE		
 		Button updateResButton = new Button("Update");
 		updateResButton.setId("updateButton");
+		
+		updateResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  updateResButton.setEffect(shadow);
+		          }
+		        });
+		updateResButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  updateResButton.setEffect(null);
+		          }
+		        });
+		
 //RETURN CAR		
 		Button returnCarButton = new Button("Return car");
 		returnCarButton.setId("returnCarButton");
+		
+		returnCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  returnCarButton.setEffect(shadow);
+		          }
+		        });
+		returnCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+		        new EventHandler<MouseEvent>() {
+		          @Override
+		          public void handle(MouseEvent e) {
+		        	  returnCarButton.setEffect(null);
+		          }
+		        });
+		
 	    
 	    HBox bottomHBox = new HBox();
-		bottomHBox.setPadding(new Insets(15, 0, 0, 0));
+		bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 		bottomHBox.setSpacing(10);
 		bottomHBox.getChildren().addAll(printPdfButton, deleteResButton, updateResButton, returnCarButton);
 		bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);

@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew6";
+	public static final String DBlocation = "DatabaseTestNew7";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 
 	public static final String usersTable = "Users";
@@ -72,6 +72,7 @@ public class Database {
 	public static final String engineSizeCol = "EngineSize";
 	public static final String enginePowerCol = "EnginePower";
 	public static final String isOnRentCol = "IsOnRent";
+	public static final String isDeactiveCol = "IsDeactive";
 	
 	
 	
@@ -1002,7 +1003,76 @@ public class Database {
 	   }
 	
 	
-//FEATURES JUNCTION TABLE	
+	public static int readFeatureID(String featureName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int featID = 0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + featureIDCol + " FROM " +
+									featuresTable + " WHERE " + featureNameCol + " = '" + featureName + "'");
+			if(rs.next()) {
+				featID = rs.getInt(featureIDCol);
+			}
+			
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readFeatureID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return featID;
+	   }
+
+	
+	public static String readFeatureName(int featureID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String featureName = "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + featureNameCol + " FROM " +
+									featuresTable + " WHERE " + featureIDCol + " = " + featureID);
+			if(rs.next()) {
+				featureName = rs.getString(featureNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readFeatureName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return featureName;
+	   }
+	
+	
+//CAR FEATURES JUNCTION TABLE	
 	public static void createCarFeaturesTable() throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
@@ -1038,7 +1108,74 @@ public class Database {
 	    }
 	}
 
+
 	
+	public static void addCarFeatures(ArrayList<String> featureNames, String vinNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+//		String add = "INSERT INTO " + carFeaturesTable + " (" + vinNumberIDCol + ", " + featureIDCol + ") VALUES (SELECT " + vinNumberIDCol + 
+//					" FROM " + carsTable + " WHERE " + vinNumberIDCol + " = ?, SELECT " + featureIDCol + " FROM " + featuresTable + " WHERE " + featureIDCol + " = ?)";
+		
+		String add = "INSERT INTO " + carFeaturesTable + " (" + vinNumberIDCol + ", " + featureIDCol + ") VALUES (?,?)";
+				
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			for(String s : featureNames) {
+			pstmt.setString(1, vinNum);
+			pstmt.setInt(2, readFeatureID(s));
+			pstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addCarFeature database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+
+	
+	
+	public static ArrayList<String> readCarFeatures(String VinNum) throws SQLException {
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<String> features = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + featureIDCol + " FROM " +
+					carFeaturesTable + " WHERE " + vinNumberIDCol + " = '" + VinNum + "'");
+			while(rs.next()) {
+				features.add(readFeatureName(rs.getInt(featureIDCol)));
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarFeatures database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return features;
+	   }
 	
 	
 //CARS TABLE	
@@ -1059,7 +1196,8 @@ public class Database {
 						actualKMCol + " INTEGER, " +
 						engineSizeCol + " INTEGER, " +
 						enginePowerCol + " INTEGER, " +
-						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, "+ 
+						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
+						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						"PRIMARY KEY (" + vinNumberIDCol + "), " +
 						"FOREIGN KEY (" + categoryCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
 						"FOREIGN KEY (" + colorCol + ") REFERENCES " + colorsTable + "(" + colorIDCol + "), " +
@@ -1096,7 +1234,7 @@ public class Database {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try {
 			conn = DriverManager.getConnection(connString);
@@ -1119,8 +1257,11 @@ public class Database {
 			pstmt.setInt(11, car.getCarEngineSize());
 			pstmt.setInt(12, car.getCarEnginePower());
 			pstmt.setBoolean(13, false);
+			pstmt.setBoolean(14, false);
 			
 			pstmt.executeUpdate();
+			
+			addCarFeatures(car.getCarFeatures(), car.getCarVinNumber());
 			System.out.println("Car added successfully");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the addNewCar database connection...");
@@ -1138,7 +1279,7 @@ public class Database {
 	    }
 	}
 	
-	
+
 	
 	public static ArrayList<Car> readCarsTable() throws SQLException{
 		  Connection conn = null;
@@ -1148,12 +1289,13 @@ public class Database {
 		  try {
 			conn = DriverManager.getConnection(connString);
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM " + carsTable);
+			rs = stmt.executeQuery("SELECT * FROM " + carsTable + " WHERE " + isDeactiveCol + " = FALSE");
 			while(rs.next()) {
 				java.sql.Date sqlDate = rs.getDate(manufactureDateCol);
 				java.time.LocalDate locDate = sqlDate.toLocalDate();
-	
-				Car car = new Car(rs.getString(vinNumberIDCol), 
+				String vinNum = rs.getString(vinNumberIDCol);
+				
+				Car car = new Car(vinNum, 
 								  rs.getString(licensePlateCol),
 								  rs.getString(brandCol),
 								  rs.getString(modelCol),
@@ -1165,7 +1307,8 @@ public class Database {
 								  rs.getInt(actualKMCol),
 								  rs.getInt(engineSizeCol),
 								  rs.getInt(enginePowerCol),
-								  rs.getBoolean(isOnRentCol));
+								  rs.getBoolean(isOnRentCol),
+								  readCarFeatures(vinNum));
 				cars.add(car);
 			}
 			rs.close();	
@@ -1187,7 +1330,58 @@ public class Database {
 		  }
 		  return cars;
 	   }
+
 	
+	
+	public static ArrayList<Car> readDeactiveCarsTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<Car> cars = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + carsTable + " WHERE " + isDeactiveCol + " = TRUE");
+			while(rs.next()) {
+				java.sql.Date sqlDate = rs.getDate(manufactureDateCol);
+				java.time.LocalDate locDate = sqlDate.toLocalDate();
+				
+				String vinNum = rs.getString(vinNumberIDCol);
+				Car car = new Car(vinNum, 
+								  rs.getString(licensePlateCol),
+								  rs.getString(brandCol),
+								  rs.getString(modelCol),
+								  readCarCategoryName(rs.getInt(categoryIDCol)),
+								  readColorName(rs.getInt(colorIDCol)),
+								  readFuelTypeName(rs.getInt(fuelTypeIDCol)),
+								  readTransmissionName(rs.getInt(transmissionIDCol)),
+								  locDate,
+								  rs.getInt(actualKMCol),
+								  rs.getInt(engineSizeCol),
+								  rs.getInt(enginePowerCol),
+								  rs.getBoolean(isOnRentCol),
+								  readCarFeatures(vinNum));
+				cars.add(car);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarsTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return cars;
+	   }
 	
 	
 	
@@ -1222,15 +1416,15 @@ public class Database {
 	}
 	
 	
-
+	
 	public static void deleteCar(String vinNum) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		String delete = "DELETE FROM " + carsTable + " WHERE " + vinNumberIDCol + " = ?";
+		String delete = "UPDATE " + carsTable + " SET " + isDeactiveCol + " = ? WHERE " + vinNumberIDCol + " = '" + vinNum + "'";
 		try {
 			conn = DriverManager.getConnection(connString);
 			pstmt = conn.prepareStatement(delete);
-			pstmt.setString(1, vinNum);
+			pstmt.setBoolean(1, true);
 		    pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with deleteCar database connection");
@@ -1249,5 +1443,30 @@ public class Database {
 	}
 	
 	
+	
+	public static void activateDeletedCar(String vinNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String delete = "UPDATE " + carsTable + " SET " + isDeactiveCol + " = ? WHERE " + vinNumberIDCol + " = '" + vinNum + "'";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(delete);
+			pstmt.setBoolean(1, false);
+		    pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with activateDeletedCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+	}
 	
 }
