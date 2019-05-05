@@ -1,28 +1,22 @@
 package wifi.agardi.fmsproject;
 
-import java.beans.FeatureDescriptor;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.sun.javafx.collections.MappingChange.Map;
-import com.sun.media.jfxmedia.events.NewFrameEvent;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.SetChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -54,8 +48,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -66,10 +58,10 @@ import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
-	DropShadow shadow = new DropShadow();
+	DropShadow shadow = new DropShadow();  //Effect for the buttons
 	
 	private ObservableList<CarFX> observCar;
-	private FilteredList<CarFX> filteredListCars;
+	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
 	private SortedList<CarFX> sortedListCars;
 	
 	TableView<CarFX> carsTableView;
@@ -77,8 +69,8 @@ public class Main extends Application {
 
 	TabPane mainTabPane;
 	Tab carsTab;
-	
 	Tab reserveTab;
+	
 	TextField carLicensePlateTF;
 	TextField carWishTF;
 	ComboBox<String> carComboBox;
@@ -230,7 +222,7 @@ public class Main extends Application {
 			reserveTab.setClosable(false);
 			reserveTab.setId("reserveTab");
 			
-			FillCarsObservableList();
+			fillCarsObservableList();
 			carsTab = new Tab("Cars");
 			carsTab.setContent(openCarsMenu());
 			carsTab.setClosable(false);
@@ -299,7 +291,7 @@ public class Main extends Application {
 
 	
 //Initialize lists, reading data out from cars database	
-	public void FillCarsObservableList() {
+	public void fillCarsObservableList() {
 		  observCar = FXCollections.observableArrayList();
 		  ArrayList<Car> cars = new ArrayList<>();
 			try {
@@ -317,7 +309,7 @@ public class Main extends Application {
 	
 	
 	
-	public void FillCarsObservableListDeactivedCars() {
+	public void fillCarsObservableListDeactivedCars() {
 		  observCar = FXCollections.observableArrayList();
 		  ArrayList<Car> cars = new ArrayList<>();
 			try {
@@ -436,17 +428,12 @@ public class Main extends Application {
 			reserveGP.add(cityTF, 1, 3);
 			
 			TextField streetTF = new TextField();
-			streetTF.setPromptText("Street");
+			streetTF.setPromptText("Street, house nr./door");
 			reserveGP.add(streetTF, 1, 4);
-			
-			TextField housenrTF = new TextField();
-			housenrTF.setPromptText("House nr./door");
-			reserveGP.add(housenrTF, 1, 5);
-			
 					
 			TextField postCodeTF = new TextField();
 			postCodeTF.setPromptText("Postal code");
-			reserveGP.add(postCodeTF, 1, 6);
+			reserveGP.add(postCodeTF, 1, 5);
 						
 			
 //Grid 3. column
@@ -595,7 +582,6 @@ public class Main extends Application {
 					.or(landTF.textProperty().isEmpty())
 					.or(cityTF.textProperty().isEmpty())
 					.or(streetTF.textProperty().isEmpty())
-					.or(housenrTF.textProperty().isEmpty())
 					.or(postCodeTF.textProperty().isEmpty());
 		
 			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().or((ObservableBooleanValue) custObs);
@@ -673,7 +659,6 @@ public class Main extends Application {
 	
 	
 	
-	
 //CARS MENU	
 	public VBox showCarsTableView() {
 		TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
@@ -683,22 +668,22 @@ public class Main extends Application {
 		categorieCol.setSortType(TableColumn.SortType.ASCENDING);
 
 		TableColumn<CarFX, String> markeCol = new TableColumn<>("Brand");
-		markeCol.setPrefWidth(110);
+		markeCol.setPrefWidth(105);
 		markeCol.setMinWidth(30);
 		markeCol.setCellValueFactory(new PropertyValueFactory<>("carBrand"));
 	
 		TableColumn<CarFX, String> modellCol = new TableColumn<>("Modell");
-		modellCol.setPrefWidth(110);
+		modellCol.setPrefWidth(105);
 		modellCol.setMinWidth(30);
 		modellCol.setCellValueFactory(new PropertyValueFactory<>("carModel"));
     
 		TableColumn<CarFX, String> licPlateCol = new TableColumn<>("License Plate");
-		licPlateCol.setPrefWidth(100);
+		licPlateCol.setPrefWidth(90);
 		licPlateCol.setMinWidth(30);
     	licPlateCol.setCellValueFactory(new PropertyValueFactory<>("carLicensePlate"));
     
     	TableColumn<CarFX, String> fuelTypeCol = new TableColumn<>("Fuel Type");
-    	fuelTypeCol.setPrefWidth(90);
+    	fuelTypeCol.setPrefWidth(80);
     	fuelTypeCol.setMinWidth(30);
     	fuelTypeCol.setCellValueFactory(new PropertyValueFactory<>("carFuelType"));
     
@@ -729,7 +714,7 @@ public class Main extends Application {
 			   for(String s: categoriesList()) {
 			    	categoriesAll.add(s);
 			    }
-			ComboBox<String> carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesAll));
+			ComboBox<String>  carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesAll));
 			carSearchBox.setId("carSearchBox");
 			carSearchBox.getSelectionModel().select(0);
 			
@@ -737,7 +722,8 @@ public class Main extends Application {
 			searchTF.setId("searchTF");
 			searchTF.setPromptText("License plate nr.");
 
-//SEARCHING LISTENERS			
+//SEARCHING LISTENERS	
+
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
@@ -755,8 +741,7 @@ public class Main extends Application {
 					filteredListCars.setPredicate(s -> s.getModellObject().getCarLicensePlate().toLowerCase().contains(newV2));
 				}
 			});
-			
-				
+		
 			HBox carSearchHB = new HBox();
 			carSearchHB.setAlignment(Pos.CENTER_LEFT);
 			carSearchHB.setSpacing(5);	
@@ -768,7 +753,6 @@ public class Main extends Application {
 		return carsLeftVBox;	
 }
 
-	
 	
 	
 	
@@ -790,8 +774,7 @@ public class Main extends Application {
 		    carsHB.getChildren().add(carsGP);
 		    carsBP.setCenter(carsHB);
 		    
-//GridPane	
-//Left side 
+//GridPane LEFT SIDE
 		    Label vehicleLB = new Label("Vehicle");
 		    vehicleLB.setPrefWidth(195);
 		    carsGP.add(vehicleLB, 0, 0);
@@ -865,7 +848,7 @@ public class Main extends Application {
 		    reservationsLV.setPrefSize(195, 130);
 		        
 		
-//Right side	
+//GridPane RIGHT SIDE	
 //CATEGORIES
 		    ComboBox<String> carCategorieBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 		    carCategorieBox.setPrefWidth(195);
@@ -952,10 +935,9 @@ public class Main extends Application {
 	                }
 	            }
 	        });
-		    
-		    
+		      
 	
-//Features LISVIEW CHECKBOX		
+//Features LISTVIEW CHECKBOX		
 		    Label featuresLB = new Label("Features");
 		    carsGP.add(featuresLB, 1, 7);
 
@@ -980,15 +962,14 @@ public class Main extends Application {
 		    featuresLV.setPrefSize(195, 130);
 		    carsGP.add(featuresLV, 1, 8);
 		   
-
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
  
 	    
-//Bottom BUTTONS
-//RESERVE
-			Button makeResButton = new Button("Reserve");
-
+//Bottom BUTTONS, first the design, then the function
+		Button makeResButton = new Button("Reserve");
+			makeResButton.setId("makeResButton");
+			makeResButton.setDisable(true);
 			makeResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 				        new EventHandler<MouseEvent>() {
 				          @Override
@@ -1003,21 +984,8 @@ public class Main extends Application {
 				        	  makeResButton.setEffect(null);
 				          }
 				        });
-			
-			
-			makeResButton.setId("makeResButton");
-			makeResButton.setDisable(true);
-			makeResButton.setOnAction(e -> {
-				mainTabPane.getSelectionModel().select(reserveTab);
-				selectedCar = carsTableView.getSelectionModel().getSelectedItem();
-				carLicensePlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
-				carWishTF.setText(selectedCar.getModellObject().getCarBrand() + " " + 
-								  selectedCar.getModellObject().getCarModel());
-				carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
-			});
-			
-//DELETE			
-			Button deleteCarButton = new Button("Delete");
+				
+		Button deleteCarButton = new Button("Delete");
 			deleteCarButton.setId("deleteButton");
 			deleteCarButton.setDisable(true);
 			
@@ -1035,63 +1003,10 @@ public class Main extends Application {
 			        	  deleteCarButton.setEffect(null);
 			          }
 			        });
-		   //Filling text fields from table view selected items
-			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
-				if (newS != null) {
-					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
-					deleteCarButton.setDisable(false);
-					makeResButton.setDisable(false);
-					
-					brandTF.setText(selectedCar.getModellObject().getCarBrand());
-					modelTF.setText(selectedCar.getModellObject().getCarModel());
-					kmTF.setText(String.valueOf(selectedCar.getModellObject().getCarKM()));
-					yearPicker.setValue(selectedCar.getModellObject().getCarManufDate());
-					carFuelBox.setValue(selectedCar.getModellObject().getCarFuelType());
-					carTransmBox.setValue(selectedCar.getModellObject().getCarTransmission());
-					carCategorieBox.setValue(selectedCar.getModellObject().getCarCategory());
-					licPlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
-					vinNumTF.setText(selectedCar.getModellObject().getCarVinNumber());
-					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
-					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
-					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
-					
-					
-					for(String key : featuresMap.keySet()) {
-						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
-						for(String s: selectedCar.getModellObject().getCarFeatures()) {
-							if(key.equals(s))
-							featuresCheckedValue.getValue();
-							
-						}
-					}
-					
-				}
-			});
-			
-			
-			deleteCarButton.setOnAction(e -> {
-				Alert alertDelete = new Alert(AlertType.CONFIRMATION);
-				alertDelete.setTitle("Deleting a car");
-				alertDelete.setHeaderText("Please confirm!");
-				alertDelete.setContentText("Would you really want to delete the selected '" + selectedCar.getModellObject().getCarBrand() + 
-									" " + selectedCar.getModellObject().getCarModel() + "' with the license plate '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
-				Optional<ButtonType> result = alertDelete.showAndWait();
-				if(result.get() == ButtonType.OK) {
-					try {
-						Database.deleteCar(selectedCar.getModellObject().getCarVinNumber());
-						observCar.remove(selectedCar);
-					} catch (SQLException e1) {
-						System.out.println("Something is wrong with the delete car database connection");
-						e1.printStackTrace();
-					}
-				}
-					
-			});
-			
-//UPDATE			
-			Button updateCarButton = new Button("Update");
+				
+		Button updateCarButton = new Button("Update");
 			updateCarButton.setId("updateButton");
-			//updateCarButton.setDisable(true);
+			updateCarButton.setDisable(true);
 			
 			updateCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
@@ -1108,8 +1023,7 @@ public class Main extends Application {
 			          }
 			        });
 			
-//ADD NEW CAR	
-			Button addCarButton = new Button("Add");
+		Button addCarButton = new Button("Add");
 			addCarButton.setId("addCarButton");
 			
 			addCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -1127,6 +1041,129 @@ public class Main extends Application {
 			          }
 			        });
 			
+			
+//Filling text fields from table view selected items, enable buttons
+			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
+				if (newS != null) {
+					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
+					deleteCarButton.setDisable(false);
+					makeResButton.setDisable(false);
+					updateCarButton.setDisable(false);
+					
+					brandTF.setText(selectedCar.getModellObject().getCarBrand());
+					modelTF.setText(selectedCar.getModellObject().getCarModel());
+					kmTF.setText(String.valueOf(selectedCar.getModellObject().getCarKM()));
+					yearPicker.setValue(selectedCar.getModellObject().getCarManufDate());
+					carFuelBox.setValue(selectedCar.getModellObject().getCarFuelType());
+					carTransmBox.setValue(selectedCar.getModellObject().getCarTransmission());
+					carCategorieBox.setValue(selectedCar.getModellObject().getCarCategory());
+					licPlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
+					vinNumTF.setText(selectedCar.getModellObject().getCarVinNumber());
+					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
+					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
+					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
+					
+					for(String key : featuresMap.keySet()) {
+						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
+						for(String s: selectedCar.getModellObject().getCarFeatures()) {
+						if(key.equals(s)) {
+							System.out.println("Extras= " + s);
+						}
+						} 
+					}
+				}
+			});
+				
+	
+//RESERVE CAR ACTION			
+			makeResButton.setOnAction(e -> {
+				mainTabPane.getSelectionModel().select(reserveTab);
+				selectedCar = carsTableView.getSelectionModel().getSelectedItem();
+				carLicensePlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
+				carWishTF.setText(selectedCar.getModellObject().getCarBrand() + " " + 
+								  selectedCar.getModellObject().getCarModel());
+				carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
+			});			
+			
+			
+//DELETE ACTION			
+			deleteCarButton.setOnAction(e -> {
+				Alert alertDelete = new Alert(AlertType.CONFIRMATION);
+				alertDelete.setTitle("Deleting a car");
+				alertDelete.setHeaderText("Please confirm!");
+				alertDelete.setContentText("Would you really want to DELETE the selected '" + selectedCar.getModellObject().getCarBrand() + 
+									" " + selectedCar.getModellObject().getCarModel() + "' with the license plate '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
+				Optional<ButtonType> result = alertDelete.showAndWait();
+				if(result.get() == ButtonType.OK) {
+					try {
+						Database.deleteCar(selectedCar.getModellObject().getCarVinNumber());
+						observCar.remove(selectedCar);
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the delete car database connection");
+						e1.printStackTrace();
+					}
+				}
+					
+			});
+				
+//UPDATE CAR ACTION	
+			updateCarButton.setOnAction(e -> {
+			  try {
+				String vinNumber = vinNumTF.getText().toUpperCase();
+				String licPlate = licPlateTF.getText().toUpperCase();
+				String brand = brandTF.getText().substring(0, 1).toUpperCase() + brandTF.getText().substring(1);
+				String model = modelTF.getText().substring(0, 1).toUpperCase() + modelTF.getText().substring(1);
+				String category = carCategorieBox.getSelectionModel().getSelectedItem().toString();
+				String color = carColorBox.getSelectionModel().getSelectedItem().toString();
+				String fuel = carFuelBox.getSelectionModel().getSelectedItem().toString();
+				String transm = carTransmBox.getSelectionModel().getSelectedItem().toString();
+				LocalDate manufDate = yearPicker.getValue();
+				int carKM = Integer.parseInt(kmTF.getText());
+				int engSize = Integer.parseInt(engineSizeTF.getText());
+				int engPower = Integer.parseInt(enginePowerTF.getText());
+				
+				ArrayList<String> features = new ArrayList<>();
+				for(String key : featuresMap.keySet()) {
+					ObservableValue<Boolean> val = featuresMap.get(key);
+					if(val.getValue()) {
+						features.add(key);
+					}
+				}
+				
+				CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
+										category, color, fuel, transm, manufDate, 
+										carKM, engSize, engPower, false, features));
+				
+				if(!Database.checkExistingCarVIN(vinNumber)) {
+					Alert alertWarn= new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Updating a car");
+					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
+					alertWarn.setContentText("Car with the VIN number '" + vinNumber + 
+							"' doesn't exists! Please add as a new car! \n\nNote, that it is NOT possible to update the VIN number. "
+							+ "In this case, please delete this car, and add as a new one!");
+					alertWarn.showAndWait();
+					return;
+				} else {
+					Alert alertUpdate = new Alert(AlertType.CONFIRMATION);
+					alertUpdate.setTitle("Updating a car");
+					alertUpdate.setHeaderText("Please confirm!");
+					alertUpdate.setContentText("Would you really want to UPDATE this '" + brand + 
+										" " + model + "' with the VIN number '" + vinNumber + "'?");
+					Optional<ButtonType> result = alertUpdate.showAndWait();
+					if(result.get() == ButtonType.OK) {
+							Database.updateCar(car.getModellObject());
+							observCar.remove(selectedCar);
+							observCar.add(car);
+						}
+				}
+			  } catch (SQLException e1) {
+				  System.out.println("Something is wrong with the database - update car");
+				  e1.printStackTrace();
+			  }
+			});
+					
+			
+//ADD NEW CAR ACTION
 			addCarButton.disableProperty().bind(brandTF.textProperty().isEmpty()
 											.or(modelTF.textProperty().isEmpty())
 											.or(kmTF.textProperty().isEmpty())
@@ -1163,19 +1200,27 @@ public class Main extends Application {
 						}
 					}
 					
-					CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
+					CarFX newCar = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 											category, color, fuel, transm, manufDate, 
 											carKM, engSize, engPower, false, features));
-//ALERT					
-					if(Database.checkExistingCar(vinNumber, licPlate)) {
+					//ALERT					
+					if(Database.checkExistingCarVIN(vinNumber)) {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a new car");
 						alertWarn.setHeaderText("Please check again, it's an existing car!");
-						alertWarn.setContentText("Car with the VIN number '"+ vinNumber +
-										"' and license plate '" + licPlate + "' already exists!");
+						alertWarn.setContentText("Car with the VIN number '"+ vinNumber + "' already exists!");
 						alertWarn.showAndWait();
 						return;
-					} if(vinNumber.length() < 11) {
+					}
+					if(Database.checkExistingCarLicP(licPlate)) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Adding a new car");
+						alertWarn.setHeaderText("Please check again, it's an existing car!");
+						alertWarn.setContentText("Car with the license plate '"+ licPlate + "' already exists!");
+						alertWarn.showAndWait();
+						return;
+					}
+					if(vinNumber.length() < 11) {
 						Alert alertWarn2= new Alert(AlertType.WARNING);
 						alertWarn2.setTitle("Adding a new car");
 						alertWarn2.setHeaderText("Please check again the VIN number!");
@@ -1203,12 +1248,12 @@ public class Main extends Application {
 						Alert alertAdd = new Alert(AlertType.CONFIRMATION);
 						alertAdd.setTitle("Adding a new car");
 						alertAdd.setHeaderText("Please confirm!");
-						alertAdd.setContentText("Would you really want to add this '" + brand + 
+						alertAdd.setContentText("Would you really want to ADD this '" + brand + 
 											" " + model + "' with the license plate '" + licPlate + "'?");
 						Optional<ButtonType> result = alertAdd.showAndWait();
 						if(result.get() == ButtonType.OK) {
-								Database.addNewCar(car.getModellObject());
-								observCar.add(car);
+								Database.addNewCar(newCar.getModellObject());
+								observCar.add(newCar);
 							}
 					}	
 				} catch (SQLException e1) {
@@ -1216,11 +1261,7 @@ public class Main extends Application {
 					e1.printStackTrace();
 				}		
 			});
-			
-			updateCarButton.setOnAction(e -> {
-				System.out.println(carsTableView.getSelectionModel().getSelectedItem().getModellObject().getCarFeatures());
-	
-			});
+
 				    
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(10, 5, 0, 0));
@@ -1232,7 +1273,6 @@ public class Main extends Application {
 		
 		return carsBP;
 	}
-	
 	
 	
 	
@@ -1398,8 +1438,6 @@ public class Main extends Application {
 		return reservationsBP;
 		
 	}
-	
-	
 	
 	
 	

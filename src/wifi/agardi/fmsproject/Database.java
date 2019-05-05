@@ -1109,13 +1109,9 @@ public class Database {
 	}
 
 
-	
 	public static void addCarFeatures(ArrayList<String> featureNames, String vinNum) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-//		String add = "INSERT INTO " + carFeaturesTable + " (" + vinNumberIDCol + ", " + featureIDCol + ") VALUES (SELECT " + vinNumberIDCol + 
-//					" FROM " + carsTable + " WHERE " + vinNumberIDCol + " = ?, SELECT " + featureIDCol + " FROM " + featuresTable + " WHERE " + featureIDCol + " = ?)";
-		
 		String add = "INSERT INTO " + carFeaturesTable + " (" + vinNumberIDCol + ", " + featureIDCol + ") VALUES (?,?)";
 				
 		try {
@@ -1142,6 +1138,32 @@ public class Database {
 	    }
 	}
 
+	
+	public static void updateCarFeatures(ArrayList<String> featureNames, String vinNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String update = "DELETE FROM " + carFeaturesTable + " WHERE " + vinNumberIDCol + " = '" + vinNum + "'";
+				
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(update);
+			pstmt.executeUpdate();
+			addCarFeatures(featureNames, vinNum);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateCarFeatures database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
 	
 	
 	public static ArrayList<String> readCarFeatures(String VinNum) throws SQLException {
@@ -1229,7 +1251,6 @@ public class Database {
 	}
 	
 	
-	
 	public static void addNewCar(Car car) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -1280,6 +1301,90 @@ public class Database {
 	}
 	
 
+	public static void updateCar(Car car) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String update = "UPDATE " + carsTable + " SET " + 
+												licensePlateCol + " = ?, " + 
+												brandCol + " = ?, " + 
+												modelCol + " = ?, " + 
+												categoryCol + " = ?, " + 
+												colorCol + " = ?, " + 
+												fuelTypeCol + " = ?, " + 
+												transmissionCol + " = ?, " + 
+												manufactureDateCol + " = ?, " + 
+												actualKMCol + " = ?, " + 
+												engineSizeCol + " = ?, " + 
+												enginePowerCol + " = ? " + 
+												"WHERE " + vinNumberIDCol + " = ?";
+		
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(update);
+			
+			pstmt.setString(1, car.getCarLicensePlate());
+			pstmt.setString(2, car.getCarBrand());
+			pstmt.setString(3, car.getCarModel());
+			pstmt.setInt(4, readCarCategoriesID(car.getCarCategory()));
+			pstmt.setInt(5, readColorID(car.getCarColor()));
+			pstmt.setInt(6, readFuelTypeID(car.getCarFuelType()));
+			pstmt.setInt(7, readTransmissionID(car.getCarTransmission()));
+			LocalDateTime date = LocalDateTime.of(car.getCarManufDate().getYear(),
+												  car.getCarManufDate().getMonth(),
+												  car.getCarManufDate().getDayOfMonth(),0,0,0,0);
+			java.sql.Date sqldate = new java.sql.Date(date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setDate(8, sqldate);
+			pstmt.setInt(9, car.getCarKM());
+			pstmt.setInt(10, car.getCarEngineSize());
+			pstmt.setInt(11, car.getCarEnginePower());
+			pstmt.setString(12, car.getCarVinNumber());
+			
+			pstmt.executeUpdate();
+	
+			updateCarFeatures(car.getCarFeatures(), car.getCarVinNumber());
+			System.out.println("Car updated successfully");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateCar database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void deleteCar(String vinNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String delete = "UPDATE " + carsTable + " SET " + isDeactiveCol + " = ? WHERE " + vinNumberIDCol + " = '" + vinNum + "'";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(delete);
+			pstmt.setBoolean(1, true);
+		    pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with deleteCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+	}
+	
 	
 	public static ArrayList<Car> readCarsTable() throws SQLException{
 		  Connection conn = null;
@@ -1332,7 +1437,6 @@ public class Database {
 	   }
 
 	
-	
 	public static ArrayList<Car> readDeactiveCarsTable() throws SQLException{
 		  Connection conn = null;
 		  Statement stmt = null;
@@ -1384,8 +1488,60 @@ public class Database {
 	   }
 	
 	
+	public static ArrayList<Car> readCarsTableCategory(String catName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<Car> cars = new ArrayList<>();
+		  int catID = readCarCategoriesID(catName);
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + carsTable + " WHERE " + isDeactiveCol + " = FALSE AND " +
+									categoryCol + " = " + catID);
+			while(rs.next()) {
+				java.sql.Date sqlDate = rs.getDate(manufactureDateCol);
+				java.time.LocalDate locDate = sqlDate.toLocalDate();
+				String vinNum = rs.getString(vinNumberIDCol);
+				
+				Car car = new Car(vinNum, 
+								  rs.getString(licensePlateCol),
+								  rs.getString(brandCol),
+								  rs.getString(modelCol),
+								  readCarCategoryName(rs.getInt(categoryIDCol)),
+								  readColorName(rs.getInt(colorIDCol)),
+								  readFuelTypeName(rs.getInt(fuelTypeIDCol)),
+								  readTransmissionName(rs.getInt(transmissionIDCol)),
+								  locDate,
+								  rs.getInt(actualKMCol),
+								  rs.getInt(engineSizeCol),
+								  rs.getInt(enginePowerCol),
+								  rs.getBoolean(isOnRentCol),
+								  readCarFeatures(vinNum));
+				cars.add(car);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCarsTableCategory database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return cars;
+	   }
 	
-	public static boolean checkExistingCar(String vinID, String licPlateID) throws SQLException {
+	
+	public static boolean checkExistingCarVIN(String vinID) throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -1393,8 +1549,37 @@ public class Database {
 			conn = DriverManager.getConnection(connString);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM "+ carsTable +
-								   " WHERE " + vinNumberIDCol + " = '" + vinID + "' OR " + 
-									licensePlateCol + " = '" + licPlateID + "'");
+								   " WHERE " + vinNumberIDCol + " = '" + vinID + "'");
+		    if(rs.next()) {
+		    	return true;
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCarVIN database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return false;
+	}
+	
+	
+	public static boolean checkExistingCarLicP(String licPlateID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ carsTable +
+								   " WHERE " + licensePlateCol + " = '" + licPlateID + "'");
 		    if(rs.next()) {
 		    	return true;
 		    }
@@ -1414,34 +1599,6 @@ public class Database {
 		}
 		return false;
 	}
-	
-	
-	
-	public static void deleteCar(String vinNum) throws SQLException {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		String delete = "UPDATE " + carsTable + " SET " + isDeactiveCol + " = ? WHERE " + vinNumberIDCol + " = '" + vinNum + "'";
-		try {
-			conn = DriverManager.getConnection(connString);
-			pstmt = conn.prepareStatement(delete);
-			pstmt.setBoolean(1, true);
-		    pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Something is wrong with deleteCar database connection");
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null)
-					pstmt.close();
-				if(conn != null)
-				  conn.close();
-			}
-		catch(SQLException e) {
-			throw e;
-		  }
-		}
-	}
-	
 	
 	
 	public static void activateDeletedCar(String vinNum) throws SQLException {
