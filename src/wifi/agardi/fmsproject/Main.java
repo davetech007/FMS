@@ -306,6 +306,7 @@ public class Main extends Application {
 		    filteredListCars = new FilteredList<>(observCar, p -> true);
 		    sortedListCars = new SortedList<>(filteredListCars);
 		}
+
 	
 	
 	
@@ -387,11 +388,18 @@ public class Main extends Application {
 			reserveGP.add(dateBornPicker, 0, 4);
 			
 //NATIONALITY TODO			
-			ComboBox<String> landComboBox = new ComboBox<>();
-			landComboBox.setPrefWidth(195);
-			landComboBox.getItems().addAll("American", "Hungarian", "Deutsch", "Chinese");
-			landComboBox.setPromptText("Choose nationality");
-			reserveGP.add(landComboBox, 0, 5);
+			ComboBox<String> nationalityComboBox = new ComboBox<>();
+			   try {
+			    	ArrayList<String> nationalities = Database.readNationalitiesTable();
+			    	Collections.sort(nationalities);
+			    	nationalityComboBox.setItems(FXCollections.observableArrayList(nationalities));
+				} catch (SQLException e1) {
+					System.out.println("Nationalities database to combobox adding failed...");
+					e1.printStackTrace();
+				} 
+			nationalityComboBox.setPrefWidth(195);
+			nationalityComboBox.setPromptText("Choose nationality");
+			reserveGP.add(nationalityComboBox, 0, 5);
 			
 			
 			TextField passportTF = new TextField();
@@ -414,7 +422,10 @@ public class Main extends Application {
 			reserveGP.add(emailTF, 0, 10);
 
 			
-//Grid 1. column		
+//Grid 1. column	
+			Label custIdLabel = new Label("ID = ");
+			reserveGP.add(custIdLabel, 1, 0);
+			
 			Label addressLabel = new Label("Address");
 			reserveGP.add(addressLabel, 1, 1);
 			
@@ -434,6 +445,8 @@ public class Main extends Application {
 			TextField postCodeTF = new TextField();
 			postCodeTF.setPromptText("Postal code");
 			reserveGP.add(postCodeTF, 1, 5);
+			
+		
 						
 			
 //Grid 3. column
@@ -492,8 +505,10 @@ public class Main extends Application {
 
 			HBox pickupHBox = new HBox();
 			pickupHBox.setSpacing(5);
+			pickupHBox.setAlignment(Pos.CENTER_LEFT);
 			TextField pickupHourTF = new TextField();
 			Label pickupHourLB = new Label("hours");
+			pickupHourLB.setAlignment(Pos.CENTER);
 			pickupHourTF.setMaxWidth(40);
 			TextField pickupMinTF = new TextField();
 			pickupMinTF.setMaxWidth(40);
@@ -528,6 +543,7 @@ public class Main extends Application {
 			
 			HBox returnHBox = new HBox();
 			returnHBox.setSpacing(5);
+			returnHBox.setAlignment(Pos.CENTER_LEFT);
 			TextField returnHourTF = new TextField();
 			returnHourTF.setMaxWidth(40);
 			Label returnHourLB = new Label("hours");
@@ -570,11 +586,11 @@ public class Main extends Application {
 			
 			
 //Reserve BorderPane BOTTOM BUTTONS
-			
-			ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
+//DESIGN			
+		ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
 					.or(lastNameTF.textProperty().isEmpty())
 					.or(dateBornPicker.valueProperty().isNull())
-					.or(landComboBox.valueProperty().isNull())
+					.or(nationalityComboBox.valueProperty().isNull())
 					.or(passportTF.textProperty().isEmpty())
 					.or(dLicenseTF.textProperty().isEmpty())
 					.or(telefonTF.textProperty().isEmpty())
@@ -584,9 +600,10 @@ public class Main extends Application {
 					.or(streetTF.textProperty().isEmpty())
 					.or(postCodeTF.textProperty().isEmpty());
 		
-			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().or((ObservableBooleanValue) custObs);
-//SAVE CUSTOMER			
-			Button saveCustomerButton = new Button("Save");
+		ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().or((ObservableBooleanValue) custObs);
+			
+					
+		Button saveCustomerButton = new Button("Add");
 			saveCustomerButton.setId("saveCustomerButton");	
 			saveCustomerButton.disableProperty().bind(custObs);
 			
@@ -606,9 +623,28 @@ public class Main extends Application {
 			        });
 			
 			
-//UPDATE RES			
-			Button updateResButton = new Button("Update");
-			updateResButton.setId("updateButton");
+		Button updateCustomerButton = new Button("Update");
+			updateCustomerButton.setId("updateCustomerButton");	
+			updateCustomerButton.disableProperty().bind(custObs);
+			
+			updateCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateCustomerButton.setEffect(shadow);
+			          }
+			        });
+			updateCustomerButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  updateCustomerButton.setEffect(null);
+			          }
+			        });
+			
+			
+		Button updateResButton = new Button("?");
+			updateResButton.setId("updateResButton");
 			updateResButton.setDisable(true);
 			
 			updateResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -625,8 +661,9 @@ public class Main extends Application {
 			        	  updateResButton.setEffect(null);
 			          }
 			        });
-//RESERVE			
-			Button reserveButton = new Button("Reserve");
+
+			
+		Button reserveButton = new Button("Save");
 			reserveButton.setId("saveResButton");
 			reserveButton.disableProperty().bind(resObs);
 			
@@ -645,12 +682,56 @@ public class Main extends Application {
 			          }
 			        });
 			
-			HBox bottomHBoxRes = new HBox();
-			bottomHBoxRes.getChildren().addAll(saveCustomerButton, updateResButton, reserveButton);
-			bottomHBoxRes.setPadding(new Insets(10, 5, 0, 0));
+//SAVE CUSTOMER ON ACTION			
+			
+			saveCustomerButton.setOnAction(e -> {
+			   try {
+				String customerID = "FMSCID" + String.valueOf(System.currentTimeMillis() / 1000);
+				String firstName = firstNameTF.getText().substring(0, 1).toUpperCase() + firstNameTF.getText().substring(1);
+				String lastName = lastNameTF.getText().substring(0, 1).toUpperCase() + lastNameTF.getText().substring(1);
+				LocalDate dateOfBorn = dateBornPicker.getValue();
+				String nationality = nationalityComboBox.getSelectionModel().getSelectedItem().toString();
+				String passportNum = passportTF.getText().toUpperCase();
+				String driversLicenseNum = dLicenseTF.getText().toUpperCase();
+				String telefon = telefonTF.getText().toUpperCase();
+				String eMail = emailTF.getText().toLowerCase();
+				String addressLand = landTF.getText().substring(0, 1).toUpperCase() + landTF.getText().substring(1);
+				String addressCity = cityTF.getText().substring(0, 1).toUpperCase() + cityTF.getText().substring(1);
+				String addressStreet = streetTF.getText().substring(0, 1).toUpperCase() + streetTF.getText().substring(1);
+				String addressPostalCode = postCodeTF.getText().toUpperCase();
+				
+				CustomerFX newCustomer = new CustomerFX(new Customer(customerID, firstName, lastName, dateOfBorn,
+														nationality, passportNum, driversLicenseNum, telefon, eMail,
+														addressLand, addressCity, addressStreet, addressPostalCode));
+				
+				
+		        Alert confirmAdd = new Alert(AlertType.CONFIRMATION);
+				
+				
+			  } catch (SQLException e1) {
+				  System.out.println("Something is wrong with the database - add custormer");
+				  e1.printStackTrace();
+			  }
+				
+			});
+			
+			
+			
+			
+			
+			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
+			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
-			reserveBP.setBottom(bottomHBoxRes);
+			
+			HBox bottomHBoxCust = new HBox(saveCustomerButton, updateCustomerButton);
+			bottomHBoxCust.setPadding(new Insets(0, 0, 0, 20));
+			bottomHBoxCust.setSpacing(10);
+			bottomHBoxCust.setAlignment(Pos.BOTTOM_LEFT);
+			
+			VBox bottomVBox = new VBox(bottomHBoxCust, bottomHBoxRes);
+			
+			reserveBP.setBottom(bottomVBox);
 
 		return reserveBP;
 		
@@ -986,7 +1067,7 @@ public class Main extends Application {
 				        });
 				
 		Button deleteCarButton = new Button("Delete");
-			deleteCarButton.setId("deleteButton");
+			deleteCarButton.setId("deleteCarButton");
 			deleteCarButton.setDisable(true);
 			
 			deleteCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -1005,7 +1086,7 @@ public class Main extends Application {
 			        });
 				
 		Button updateCarButton = new Button("Update");
-			updateCarButton.setId("updateButton");
+			updateCarButton.setId("updateCarButton");
 			updateCarButton.setDisable(true);
 			
 			updateCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -1372,7 +1453,7 @@ public class Main extends Application {
 		        });
 //DELETE		
 		Button deleteResButton = new Button("Delete");
-		deleteResButton.setId("deleteButton");
+		deleteResButton.setId("deleteResButton");
 		
 		deleteResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 		        new EventHandler<MouseEvent>() {
@@ -1390,7 +1471,7 @@ public class Main extends Application {
 		        });
 //UPDATE		
 		Button updateResButton = new Button("Update");
-		updateResButton.setId("updateButton");
+		updateResButton.setId("updateResButton");
 		
 		updateResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 		        new EventHandler<MouseEvent>() {
@@ -1462,7 +1543,10 @@ public class Main extends Application {
 			System.out.println("Created features table, or already exists");
 		    Database.createCarFeaturesTable();
 			System.out.println("Created car features junction table, or already exists");
-		
+			Database.createNationalitiesTable();
+			System.out.println("Created nationalities table, or already exists");
+			Database.createCustomersTable();
+			System.out.println("Created customers table, or already exists");
 			
 		} catch (SQLException e) {
 			System.out.println(e);

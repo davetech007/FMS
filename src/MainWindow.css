@@ -3,10 +3,6 @@
 	-fx-font-family: "Segoe UI Light";
 }
 
-.button {
-    -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
-}
-
 .root {
 	-fx-background-image: url("EverlastingSky.png");
 	-fx-background-size: cover;
@@ -114,6 +110,7 @@
 
 #chooseCarButton {
   -fx-background-image:url("ChooseCar.png");
+  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
   -fx-background-repeat: no-repeat;
   -fx-background-size: 50px;
   -fx-background-position: right center;
@@ -124,6 +121,7 @@
 
 #searchDriverButton {
   -fx-background-image:url("ChooseCustomer.png");
+  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
   -fx-background-repeat: no-repeat;
   -fx-background-size: 33px;
   -fx-background-position: right center;
@@ -132,49 +130,7 @@
   -fx-pref-width: 195px;
 }
 
-#makeResButton {
-  -fx-background-image:url("IconReserveCar.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 33px;
-  -fx-pref-width: 120px;
-  -fx-pref-height: 40px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
-}
 
-#updateButton {
-  -fx-background-image:url("IconUpdate.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 33px;
-  -fx-pref-width: 120px;
-  -fx-pref-height: 40px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#ffeed1, #FFA500);
-}
-
-#deleteButton {
-  -fx-background-image:url("IconDelete.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 33px;
-  -fx-pref-width: 120px;
-  -fx-pref-height: 40px;
-  -fx-background-position: 5%;
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #ffafaf);	
-}
-
-#addCarButton {
-  -fx-background-image:url("IconAddCar.png");
-  -fx-background-repeat: no-repeat;
-  -fx-background-size: 33px;
-  -fx-pref-width: 120px;
-  -fx-pref-height: 40px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #96d666);	
-}
 
 #saveCustomerButton {
   -fx-background-image:url("IconSaveCustomer.png");
@@ -186,7 +142,30 @@
   -fx-padding: 0 0 0 20;
   -fx-background-color: linear-gradient(#efefef, #C0C0C0);	
 }
+#updateCustomerButton {
+  -fx-background-image:url("IconUpdateCustomer.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 38px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#ffeed1, #FFA500);	
+}
 
+
+
+
+#updateResButton {
+  -fx-background-image:url("IconUpdateRes.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 35px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#ffeed1, #FFA500);
+}
 #saveResButton {
   -fx-background-image:url("IconSaveRes.png");
   -fx-background-repeat: no-repeat;
@@ -198,6 +177,57 @@
   -fx-background-color: linear-gradient(#efefef, #96d666);	
 }
 
+
+
+
+
+#makeResButton {
+  -fx-background-image:url("IconReserveCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
+}
+#deleteCarButton {
+  -fx-background-image:url("IconDelete.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
+}
+#updateCarButton {
+  -fx-background-image:url("IconUpdateCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 40px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#ffeed1, #FFA500);
+}
+#addCarButton {
+  -fx-background-image:url("IconAddCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #96d666);	
+}
+
+
+
+
+
+
+
 #printPdfButton {
   -fx-background-image:url("IconPrintPdf.png");
   -fx-background-repeat: no-repeat;
@@ -208,7 +238,16 @@
   -fx-padding: 0 0 0 20;
   -fx-background-color: linear-gradient(#efefef, #C0C0C0);
 }
-
+#deleteResButton {
+  -fx-background-image:url("IconDeleteRes.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
+}
 #returnCarButton {
   -fx-background-image:url("IconReturnCar.png");
   -fx-background-repeat: no-repeat;
@@ -221,4 +260,26 @@
 }
 
 
+
+
+#deleteCustomerButton {
+  -fx-background-image:url("IconDeleteCustomer.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 25px;
+  -fx-pref-width: 100px;
+  -fx-pref-height: 30px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
+}
+.dialog-pane:header .header-panel {
+  -fx-background-color: transparent;
+  
+}
+.dialog-pane:header .header-panel .label{
+  -fx-alignment: center;
+  -fx-font-size: 18px;
+  -fx-font-family: "Segoe UI Light";
+  -fx-font-weight: bold;
+}
 

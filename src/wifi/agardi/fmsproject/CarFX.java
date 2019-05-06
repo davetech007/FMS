@@ -158,7 +158,6 @@ public class CarFX {
 	
 	
 	
-	
 	public String getCarTransmission() {
 		return carTransmission.get();
 	}
@@ -172,9 +171,7 @@ public class CarFX {
 	
 	
 	
-	
-	
-	
+
 	public LocalDate getCarManufDate() {
 		return carManufDate.get();
 	}
@@ -185,8 +182,6 @@ public class CarFX {
 	public ObjectProperty<LocalDate> carManufDateProperty() {
 		return carManufDate;
 	}
-	
-	
 	
 	
 	

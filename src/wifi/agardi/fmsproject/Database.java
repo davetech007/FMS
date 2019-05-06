@@ -19,17 +19,17 @@ import java.util.LinkedHashMap;
 public class Database {
 	public static final String DBlocation = "DatabaseTestNew7";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
-
+//USERS
 	public static final String usersTable = "Users";
 	public static final String userIDCol = "User_ID";
 	public static final String userNameCol = "Username";
 	public static final String passwordCol = "Password";
 	
+//CARS	
 	public static final String categoriesTable = "Categories";
 	public static final String categoryIDCol = "Category_ID";
 	public static final String categoryNameCol = "CategoryName";
 	public static final String categoryPriceCol = "CategoryPrice";
-	
 
 	public static final String fuelTypesTable = "FuelTypes";
 	public static final String fuelTypeIDCol = "FuelType_ID";
@@ -47,7 +47,6 @@ public class Database {
 	private static final String[] colors = {"Beige", "Black", "Blue", "Gold", "Gray", "Green", "Orange", 
 											"Purple", "Red", "Silver", "Yellow", "White" };
 	
-	
 	public static final String featuresTable = "Features";
 	public static final String featureIDCol = "Feature_ID";
 	public static final String featureNameCol = "FeatureName";
@@ -57,22 +56,46 @@ public class Database {
 	public static final String carFeaturesTable = "CarFeatures";
 	public static final String carFeaturesIDCol = "CarFeatures_ID";
 	
-	
 	public static final String carsTable = "Cars";
 	public static final String vinNumberIDCol = "VinNumber_ID";
 	public static final String licensePlateCol = "LicensePlate";
 	public static final String brandCol = "Brand";
 	public static final String modelCol = "Model";
-	public static final String categoryCol = "Category_ID";
-	public static final String colorCol = "Color_ID";
-	public static final String fuelTypeCol = "FuelType_ID";
-	public static final String transmissionCol = "Transmission_ID";
+//	public static final String categoryCol = "Category_ID";
+//	public static final String colorCol = "Color_ID";
+//	public static final String fuelTypeCol = "FuelType_ID";
+//	public static final String transmissionCol = "Transmission_ID";
 	public static final String manufactureDateCol = "ManufactureDate";
 	public static final String actualKMCol = "ActualKM";
 	public static final String engineSizeCol = "EngineSize";
 	public static final String enginePowerCol = "EnginePower";
 	public static final String isOnRentCol = "IsOnRent";
 	public static final String isDeactiveCol = "IsDeactive";
+
+	
+//CUSTOMERS
+	public static final String nationalitiesTable = "Nationalities";
+	public static final String nationalityIDCol = "Nationality_ID";
+	public static final String nationalityNameCol = "NationalityName";
+	private static final String[] nationalities = {"American", "Australian", "Austrian", "Belgian", "Brazilian", "British", "Canadian", "Chinese",	
+				"Colombian", "Croatian", "Czech", "Dane", "Egyptian", "Finn", "French", "German", "Greek", "Dutch",
+				"Hungarian", "Indian", "Irish", "Israeli", "Italian", "Japanese", "Korean", "Kuwaiti", "Liechtensteiner", "Luxembourger",
+				"Malaysian", "Mexican", "Montenegrin", "Norwegian", "Pakistani", "Panamanian", "Filipino", "Pole", "Portuguese", "Quatari",
+				"Romanian", "Russian", "Scot", "Serbian", "Slovak", "Slovenian", "Swede", "Swiss", "Thai", "Turk", "Ukrainian", "Welsh", "Yugoslav"};
+	
+	public static final String customersTable = "Customers";
+	public static final String customerIDCol = "Customer_ID";
+	public static final String firstNameCol = "FirstName";
+	public static final String lastNameCol = "LastName";
+	public static final String dateOfBornCol = "DateOfBorn";
+	public static final String passportNumCol = "PassportNumber";
+	public static final String driversLicCol = "DriversLicenseNumber";
+	public static final String telefonCol = "Telefon";
+	public static final String eMailCol = "EMail";
+	public static final String addressLandCol = "AddressLand";
+	public static final String addressCityCol = "AddressCity";
+	public static final String addressStreetCol = "AddressStreet";
+	public static final String addressPostCodeCol = "AddressPostalCode";
 	
 	
 	
@@ -83,8 +106,8 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + usersTable + "(" +
 						 userIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-				         userNameCol + " VARCHAR(50), " +
-				         passwordCol + " VARCHAR(50))";
+				         userNameCol + " VARCHAR(100), " +
+				         passwordCol + " VARCHAR(100))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, usersTable.toUpperCase(), new String[] {"TABLE"});
@@ -235,7 +258,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + categoriesTable + "(" +
 						categoryIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						categoryNameCol + " VARCHAR(30), "+ categoryPriceCol +" INTEGER)";
+						categoryNameCol + " VARCHAR(50), "+ categoryPriceCol +" INTEGER)";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, categoriesTable.toUpperCase(), new String[] {"TABLE"});
@@ -416,7 +439,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + fuelTypesTable + "(" +
 						fuelTypeIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						fuelTypeNameCol + " VARCHAR(30))";
+						fuelTypeNameCol + " VARCHAR(50))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, fuelTypesTable.toUpperCase(), new String[] {"TABLE"});
@@ -582,7 +605,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + transmissionsTable + "(" +
 						transmissionIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						transmissionTypeCol + " VARCHAR(30))";
+						transmissionTypeCol + " VARCHAR(50))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, transmissionsTable.toUpperCase(), new String[] {"TABLE"});
@@ -749,7 +772,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + colorsTable + "(" +
 						colorIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						colorNameCol + " VARCHAR(30))";
+						colorNameCol + " VARCHAR(50))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, colorsTable.toUpperCase(), new String[] {"TABLE"});
@@ -914,7 +937,7 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + featuresTable + "(" +
 						featureIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-						featureNameCol + " VARCHAR(40))";
+						featureNameCol + " VARCHAR(50))";
 		try {
 			conn = DriverManager.getConnection(connString);
 			rs = conn.getMetaData().getTables(null, null, featuresTable.toUpperCase(), new String[] {"TABLE"});
@@ -1207,13 +1230,13 @@ public class Database {
 		ResultSet rs = null;
 		String create = "CREATE TABLE " + carsTable + "(" +
 						vinNumberIDCol + " VARCHAR(17), " +
-						licensePlateCol + " VARCHAR(10), " +
-						brandCol + " VARCHAR(20), " +
-						modelCol + " VARCHAR(20), " +
-						categoryCol + " INTEGER, " +
-						colorCol + " INTEGER, " +
-						fuelTypeCol + " INTEGER, " +
-						transmissionCol + " INTEGER, " +
+						licensePlateCol + " VARCHAR(20), " +
+						brandCol + " VARCHAR(50), " +
+						modelCol + " VARCHAR(50), " +
+						categoryIDCol + " INTEGER, " +
+						colorIDCol + " INTEGER, " +
+						fuelTypeIDCol + " INTEGER, " +
+						transmissionIDCol + " INTEGER, " +
 						manufactureDateCol + " DATE, " + 
 						actualKMCol + " INTEGER, " +
 						engineSizeCol + " INTEGER, " +
@@ -1221,10 +1244,10 @@ public class Database {
 						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						"PRIMARY KEY (" + vinNumberIDCol + "), " +
-						"FOREIGN KEY (" + categoryCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
-						"FOREIGN KEY (" + colorCol + ") REFERENCES " + colorsTable + "(" + colorIDCol + "), " +
-						"FOREIGN KEY (" + fuelTypeCol + ") REFERENCES " + fuelTypesTable + "(" + fuelTypeIDCol + "), " +
-						"FOREIGN KEY (" + transmissionCol + ") REFERENCES " + transmissionsTable + "(" + transmissionIDCol + "))";
+						"FOREIGN KEY (" + categoryIDCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
+						"FOREIGN KEY (" + colorIDCol + ") REFERENCES " + colorsTable + "(" + colorIDCol + "), " +
+						"FOREIGN KEY (" + fuelTypeIDCol + ") REFERENCES " + fuelTypesTable + "(" + fuelTypeIDCol + "), " +
+						"FOREIGN KEY (" + transmissionIDCol + ") REFERENCES " + transmissionsTable + "(" + transmissionIDCol + "))";
 					
 		try {
 			conn = DriverManager.getConnection(connString);
@@ -1308,10 +1331,10 @@ public class Database {
 												licensePlateCol + " = ?, " + 
 												brandCol + " = ?, " + 
 												modelCol + " = ?, " + 
-												categoryCol + " = ?, " + 
-												colorCol + " = ?, " + 
-												fuelTypeCol + " = ?, " + 
-												transmissionCol + " = ?, " + 
+												categoryIDCol + " = ?, " + 
+												colorIDCol + " = ?, " + 
+												fuelTypeIDCol + " = ?, " + 
+												transmissionIDCol + " = ?, " + 
 												manufactureDateCol + " = ?, " + 
 												actualKMCol + " = ?, " + 
 												engineSizeCol + " = ?, " + 
@@ -1498,7 +1521,7 @@ public class Database {
 			conn = DriverManager.getConnection(connString);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM " + carsTable + " WHERE " + isDeactiveCol + " = FALSE AND " +
-									categoryCol + " = " + catID);
+									categoryIDCol + " = " + catID);
 			while(rs.next()) {
 				java.sql.Date sqlDate = rs.getDate(manufactureDateCol);
 				java.time.LocalDate locDate = sqlDate.toLocalDate();
@@ -1625,5 +1648,321 @@ public class Database {
 		  }
 		}
 	}
+	
+	
+	
+//NATIONALITY	
+	public static void createNationalitiesTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + nationalitiesTable + "(" +
+						nationalityIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+						nationalityNameCol + " VARCHAR(50))";
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, nationalitiesTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+			for(String ft : nationalities) {
+				addNationality(ft);
+			}
+			System.out.println("Adding basic nationalities completed");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createNationalityTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void addNationality(String nationality) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "INSERT INTO " + nationalitiesTable + " (" + nationalityNameCol + ") VALUES(?)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, nationality);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addNationality database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static ArrayList<String> readNationalitiesTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<String> nationalities = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + nationalitiesTable);
+			while(rs.next()) {
+				nationalities.add(rs.getString(nationalityNameCol));
+			}
+			rs.close();
+				
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readNationalitiesTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return nationalities;
+	   }
+	
+	
+	public static int readNationalityID(String nationality) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int nationalityID = 0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + nationalityIDCol + " FROM " +
+									nationalitiesTable + " WHERE " + nationalityNameCol + " = '" + nationality + "'");
+			if(rs.next()) {
+				nationalityID = rs.getInt(nationalityIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readNationalityID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return nationalityID;
+	   }
+	
+	
+	public static String readNationalityName(int nationalityID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String nationalityName =  "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + nationalityNameCol + " FROM " +
+									nationalitiesTable + " WHERE " + nationalityIDCol + " = " + nationalityID);
+			if(rs.next()) {
+				nationalityName = rs.getString(nationalityNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readNationalityName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return nationalityName;
+	   }
+	
+	
+	
+//CUSTOMERS TABLE	
+	public static void createCustomersTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + customersTable + "(" +
+						customerIDCol + " VARCHAR(100), " +
+						firstNameCol + " VARCHAR(100), " +
+						lastNameCol + " VARCHAR(100), " +
+						dateOfBornCol + " DATE, " +
+						nationalityIDCol + " INTEGER, " +
+						passportNumCol + " VARCHAR(50), " +
+						driversLicCol + " VARCHAR(50), " +
+						telefonCol + " VARCHAR(50), " +
+						eMailCol + " VARCHAR(50), " + 
+						addressLandCol + " VARCHAR(50), " +
+						addressCityCol + " VARCHAR(50), " +
+						addressStreetCol + " VARCHAR(50), " +
+						addressPostCodeCol + " VARCHAR(30), " +
+						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
+						"PRIMARY KEY (" + customerIDCol + "), " +
+						"FOREIGN KEY (" + nationalityIDCol + ") REFERENCES " + nationalitiesTable + "(" + nationalityIDCol + "))";
+						
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, customersTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createCustomersTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+		   }
+	}
+	
+	
+	public static void addNewCustomer(Customer customer) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		String add = "INSERT INTO " + customersTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			
+			pstmt.setString(1, customer.getCustomerID());
+			pstmt.setString(2, customer.getFirstName());
+			pstmt.setString(3, customer.getLastName());
+			LocalDateTime date = LocalDateTime.of(customer.getDateOfBorn().getYear(),
+					  							  customer.getDateOfBorn().getMonth(),
+					                              customer.getDateOfBorn().getDayOfMonth(),0,0,0,0);
+			java.sql.Date sqldate = new java.sql.Date(date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setDate(4, sqldate);
+			pstmt.setInt(5, readNationalityID(customer.getNationality()));
+			pstmt.setString(6, customer.getPassportNum());
+			pstmt.setString(7, customer.getDriversLicenseNum());
+			pstmt.setString(8, customer.getTelefon());
+			pstmt.setString(9, customer.geteMail());
+			pstmt.setString(10, customer.getAddressLand());
+			pstmt.setString(11, customer.getAddressCity());
+			pstmt.setString(12, customer.getAddressStreet());
+			pstmt.setString(13, customer.getAddressPostalCode());
+			pstmt.setBoolean(14, false);
+		
+			pstmt.executeUpdate();
+			System.out.println("Customer added successfully");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addNewCustomer database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static ArrayList<Customer> readCustomersTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<Customer> customers = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + customersTable + " WHERE " + isDeactiveCol + " = FALSE");
+			while(rs.next()) {
+				java.sql.Date sqlDate = rs.getDate(dateOfBornCol);
+				java.time.LocalDate locDate = sqlDate.toLocalDate();
+				
+				Customer customer = new Customer(rs.getString(customerIDCol), 
+								  rs.getString(firstNameCol),
+								  rs.getString(lastNameCol),
+								  locDate,
+								  readNationalityName(rs.getInt(nationalityIDCol)),
+								  rs.getString(passportNumCol),
+								  rs.getString(driversLicCol),
+								  rs.getString(telefonCol),
+								  rs.getString(eMailCol),
+								  rs.getString(addressLandCol),
+								  rs.getString(addressCityCol),
+								  rs.getString(addressStreetCol),
+								  rs.getString(addressPostCodeCol));
+				customers.add(customer);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readCustomersTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return customers;
+	   }
+	
+	
+	
+	
 	
 }
