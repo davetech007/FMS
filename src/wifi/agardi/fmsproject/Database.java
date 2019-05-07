@@ -1913,6 +1913,33 @@ public class Database {
 	}
 	
 	
+	public static void deleteCustomer(String customerID) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String delete = "UPDATE " + customersTable + " SET " + isDeactiveCol + " = ? WHERE " + customerIDCol + " = '" + customerID + "'";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(delete);
+			pstmt.setBoolean(1, true);
+		    pstmt.executeUpdate();
+		    System.out.println("Customer successfully deleted!");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with deleteCustomer database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+	}
+	
+	
 	public static ArrayList<Customer> readCustomersTable() throws SQLException{
 		  Connection conn = null;
 		  Statement stmt = null;
@@ -1962,7 +1989,114 @@ public class Database {
 	   }
 	
 	
+	public static ArrayList<Customer> readDeactiveCustomersTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<Customer> customers = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + customersTable + " WHERE " + isDeactiveCol + " = TRUE");
+			while(rs.next()) {
+				java.sql.Date sqlDate = rs.getDate(dateOfBornCol);
+				java.time.LocalDate locDate = sqlDate.toLocalDate();
+				
+				Customer customer = new Customer(rs.getString(customerIDCol), 
+								  rs.getString(firstNameCol),
+								  rs.getString(lastNameCol),
+								  locDate,
+								  readNationalityName(rs.getInt(nationalityIDCol)),
+								  rs.getString(passportNumCol),
+								  rs.getString(driversLicCol),
+								  rs.getString(telefonCol),
+								  rs.getString(eMailCol),
+								  rs.getString(addressLandCol),
+								  rs.getString(addressCityCol),
+								  rs.getString(addressStreetCol),
+								  rs.getString(addressPostCodeCol));
+				customers.add(customer);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readDeactiveCustomersTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return customers;
+	   }
 	
+	
+	public static boolean checkExistingCustomerPassport(String passport) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ customersTable +
+								   " WHERE " + passportNumCol + " = '" + passport + "'");
+		    if(rs.next()) {
+		    	return true;
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCustomerPassport database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return false;
+	}
+	
+	
+	public static String checkExistingCustomerPassportGetName(String passport) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String name = "";
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + firstNameCol + ", " +lastNameCol +" FROM "+ customersTable +
+								   " WHERE " + passportNumCol + " = '" + passport + "'");
+		    if(rs.next()) {
+		    	name = rs.getString(firstNameCol) + " " + rs.getString(lastNameCol);
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCustomerPassportGetName database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return name;
+	}
 	
 	
 }

@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+import javax.swing.text.DefaultEditorKit.CutAction;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
@@ -77,6 +81,8 @@ public class Main extends Application {
 
 	int minEngineSize = 500;
 	int minEnginePower = 40;
+	
+
 
 //LOGIN	
 	@Override
@@ -351,10 +357,7 @@ public class Main extends Application {
 			Button searchDriverButton = new Button("Choose a driver");
 			searchDriverButton.setId("searchDriverButton");
 			reserveGP.add(searchDriverButton, 0, 0);
-			searchDriverButton.setOnAction(e ->{
-				CustomerListDialog custList = new CustomerListDialog();
-				custList.showAndWait();
-			});
+			
 			
 			searchDriverButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
@@ -586,7 +589,32 @@ public class Main extends Application {
 			
 			
 //Reserve BorderPane BOTTOM BUTTONS
-//DESIGN			
+//DESIGN
+			
+//SearchDriver ACTION			
+			searchDriverButton.setOnAction(e ->{
+				CustomerListDialog custList = new CustomerListDialog();
+				Optional<CustomerFX> result = custList.showAndWait();
+				if(result.isPresent()) {
+					CustomerFX selectedCust = result.get();
+					custIdLabel.setText("ID = " + selectedCust.getModellObject().getCustomerID());
+					firstNameTF.setText(selectedCust.getModellObject().getFirstName());
+					lastNameTF.setText(selectedCust.getModellObject().getLastName());
+					dateBornPicker.setValue(selectedCust.getModellObject().getDateOfBorn());
+					nationalityComboBox.setValue(selectedCust.getModellObject().getNationality());
+					passportTF.setText(selectedCust.getModellObject().getPassportNum());
+					dLicenseTF.setText(selectedCust.getModellObject().getDriversLicenseNum());
+					telefonTF.setText(selectedCust.getModellObject().getTelefon());
+					emailTF.setText(selectedCust.getModellObject().geteMail());
+					landTF.setText(selectedCust.getModellObject().getAddressLand());
+					cityTF.setText(selectedCust.getModellObject().getAddressCity());
+					streetTF.setText(selectedCust.getModellObject().getAddressStreet());
+					postCodeTF.setText(selectedCust.getModellObject().getAddressPostalCode());	
+				}
+			});	
+			
+			
+			
 		ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
 					.or(lastNameTF.textProperty().isEmpty())
 					.or(dateBornPicker.valueProperty().isNull())
@@ -686,7 +714,7 @@ public class Main extends Application {
 			
 			saveCustomerButton.setOnAction(e -> {
 			   try {
-				String customerID = "FMSCID" + String.valueOf(System.currentTimeMillis() / 1000);
+				String customerID = "CUSID" + String.valueOf(System.currentTimeMillis() / 1000);
 				String firstName = firstNameTF.getText().substring(0, 1).toUpperCase() + firstNameTF.getText().substring(1);
 				String lastName = lastNameTF.getText().substring(0, 1).toUpperCase() + lastNameTF.getText().substring(1);
 				LocalDate dateOfBorn = dateBornPicker.getValue();
@@ -703,11 +731,25 @@ public class Main extends Application {
 				CustomerFX newCustomer = new CustomerFX(new Customer(customerID, firstName, lastName, dateOfBorn,
 														nationality, passportNum, driversLicenseNum, telefon, eMail,
 														addressLand, addressCity, addressStreet, addressPostalCode));
-				
-				
-		        Alert confirmAdd = new Alert(AlertType.CONFIRMATION);
-				
-				
+			
+				if(Database.checkExistingCustomerPassport(passportNum)) {
+					Alert alertWarn= new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Adding customer");
+					alertWarn.setHeaderText("Please check again, it seems customer already exists!");
+					alertWarn.setContentText("You wanted to add new customer '"+ firstName + " " + lastName + "', but this passport number '" 
+					                         + passportNum +"' already exists under this name '" + Database.checkExistingCustomerPassportGetName(passportNum) + "'");
+					alertWarn.showAndWait();
+				}
+				else {
+					Alert confirmAdd = new Alert(AlertType.CONFIRMATION);
+					confirmAdd.setTitle("Adding a new customer");
+					confirmAdd.setHeaderText("Please confirm!");
+					confirmAdd.setContentText("Would you really want to ADD this new customer '" + firstName + " " + lastName + "'?");
+					Optional<ButtonType> result = confirmAdd.showAndWait();
+					if(result.get() == ButtonType.OK) {
+					Database.addNewCustomer(newCustomer.getModellObject());
+					}
+				}
 			  } catch (SQLException e1) {
 				  System.out.println("Something is wrong with the database - add custormer");
 				  e1.printStackTrace();
@@ -804,6 +846,32 @@ public class Main extends Application {
 			searchTF.setPromptText("License plate nr.");
 
 //SEARCHING LISTENERS	
+			
+			
+//			ObjectProperty<Predicate<CarFX>> licPlatefilter = new SimpleObjectProperty<>();
+//			ObjectProperty<Predicate<CarFX>> catFilter = new SimpleObjectProperty<>();
+//			
+//			licPlatefilter.bind(Bindings.createObjectBinding(() -> 
+//			s -> s.getModellObject().getCarLicensePlate().toLowerCase().contains(searchTF.getText().toLowerCase()), 
+//			searchTF.textProperty()));
+//			
+//			catFilter.bind(Bindings.createObjectBinding(() -> 
+//	        s -> carSearchBox.getValue().contains("All cars") || carSearchBox.getValue() == s.getModellObject().getCarCategory(), 
+//	        carSearchBox.valueProperty()));
+//			
+//			catFilter.bind(Bindings.createObjectBinding(() -> 
+//	        s -> carSearchBox.getValue() == null || carSearchBox.getValue() == s.getModellObject().getCarCategory(), 
+//	        carSearchBox.valueProperty()));
+//			
+//			filteredListCars.predicateProperty().bind(Bindings.createObjectBinding(
+//		                () -> licPlatefilter.get().and(catFilter.get()), 
+//		                licPlatefilter, catFilter));
+//			
+//			filteredListCars.predicateProperty().bind(Bindings.createObjectBinding(
+//	                () -> licPlatefilter.get(), 
+//	                licPlatefilter));
+			
+					
 
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
@@ -834,6 +902,7 @@ public class Main extends Application {
 		return carsLeftVBox;	
 }
 
+	
 	
 	
 	
