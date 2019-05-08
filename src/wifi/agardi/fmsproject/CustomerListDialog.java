@@ -109,8 +109,9 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			Alert confirmDel = new Alert(AlertType.CONFIRMATION);
 			confirmDel.setTitle("Delete customer");
 			confirmDel.setHeaderText("Please confirm!");
-			confirmDel.setContentText("Would you really want to DELETE this customer '" + selectedCustomer.getModellObject().getFirstName() + 
-									" " + selectedCustomer.getModellObject().getLastName() + "'?");
+			confirmDel.setContentText("Would you really want to DELETE this customer '" + 
+									  selectedCustomer.getModellObject().getFirstName() + 
+									  " " + selectedCustomer.getModellObject().getLastName() + "'?");
 			Optional<ButtonType> result = confirmDel.showAndWait();
 			if(result.get() == ButtonType.OK) {
 				try {
@@ -139,9 +140,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 				}
 				return null;
 			}
-			
-		});
-		
+		});	
 	}
 	
 	

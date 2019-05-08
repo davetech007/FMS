@@ -12,6 +12,7 @@ import javax.swing.text.DefaultEditorKit.CutAction;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -82,7 +83,7 @@ public class Main extends Application {
 	int minEngineSize = 500;
 	int minEnginePower = 40;
 	
-
+	CustomerFX selectedCust;
 
 //LOGIN	
 	@Override
@@ -518,6 +519,28 @@ public class Main extends Application {
 			Label pickupMinuteLB = new Label("minutes");
 			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
 			reserveGP.add(pickupHBox, 3, 7);
+			
+			pickupHourTF.textProperty().addListener(new ChangeListener<String>() {
+		            @Override
+		            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+		                if (!newValue.matches("([01]?[0-9]|2[0-3])?")) {
+		                	pickupHourTF.setText(oldValue);
+		                }
+		            }
+		        });  
+			
+			pickupMinTF.textProperty().addListener(new ChangeListener<String>() {
+	            @Override
+	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	                if (!newValue.matches("[0-5][0-9]?")) {
+	                	pickupMinTF.setText(oldValue);
+	                }
+	            }
+	        }); 
+			
+			
+			
+			
 
 			
 //Grid 4. column			
@@ -590,32 +613,7 @@ public class Main extends Application {
 			
 //Reserve BorderPane BOTTOM BUTTONS
 //DESIGN
-			
-//SearchDriver ACTION			
-			searchDriverButton.setOnAction(e ->{
-				CustomerListDialog custList = new CustomerListDialog();
-				Optional<CustomerFX> result = custList.showAndWait();
-				if(result.isPresent()) {
-					CustomerFX selectedCust = result.get();
-					custIdLabel.setText("ID = " + selectedCust.getModellObject().getCustomerID());
-					firstNameTF.setText(selectedCust.getModellObject().getFirstName());
-					lastNameTF.setText(selectedCust.getModellObject().getLastName());
-					dateBornPicker.setValue(selectedCust.getModellObject().getDateOfBorn());
-					nationalityComboBox.setValue(selectedCust.getModellObject().getNationality());
-					passportTF.setText(selectedCust.getModellObject().getPassportNum());
-					dLicenseTF.setText(selectedCust.getModellObject().getDriversLicenseNum());
-					telefonTF.setText(selectedCust.getModellObject().getTelefon());
-					emailTF.setText(selectedCust.getModellObject().geteMail());
-					landTF.setText(selectedCust.getModellObject().getAddressLand());
-					cityTF.setText(selectedCust.getModellObject().getAddressCity());
-					streetTF.setText(selectedCust.getModellObject().getAddressStreet());
-					postCodeTF.setText(selectedCust.getModellObject().getAddressPostalCode());	
-				}
-			});	
-			
-			
-			
-		ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
+			ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
 					.or(lastNameTF.textProperty().isEmpty())
 					.or(dateBornPicker.valueProperty().isNull())
 					.or(nationalityComboBox.valueProperty().isNull())
@@ -628,13 +626,10 @@ public class Main extends Application {
 					.or(streetTF.textProperty().isEmpty())
 					.or(postCodeTF.textProperty().isEmpty());
 		
-		ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().or((ObservableBooleanValue) custObs);
-			
-					
+		
+		
 		Button saveCustomerButton = new Button("Add");
 			saveCustomerButton.setId("saveCustomerButton");	
-			saveCustomerButton.disableProperty().bind(custObs);
-			
 			saveCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
 			          @Override
@@ -649,12 +644,12 @@ public class Main extends Application {
 			        	  saveCustomerButton.setEffect(null);
 			          }
 			        });
+			saveCustomerButton.disableProperty().bind(custObs);
 			
 			
 		Button updateCustomerButton = new Button("Update");
 			updateCustomerButton.setId("updateCustomerButton");	
-			updateCustomerButton.disableProperty().bind(custObs);
-			
+			updateCustomerButton.setDisable(true);
 			updateCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
 			          @Override
@@ -674,7 +669,6 @@ public class Main extends Application {
 		Button updateResButton = new Button("?");
 			updateResButton.setId("updateResButton");
 			updateResButton.setDisable(true);
-			
 			updateResButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
 			          @Override
@@ -693,8 +687,7 @@ public class Main extends Application {
 			
 		Button reserveButton = new Button("Save");
 			reserveButton.setId("saveResButton");
-			reserveButton.disableProperty().bind(resObs);
-			
+			reserveButton.setDisable(true);
 			reserveButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
 			          @Override
@@ -710,11 +703,48 @@ public class Main extends Application {
 			          }
 			        });
 			
+			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().
+												or(custIdLabel.textProperty().length().lessThan(6).
+												or(pickupLocTF.textProperty().isEmpty()).
+												or(pickupHourTF.textProperty().isEmpty()).
+												or(pickupMinTF.textProperty().isEmpty()).
+												or(returnLocTF.textProperty().isEmpty()).
+												or(returnHourTF.textProperty().isEmpty()).
+												or(returnMinTF.textProperty().isEmpty()));
+			reserveButton.disableProperty().bind(resObs);
+			
+
+//SearchDriver ACTION			
+			searchDriverButton.setOnAction(e ->{
+				CustomerListDialog custList = new CustomerListDialog();
+				Optional<CustomerFX> result = custList.showAndWait();
+				if(result.isPresent()) {
+					selectedCust = result.get();
+					custIdLabel.setText("ID = " + selectedCust.getModellObject().getCustomerID());
+					firstNameTF.setText(selectedCust.getModellObject().getFirstName());
+					lastNameTF.setText(selectedCust.getModellObject().getLastName());
+					dateBornPicker.setValue(selectedCust.getModellObject().getDateOfBorn());
+					nationalityComboBox.setValue(selectedCust.getModellObject().getNationality());
+					passportTF.setText(selectedCust.getModellObject().getPassportNum());
+					dLicenseTF.setText(selectedCust.getModellObject().getDriversLicenseNum());
+					telefonTF.setText(selectedCust.getModellObject().getTelefon());
+					emailTF.setText(selectedCust.getModellObject().geteMail());
+					landTF.setText(selectedCust.getModellObject().getAddressLand());
+					cityTF.setText(selectedCust.getModellObject().getAddressCity());
+					streetTF.setText(selectedCust.getModellObject().getAddressStreet());
+					postCodeTF.setText(selectedCust.getModellObject().getAddressPostalCode());	
+					
+					updateCustomerButton.setDisable(false);
+				}
+			});	
+			
+	
+			
 //SAVE CUSTOMER ON ACTION			
 			
 			saveCustomerButton.setOnAction(e -> {
 			   try {
-				String customerID = "CUSID" + String.valueOf(System.currentTimeMillis() / 1000);
+				String customerID = "CID" + String.valueOf(System.currentTimeMillis() / 1000);
 				String firstName = firstNameTF.getText().substring(0, 1).toUpperCase() + firstNameTF.getText().substring(1);
 				String lastName = lastNameTF.getText().substring(0, 1).toUpperCase() + lastNameTF.getText().substring(1);
 				LocalDate dateOfBorn = dateBornPicker.getValue();
@@ -734,20 +764,44 @@ public class Main extends Application {
 			
 				if(Database.checkExistingCustomerPassport(passportNum)) {
 					Alert alertWarn= new Alert(AlertType.WARNING);
-					alertWarn.setTitle("Adding customer");
-					alertWarn.setHeaderText("Please check again, it seems customer already exists!");
-					alertWarn.setContentText("You wanted to add new customer '"+ firstName + " " + lastName + "', but this passport number '" 
-					                         + passportNum +"' already exists under this name '" + Database.checkExistingCustomerPassportGetName(passportNum) + "'");
+					alertWarn.setTitle("Adding a customer");
+					alertWarn.setHeaderText("Please check again, PASSPORT number already exists!");
+					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
+											 "', but his/her passport number '" + passportNum +
+											 "' already exists under this name '" + 
+											 Database.checkExistingCustomerPassportGetName(passportNum) + "'");
 					alertWarn.showAndWait();
+					return;
 				}
+				if(Database.checkExistingCustomerDLicense(driversLicenseNum)) {
+					Alert alertWarn= new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Adding a customer");
+					alertWarn.setHeaderText("Please check again, DRIVER'S LICENSE number already exists!");
+					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
+											 "', but his/her driver's license number '" + driversLicenseNum +
+											 "' already exists under this name '" +
+											 Database.checkExistingCustomerDLicenseGetName(driversLicenseNum) + "'");
+					alertWarn.showAndWait();
+					return;
+				}
+				 if (!(eMail.length() > 3 && eMail.contains("@") && eMail.contains("."))){
+					 Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Adding a customer");
+						alertWarn.setHeaderText("Please check again, e-mail address looks invalid!");
+						alertWarn.setContentText("Please give a real e-mail address (contains '@' and '.')!");
+						alertWarn.showAndWait();
+						return;
+				 }
 				else {
 					Alert confirmAdd = new Alert(AlertType.CONFIRMATION);
 					confirmAdd.setTitle("Adding a new customer");
 					confirmAdd.setHeaderText("Please confirm!");
-					confirmAdd.setContentText("Would you really want to ADD this new customer '" + firstName + " " + lastName + "'?");
+					confirmAdd.setContentText("Would you really want to ADD a new customer '" + firstName + " " + lastName + "'?");
 					Optional<ButtonType> result = confirmAdd.showAndWait();
 					if(result.get() == ButtonType.OK) {
 					Database.addNewCustomer(newCustomer.getModellObject());
+					custIdLabel.setText("ID = " + newCustomer.getModellObject().getCustomerID());
+					selectedCust = newCustomer;
 					}
 				}
 			  } catch (SQLException e1) {
@@ -757,10 +811,45 @@ public class Main extends Application {
 				
 			});
 			
-			
-			
-			
-			
+			updateCustomerButton.setOnAction(e -> {
+			 try {
+				String customerID = selectedCust.getModellObject().getCustomerID();
+				String firstName = firstNameTF.getText().substring(0, 1).toUpperCase() + firstNameTF.getText().substring(1);
+				String lastName = lastNameTF.getText().substring(0, 1).toUpperCase() + lastNameTF.getText().substring(1);
+				LocalDate dateOfBorn = dateBornPicker.getValue();
+				String nationality = nationalityComboBox.getSelectionModel().getSelectedItem().toString();
+				String passportNum = passportTF.getText().toUpperCase();
+				String driversLicenseNum = dLicenseTF.getText().toUpperCase();
+				String telefon = telefonTF.getText().toUpperCase();
+				String eMail = emailTF.getText().toLowerCase();
+				String addressLand = landTF.getText().substring(0, 1).toUpperCase() + landTF.getText().substring(1);
+				String addressCity = cityTF.getText().substring(0, 1).toUpperCase() + cityTF.getText().substring(1);
+				String addressStreet = streetTF.getText().substring(0, 1).toUpperCase() + streetTF.getText().substring(1);
+				String addressPostalCode = postCodeTF.getText().toUpperCase();
+				
+				CustomerFX updateCustomer = new CustomerFX(new Customer(customerID, firstName, lastName, dateOfBorn,
+														nationality, passportNum, driversLicenseNum, telefon, eMail,
+														addressLand, addressCity, addressStreet, addressPostalCode));
+				
+				Alert confirmUpdate = new Alert(AlertType.CONFIRMATION);
+				confirmUpdate.setTitle("Updating customer");
+				confirmUpdate.setHeaderText("Please confirm!");
+				confirmUpdate.setContentText("Would you really want to UPDATE the selected customer?\n\n" +
+											"Customer with this ID '" + customerID + "' existing under this name '" +
+											 Database.checkExistingCustomerIDGetName(customerID) + "'.\n" +
+											 "Update to '" + firstName + " " + lastName + "'?");
+				Optional<ButtonType> result = confirmUpdate.showAndWait();
+				if(result.get() == ButtonType.OK) {
+					Database.updateCustomer(updateCustomer.getModellObject());
+					selectedCust = updateCustomer;
+				}
+				
+			 } catch (SQLException e1) {
+					  System.out.println("Something is wrong with the database - update custormer");
+					  e1.printStackTrace();
+				  }
+			});
+				
 			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
 			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
@@ -955,7 +1044,7 @@ public class Main extends Application {
 		    kmTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+	                if (!newValue.matches("\\d{0,6}?")) {
 	                    kmTF.setText(oldValue);
 	                }
 	            }
@@ -1072,7 +1161,7 @@ public class Main extends Application {
 		    engineSizeTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+	                if (!newValue.matches("\\d{0,5}?")) {
 	                	engineSizeTF.setText(oldValue);
 	                }
 	            }
@@ -1080,7 +1169,7 @@ public class Main extends Application {
 		    enginePowerTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+	                if (!newValue.matches("\\d{0,4}?")) {
 	                	enginePowerTF.setText(oldValue);
 	                }
 	            }
@@ -1241,8 +1330,10 @@ public class Main extends Application {
 				Alert alertDelete = new Alert(AlertType.CONFIRMATION);
 				alertDelete.setTitle("Deleting a car");
 				alertDelete.setHeaderText("Please confirm!");
-				alertDelete.setContentText("Would you really want to DELETE the selected '" + selectedCar.getModellObject().getCarBrand() + 
-									" " + selectedCar.getModellObject().getCarModel() + "' with the license plate '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
+				alertDelete.setContentText("Would you really want to DELETE the selected '" 
+										   + selectedCar.getModellObject().getCarBrand() + 
+									       " " + selectedCar.getModellObject().getCarModel() + 
+									       "' with the license plate '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
 				Optional<ButtonType> result = alertDelete.showAndWait();
 				if(result.get() == ButtonType.OK) {
 					try {
@@ -1289,8 +1380,9 @@ public class Main extends Application {
 					alertWarn.setTitle("Updating a car");
 					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
 					alertWarn.setContentText("Car with the VIN number '" + vinNumber + 
-							"' doesn't exists! Please add as a new car! \n\nNote, that it is NOT possible to update the VIN number. "
-							+ "In this case, please delete this car, and add as a new one!");
+							                 "' doesn't exists! Please add as a new car! " +
+							                 "\n\nNote, that it is NOT possible to update the VIN number. " +
+							                 "In this case, please delete this car, and add as a new one!");
 					alertWarn.showAndWait();
 					return;
 				} else {
@@ -1298,7 +1390,7 @@ public class Main extends Application {
 					alertUpdate.setTitle("Updating a car");
 					alertUpdate.setHeaderText("Please confirm!");
 					alertUpdate.setContentText("Would you really want to UPDATE this '" + brand + 
-										" " + model + "' with the VIN number '" + vinNumber + "'?");
+										       " " + model + "' with the VIN number '" + vinNumber + "'?");
 					Optional<ButtonType> result = alertUpdate.showAndWait();
 					if(result.get() == ButtonType.OK) {
 							Database.updateCar(car.getModellObject());
@@ -1374,8 +1466,8 @@ public class Main extends Application {
 						Alert alertWarn2= new Alert(AlertType.WARNING);
 						alertWarn2.setTitle("Adding a new car");
 						alertWarn2.setHeaderText("Please check again the VIN number!");
-						alertWarn2.setContentText("Car's VIN number should be at least 11 characters "
-												+ "(in cars made after 1981 every VIN number should be 17 characters)!");
+						alertWarn2.setContentText("Car's VIN number should be at least 11 characters " +
+												  "(in cars made after 1981 every VIN number should be 17 characters)!");
 						alertWarn2.showAndWait();
 						return;
 						

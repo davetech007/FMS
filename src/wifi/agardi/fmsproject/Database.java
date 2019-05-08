@@ -1913,6 +1913,65 @@ public class Database {
 	}
 	
 	
+	public static void updateCustomer(Customer customer) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String update = "UPDATE " + customersTable + " SET " + 
+												firstNameCol + " = ?, " + 
+												lastNameCol + " = ?, " + 
+												dateOfBornCol + " = ?, " + 
+												nationalityIDCol + " = ?, " + 
+												passportNumCol + " = ?, " + 
+												driversLicCol + " = ?, " + 
+												telefonCol + " = ?, " + 
+												eMailCol + " = ?, " + 
+												addressLandCol + " = ?, " + 
+												addressCityCol + " = ?, " + 
+												addressStreetCol + " = ?, " + 
+												addressPostCodeCol + " = ? " + 
+												"WHERE " + customerIDCol + " = ?";
+		
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(update);
+			
+			pstmt.setString(1, customer.getFirstName());
+			pstmt.setString(2, customer.getLastName());
+			LocalDateTime date = LocalDateTime.of(customer.getDateOfBorn().getYear(),
+											      customer.getDateOfBorn().getMonth(),
+												  customer.getDateOfBorn().getDayOfMonth(),0,0,0,0);
+			java.sql.Date sqldate = new java.sql.Date(date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setDate(3, sqldate);
+			pstmt.setInt(4, readNationalityID(customer.getNationality()));
+			pstmt.setString(5, customer.getPassportNum());
+			pstmt.setString(6, customer.getDriversLicenseNum());
+			pstmt.setString(7, customer.getTelefon());
+			pstmt.setString(8, customer.geteMail());
+			pstmt.setString(9, customer.getAddressLand());
+			pstmt.setString(10, customer.getAddressCity());
+			pstmt.setString(11, customer.getAddressStreet());
+			pstmt.setString(12, customer.getAddressPostalCode());
+			pstmt.setString(13, customer.getCustomerID());
+			
+			pstmt.executeUpdate();
+			System.out.println("Customer updated successfully");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateCustomer database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+ 		
+	
 	public static void deleteCustomer(String customerID) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -2097,6 +2156,125 @@ public class Database {
 		}
 		return name;
 	}
+	
+	
+	public static String checkExistingCustomerIDGetName(String custID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String name = "";
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + firstNameCol + ", " +lastNameCol +" FROM "+ customersTable +
+								   " WHERE " + customerIDCol + " = '" + custID + "'");
+		    if(rs.next()) {
+		    	name = rs.getString(firstNameCol) + " " + rs.getString(lastNameCol);
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCustomerIDGetName database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return name;
+	}
+	
+	
+	public static boolean checkExistingCustomerDLicense(String dLicense) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM "+ customersTable +
+								   " WHERE " + driversLicCol + " = '" + dLicense + "'");
+		    if(rs.next()) {
+		    	return true;
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCustomerDLicense database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return false;
+	}
+
+	
+	public static String checkExistingCustomerDLicenseGetName(String dLicense) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String name = "";
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + firstNameCol + ", " +lastNameCol +" FROM "+ customersTable +
+								   " WHERE " + driversLicCol + " = '" + dLicense + "'");
+		    if(rs.next()) {
+		    	name = rs.getString(firstNameCol) + " " + rs.getString(lastNameCol);
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCustomerDLicenseGetName database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return name;
+	}
+	
+	
+	public static void activateDeletedCustomer(String customerID) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String delete = "UPDATE " + customersTable + " SET " + isDeactiveCol + " = ? WHERE " + customerIDCol + " = '" + customerID + "'";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(delete);
+			pstmt.setBoolean(1, false);
+		    pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with activateDeletedCustomer database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+	}
+	
 	
 	
 }
