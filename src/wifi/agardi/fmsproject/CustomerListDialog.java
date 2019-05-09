@@ -10,6 +10,8 @@ import org.apache.derby.iapi.types.DataValueDescriptor;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -20,6 +22,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -50,17 +53,20 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		this.setHeaderText("Search for a customer");
 		fillCustomersObservableList();
 		
-		Label custSearchLB = new Label("Write a customer ID");
-		custSearchLB.setId("searchLB");
-		
-		TextField custIDTF = new TextField();
-		custIDTF.setPromptText("Customer ID");
-		custIDTF.setId("searchTF");
+		ComboBox<String> searchCB = new ComboBox<>();
+		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Customer ID", "First name", "Last name"));
+		searchCB.getSelectionModel().selectFirst();
+		searchCB.setId("carSearchBox");
 
+		TextField custSearchTF = new TextField();
+		custSearchTF.promptTextProperty().bind(searchCB.valueProperty());
+		custSearchTF.setId("searchTF");
+		
 		Button deleteCustomerButton = new Button("Delete");
 		deleteCustomerButton.setPadding(new Insets(0, 0, 0, 20));
 		deleteCustomerButton.setId("deleteCustomerButton");
 		deleteCustomerButton.setDisable(true);
+//Animation shadow for delete button		
 		deleteCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 		        new EventHandler<MouseEvent>() {
 		          @Override
@@ -76,14 +82,14 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		          }
 		        });
 		
-		HBox custHB = new HBox(custSearchLB, custIDTF, deleteCustomerButton);
+		HBox custHB = new HBox(searchCB, custSearchTF, deleteCustomerButton);
 		custHB.setAlignment(Pos.CENTER);
 		custHB.setSpacing(5);
 		
 		VBox custVB = new VBox(custHB, customersTableView());
 		custVB.setSpacing(5);
 
-		
+//If a customer selected, delete button enabled		
 		customersTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
 			if(newV != null) {
 				selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
@@ -91,17 +97,44 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			}
 		});
 		
-	
-		
-		
-		custIDTF.textProperty().addListener((obs, oldV, newV) -> {
-			if(newV == null || newV.length() == 0) {
-				filteredListCustomers.setPredicate(s -> true);
-			}
-			else {
-				filteredListCustomers.setPredicate(s -> s.getModellObject().getCustomerID().toLowerCase().contains(newV));
+//SEARHCING		
+		searchCB.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(newValue.contains("Customer ID")) {
+					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
+						if(newV == null || newV.length() == 0) {
+							filteredListCustomers.setPredicate(s -> true);
+						}
+						else {
+							filteredListCustomers.setPredicate(s -> s.getModellObject().getCustomerID().toLowerCase().contains(newV));
+						}
+					});
+				} 
+				if(newValue.contains("First name")) {
+					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
+						if(newV == null || newV.length() == 0) {
+							filteredListCustomers.setPredicate(s -> true);
+						}
+						else {
+							filteredListCustomers.setPredicate(s -> s.getModellObject().getFirstName().toLowerCase().contains(newV));
+							
+						}
+					});
+				}
+				if(newValue.contains("Last name")){
+					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
+						if(newV == null || newV.length() == 0) {
+							filteredListCustomers.setPredicate(s -> true);
+						}
+						else {
+							filteredListCustomers.setPredicate(s -> s.getModellObject().getLastName().toLowerCase().contains(newV));
+						}
+					});	
+				}
 			}
 		});
+	
 		
 		
 //DELETE Customer
@@ -131,8 +164,8 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		ButtonType cancel = ButtonType.CANCEL; 
 		this.getDialogPane().getButtonTypes().addAll(ok, cancel);
 		
+//Return selected customer object
 		this.setResultConverter(new Callback<ButtonType, CustomerFX>(){
-
 			@Override
 			public CustomerFX call(ButtonType bt) {
 				if(bt == ok) {

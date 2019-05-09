@@ -1,26 +1,20 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Optional;
-import java.util.function.Predicate;
-
-import javax.swing.text.DefaultEditorKit.CutAction;
 
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -35,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -64,7 +59,12 @@ import javafx.scene.layout.VBox;
 
 public class Main extends Application {
 	DropShadow shadow = new DropShadow();  //Effect for the buttons
+	LocalDate minDate = LocalDate.of(1900, 01, 01);
 	
+	TabPane mainTabPane;
+	Tab carsTab;
+	Tab reserveTab;
+
 	private ObservableList<CarFX> observCar;
 	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
 	private SortedList<CarFX> sortedListCars;
@@ -72,10 +72,6 @@ public class Main extends Application {
 	TableView<CarFX> carsTableView;
 	CarFX selectedCar;
 
-	TabPane mainTabPane;
-	Tab carsTab;
-	Tab reserveTab;
-	
 	TextField carLicensePlateTF;
 	TextField carWishTF;
 	ComboBox<String> carComboBox;
@@ -83,9 +79,15 @@ public class Main extends Application {
 	int minEngineSize = 500;
 	int minEnginePower = 40;
 	
-	CustomerFX selectedCust;
 
-//LOGIN	
+	CustomerFX selectedCust;
+	
+	
+	
+	LocalDateTime ldtPickup;
+	LocalDateTime ldtReturn;
+
+//LOGIN WINDOW	
 	@Override
 	public void start(Stage primaryStage) {
 //Setting up LOGIN page		
@@ -204,11 +206,11 @@ public class Main extends Application {
 	
 
 
-//After login, MAIN Window	
+//MAIN WINDOW after login
 	public void mainMenu() {
 			Stage mainStage = new Stage();
 			HBox mainHB = new HBox();
-			mainHB.setPadding(new Insets(15, 15 , 15, 15));
+			mainHB.setPadding(new Insets(15, 15 , 12, 15));
 			mainHB.setAlignment(Pos.CENTER);
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
@@ -280,73 +282,19 @@ public class Main extends Application {
 	
 	
 	
-	
-	public ArrayList<String> categoriesList(){
-		ArrayList<String> categoryNames = new ArrayList<>();
-		try {
-			for(String key: Database.readCarCategoriesTable().keySet()) {
-				categoryNames.add(key);
-			}
-		} catch (SQLException e) {
-			System.out.println("Something is wrong with the reading of car categories table from database");
-			e.printStackTrace();
-		}
-		Collections.sort(categoryNames);
-		return categoryNames;
-	}
-	
 
-	
-//Initialize lists, reading data out from cars database	
-	public void fillCarsObservableList() {
-		  observCar = FXCollections.observableArrayList();
-		  ArrayList<Car> cars = new ArrayList<>();
-			try {
-				cars = Database.readCarsTable();
-			} catch (SQLException e) {
-				System.out.println("Something is wrong with the filling observable list with cars database");
-				e.printStackTrace();
-			}
-		    for(Car c : cars) {
-		    	observCar.add(new CarFX(c));
-		    }
-		    filteredListCars = new FilteredList<>(observCar, p -> true);
-		    sortedListCars = new SortedList<>(filteredListCars);
-		}
-
-	
-	
-	
-	public void fillCarsObservableListDeactivedCars() {
-		  observCar = FXCollections.observableArrayList();
-		  ArrayList<Car> cars = new ArrayList<>();
-			try {
-				cars = Database.readDeactiveCarsTable();
-			} catch (SQLException e) {
-				System.out.println("Something is wrong with the filling observable list with deactive cars database");
-				e.printStackTrace();
-			}
-		    for(Car c : cars) {
-		    	observCar.add(new CarFX(c));
-		    }
-		    filteredListCars = new FilteredList<>(observCar, p -> true);
-		    sortedListCars = new SortedList<>(filteredListCars);
-		}
-	
-	
 	
 //RESERVE MENU	
 	public BorderPane openReserveMenu() {
 			BorderPane reserveBP = new BorderPane();
-			
 			GridPane reserveGP = new GridPane();
-			reserveGP.setAlignment(Pos.CENTER);
+			reserveGP.setAlignment(Pos.BOTTOM_CENTER);
 			reserveGP.setPadding(new Insets(0, 25, 0, 25));
 			reserveGP.setHgap(15);
 			reserveGP.setVgap(10);
 			reserveGP.setMinSize(0, 0);
 			reserveBP.setCenter(reserveGP);
-			
+			//set the 3rd column's size to be automatic
 			ColumnConstraints columnSpace = new ColumnConstraints();
 			columnSpace.setHgrow(Priority.ALWAYS);				
 			ColumnConstraints col1 = new ColumnConstraints();
@@ -354,11 +302,9 @@ public class Main extends Application {
 		
 //GRIDPANE			
 //Searching for a driver	
-//TODO
 			Button searchDriverButton = new Button("Choose a driver");
 			searchDriverButton.setId("searchDriverButton");
 			reserveGP.add(searchDriverButton, 0, 0);
-			
 			
 			searchDriverButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
@@ -389,9 +335,10 @@ public class Main extends Application {
 			
 			DatePicker dateBornPicker = new DatePicker();
 			dateBornPicker.setPromptText("Date of Born");
+			dateBornPicker.setDayCellFactory(dp -> new DateCellFactory(minDate, LocalDate.now()));
 			reserveGP.add(dateBornPicker, 0, 4);
 			
-//NATIONALITY TODO			
+//NATIONALITY		
 			ComboBox<String> nationalityComboBox = new ComboBox<>();
 			   try {
 			    	ArrayList<String> nationalities = Database.readNationalitiesTable();
@@ -449,8 +396,6 @@ public class Main extends Application {
 			TextField postCodeTF = new TextField();
 			postCodeTF.setPromptText("Postal code");
 			reserveGP.add(postCodeTF, 1, 5);
-			
-		
 						
 			
 //Grid 3. column
@@ -478,6 +423,7 @@ public class Main extends Application {
 			          }
 			        });
 					
+			
 			carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 			carComboBox.setId("carSearchBox");
 			carComboBox.setPromptText("Reserve a category");
@@ -506,7 +452,6 @@ public class Main extends Application {
 			datePickupPicker.setPromptText("Pickup date");
 			reserveGP.add(datePickupPicker, 3, 6);
 			
-
 			HBox pickupHBox = new HBox();
 			pickupHBox.setSpacing(5);
 			pickupHBox.setAlignment(Pos.CENTER_LEFT);
@@ -519,7 +464,7 @@ public class Main extends Application {
 			Label pickupMinuteLB = new Label("minutes");
 			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
 			reserveGP.add(pickupHBox, 3, 7);
-			
+			//PUCKUP TIME REGEX			
 			pickupHourTF.textProperty().addListener(new ChangeListener<String>() {
 		            @Override
 		            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -532,16 +477,13 @@ public class Main extends Application {
 			pickupMinTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("[0-5][0-9]?")) {
+	                if (!newValue.matches("([0-5]?[0-9])?")) {
 	                	pickupMinTF.setText(oldValue);
 	                }
 	            }
 	        }); 
 			
 			
-			
-			
-
 			
 //Grid 4. column			
 			Label dateLabel = new Label("Insurance");
@@ -554,6 +496,7 @@ public class Main extends Application {
 			fullCascoRB.setToggleGroup(tg);
 			reserveGP.add(cascoRB, 4, 2);
 			reserveGP.add(fullCascoRB, 4, 3);
+			
 //RETURN DETAILS			
 			Label returnLabel = new Label("Return");
 			reserveGP.add(returnLabel, 4, 4);
@@ -563,9 +506,9 @@ public class Main extends Application {
 			reserveGP.add(returnLocTF, 4, 5);
 			
 			DatePicker dateReturnPicker = new DatePicker();
+			dateReturnPicker.setDisable(true);
 			dateReturnPicker.setPromptText("Return date");
 			reserveGP.add(dateReturnPicker, 4, 6);
-			
 			
 			HBox returnHBox = new HBox();
 			returnHBox.setSpacing(5);
@@ -578,6 +521,35 @@ public class Main extends Application {
 			Label returnMinuteLB = new Label("minutes");
 			returnHBox.getChildren().addAll(returnHourTF, returnHourLB, returnMinTF, returnMinuteLB);
 			reserveGP.add(returnHBox, 4, 7);
+			//RETURN TIME REGEX			
+			returnHourTF.textProperty().addListener(new ChangeListener<String>() {
+	            @Override
+	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	                if (!newValue.matches("([01]?[0-9]|2[0-3])?")) {
+	                	returnHourTF.setText(oldValue);
+	                }
+	            }
+	        }); 
+			
+			returnMinTF.textProperty().addListener(new ChangeListener<String>() {
+	            @Override
+	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	                if (!newValue.matches("([0-5]?[0-9])?")) {
+	                	returnMinTF.setText(oldValue);
+	                }
+	            }
+	        }); 
+			
+			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
+			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
+			
+			datePickupPicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
+				@Override
+				public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue,
+						LocalDate newValue) {
+					dateReturnPicker.setDayCellFactory(dp -> new DateCellFactory(newValue, LocalDate.MAX));
+				}
+			});		
 			
 //EXTRAS		
 			Label extrasLB = new Label("Extras");
@@ -602,6 +574,7 @@ public class Main extends Application {
 			reserveGP.add(notesTA2, 3, 12);
 	
 //PRICE TODO
+			
 			VBox priceVBox = new VBox();
 			Label priceDaysLabel = new Label("Total days   = ");
 			Label priceLabel1 =    new Label("Price * days = ");
@@ -609,6 +582,36 @@ public class Main extends Application {
 			Label priceLabel3 =    new Label("Total price  = ");
 			priceVBox.getChildren().addAll(priceDaysLabel, priceLabel1, priceLabel2, priceLabel3);
 			reserveGP.add(priceVBox, 4, 12);
+			
+			Button calcPriceButton = new Button("Calculate price");
+			calcPriceButton.setId("calcPriceButton");
+			reserveGP.add(calcPriceButton, 4, 13);
+
+			calcPriceButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  calcPriceButton.setEffect(shadow);
+			          }
+			        });
+			calcPriceButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  calcPriceButton.setEffect(null);
+			          }
+			        });
+
+			
+			
+			
+//ON ACTION FUNCTIONS
+			 carComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+						priceLabel1.setText("Price * days = " + getCategoryPrice(newValue));
+					}
+				});
 			
 			
 //Reserve BorderPane BOTTOM BUTTONS
@@ -625,8 +628,6 @@ public class Main extends Application {
 					.or(cityTF.textProperty().isEmpty())
 					.or(streetTF.textProperty().isEmpty())
 					.or(postCodeTF.textProperty().isEmpty());
-		
-		
 		
 		Button saveCustomerButton = new Button("Add");
 			saveCustomerButton.setId("saveCustomerButton");	
@@ -702,17 +703,7 @@ public class Main extends Application {
 			        	  reserveButton.setEffect(null);
 			          }
 			        });
-			
-			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().
-												or(custIdLabel.textProperty().length().lessThan(6).
-												or(pickupLocTF.textProperty().isEmpty()).
-												or(pickupHourTF.textProperty().isEmpty()).
-												or(pickupMinTF.textProperty().isEmpty()).
-												or(returnLocTF.textProperty().isEmpty()).
-												or(returnHourTF.textProperty().isEmpty()).
-												or(returnMinTF.textProperty().isEmpty()));
-			reserveButton.disableProperty().bind(resObs);
-			
+		
 
 //SearchDriver ACTION			
 			searchDriverButton.setOnAction(e ->{
@@ -737,11 +728,9 @@ public class Main extends Application {
 					updateCustomerButton.setDisable(false);
 				}
 			});	
-			
 	
 			
 //SAVE CUSTOMER ON ACTION			
-			
 			saveCustomerButton.setOnAction(e -> {
 			   try {
 				String customerID = "CID" + String.valueOf(System.currentTimeMillis() / 1000);
@@ -810,7 +799,7 @@ public class Main extends Application {
 			  }
 				
 			});
-			
+//UPDATE CUSTOMER ON ACTION			
 			updateCustomerButton.setOnAction(e -> {
 			 try {
 				String customerID = selectedCust.getModellObject().getCustomerID();
@@ -849,9 +838,47 @@ public class Main extends Application {
 					  e1.printStackTrace();
 				  }
 			});
+			
+//RESERVE BUTTON ON ACTION	
+			
+			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().
+					or(custIdLabel.textProperty().length().lessThan(6).
+					or(pickupLocTF.textProperty().isEmpty()).
+					or(datePickupPicker.valueProperty().isNull()).
+					or(pickupHourTF.textProperty().isEmpty()).
+					or(pickupMinTF.textProperty().isEmpty()).
+					or(returnLocTF.textProperty().isEmpty()).
+					or(dateReturnPicker.valueProperty().isNull()).
+					or(returnHourTF.textProperty().isEmpty()).
+					or(returnMinTF.textProperty().isEmpty()));
+			reserveButton.disableProperty().bind(resObs);
+
+			
+			
+			reserveButton.setOnAction(e -> {
+				ldtPickup = LocalDateTime.of(datePickupPicker.getValue().getYear(),
+						datePickupPicker.getValue().getMonth(),
+						datePickupPicker.getValue().getDayOfMonth(),
+						Integer.parseInt(pickupHourTF.getText()),
+						Integer.parseInt(pickupMinTF.getText()));
+				
+				
+			    ldtReturn = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
+						dateReturnPicker.getValue().getMonth(),
+						dateReturnPicker.getValue().getDayOfMonth(),
+						Integer.parseInt(returnHourTF.getText()),
+						Integer.parseInt(returnMinTF.getText()));
+				
+			    System.out.println(Duration.between(ldtPickup, ldtReturn).toHours());
+				
+			    
+			});
+			
+			
+			
 				
 			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
-			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
+			bottomHBoxRes.setPadding(new Insets(0, 0, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
 			
@@ -861,7 +888,6 @@ public class Main extends Application {
 			bottomHBoxCust.setAlignment(Pos.BOTTOM_LEFT);
 			
 			VBox bottomVBox = new VBox(bottomHBoxCust, bottomHBoxRes);
-			
 			reserveBP.setBottom(bottomVBox);
 
 		return reserveBP;
@@ -934,34 +960,9 @@ public class Main extends Application {
 			searchTF.setId("searchTF");
 			searchTF.setPromptText("License plate nr.");
 
-//SEARCHING LISTENERS	
-			
-			
-//			ObjectProperty<Predicate<CarFX>> licPlatefilter = new SimpleObjectProperty<>();
-//			ObjectProperty<Predicate<CarFX>> catFilter = new SimpleObjectProperty<>();
-//			
-//			licPlatefilter.bind(Bindings.createObjectBinding(() -> 
-//			s -> s.getModellObject().getCarLicensePlate().toLowerCase().contains(searchTF.getText().toLowerCase()), 
-//			searchTF.textProperty()));
-//			
-//			catFilter.bind(Bindings.createObjectBinding(() -> 
-//	        s -> carSearchBox.getValue().contains("All cars") || carSearchBox.getValue() == s.getModellObject().getCarCategory(), 
-//	        carSearchBox.valueProperty()));
-//			
-//			catFilter.bind(Bindings.createObjectBinding(() -> 
-//	        s -> carSearchBox.getValue() == null || carSearchBox.getValue() == s.getModellObject().getCarCategory(), 
-//	        carSearchBox.valueProperty()));
-//			
-//			filteredListCars.predicateProperty().bind(Bindings.createObjectBinding(
-//		                () -> licPlatefilter.get().and(catFilter.get()), 
-//		                licPlatefilter, catFilter));
-//			
-//			filteredListCars.predicateProperty().bind(Bindings.createObjectBinding(
-//	                () -> licPlatefilter.get(), 
-//	                licPlatefilter));
-			
+//SEARCHING LISTENERS
 					
-
+				
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
@@ -994,11 +995,9 @@ public class Main extends Application {
 	
 	
 	
-	
 	public BorderPane openCarsMenu() {
 		Label basePriceLB = new Label("Base price = ");
 		    BorderPane carsBP = new BorderPane();
-		 
 		    GridPane carsGP = new GridPane();
 		    carsGP.setAlignment(Pos.CENTER_RIGHT);
 		    carsGP.setHgap(15);
@@ -1028,6 +1027,7 @@ public class Main extends Application {
 		    
 		    DatePicker yearPicker = new DatePicker();
 		    yearPicker.setPromptText("Manuf. date");
+		    yearPicker.setDayCellFactory(dp -> new DateCellFactory(minDate, LocalDate.now()));
 		    carsGP.add(yearPicker, 0, 3);
 		    
 		    HBox kmHB = new HBox();
@@ -1040,7 +1040,7 @@ public class Main extends Application {
 		    kmHB.getChildren().addAll(kmTF, kmLbl);
 		    carsGP.add(kmHB, 0, 4);
 		    
-		   //ONLY numbers for km 
+		   //ONLY numbers for km, max 6 characters
 		    kmTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -1097,17 +1097,7 @@ public class Main extends Application {
 		    carCategorieBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					int price = 0;
-					try {
-						for(String key: Database.readCarCategoriesTable().keySet()) {
-							if(newValue.equals(key))
-							price = Database.readCarCategoriesTable().get(key);
-						}
-						basePriceLB.setText("Base price = " + price + " EUR / Day");
-					} catch (SQLException e) {
-						System.out.println("Something is wrong with the reading of car categories table price from database");
-						e.printStackTrace();
-					}
+					basePriceLB.setText("Base price = " + getCategoryPrice(newValue) + " EUR / Day");
 				}
 			});
 		   		    
@@ -1157,7 +1147,7 @@ public class Main extends Application {
 		    engineHB.getChildren().addAll(engineSizeTF,ccmLB,enginePowerTF,powerLB);
 		    carsGP.add(engineHB, 1, 6);
 		    
-		    //Only numbers for engine    
+		    //Only numbers for engine, max 4, 5 characters  
 		    engineSizeTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -1303,7 +1293,7 @@ public class Main extends Application {
 					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
 					
 					for(String key : featuresMap.keySet()) {
-						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
+//						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
 						for(String s: selectedCar.getModellObject().getCarFeatures()) {
 						if(key.equals(s)) {
 							System.out.println("Extras= " + s);
@@ -1517,8 +1507,7 @@ public class Main extends Application {
 	}
 	
 	
-	
-	
+		
 	
 //RESERVATIONS MENU	
 	public BorderPane openReservationsMenu() {
@@ -1681,6 +1670,79 @@ public class Main extends Application {
 		
 	}
 	
+	
+	
+	
+	
+	
+	
+//METHODS for CARS menu
+//Initialize lists, reading data out from cars database	
+	public void fillCarsObservableList() {
+		 observCar = FXCollections.observableArrayList();
+			ArrayList<Car> cars = new ArrayList<>();
+			try {
+				cars = Database.readCarsTable();
+			} catch (SQLException e) {
+				System.out.println("Something is wrong with the filling observable list with cars database");
+				e.printStackTrace();
+			}
+			 for(Car c : cars) {
+			    observCar.add(new CarFX(c));
+			 }
+			  filteredListCars = new FilteredList<>(observCar, p -> true);
+			  sortedListCars = new SortedList<>(filteredListCars);
+		}
+	
+	
+	
+	public void fillCarsObservableListDeactivedCars() {
+		  observCar = FXCollections.observableArrayList();
+		  ArrayList<Car> cars = new ArrayList<>();
+			try {
+				cars = Database.readDeactiveCarsTable();
+			} catch (SQLException e) {
+				System.out.println("Something is wrong with the filling observable list with deactive cars database");
+				e.printStackTrace();
+			}
+		    for(Car c : cars) {
+		    	observCar.add(new CarFX(c));
+		    }
+		    filteredListCars = new FilteredList<>(observCar, p -> true);
+		    sortedListCars = new SortedList<>(filteredListCars);
+		}
+	
+	
+	
+	public ArrayList<String> categoriesList(){
+		ArrayList<String> categoryNames = new ArrayList<>();
+		try {
+			for(String key: Database.readCarCategoriesTable().keySet()) {
+				categoryNames.add(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the reading of car categories table from database");
+			e.printStackTrace();
+		}
+		Collections.sort(categoryNames);
+		return categoryNames;
+	}
+	
+	
+	
+	public int getCategoryPrice(String category) {
+		int price = 0;
+		try {
+			for(String key: Database.readCarCategoriesTable().keySet()) {
+				if(category.equals(key))
+				price = Database.readCarCategoriesTable().get(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the getCategoryPrice method's database connection");
+			e.printStackTrace();
+		}
+		return price;
+	}
 	
 	
 	

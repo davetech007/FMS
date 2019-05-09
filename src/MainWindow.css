@@ -105,7 +105,7 @@
 #carSearchBox {
   -fx-font-size: 14px;
   -fx-pref-width: 195px;
-  -fx-pref-height: 30px;
+  -fx-pref-height: 28px;
 }
 
 #chooseCarButton {
@@ -177,6 +177,16 @@
   -fx-background-color: linear-gradient(#efefef, #96d666);	
 }
 
+#calcPriceButton {
+  -fx-background-image:url("IconCalculatePrice.png");
+  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-background-position: right center;
+  -fx-font-size: 15px;
+  -fx-pref-height: 30px;
+  -fx-pref-width: 195px;
+}
 
 
 
