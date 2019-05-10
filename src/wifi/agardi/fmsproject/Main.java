@@ -10,9 +10,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
+import org.apache.derby.iapi.store.raw.FetchDescriptor;
+
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -484,6 +488,15 @@ public class Main extends Application {
 	        }); 
 			
 			
+			//Notes, Comments			
+			Label notesLabel2 = new Label("Notes");
+			reserveGP.add(notesLabel2, 3, 11);
+			
+			TextArea notesTA2 = new TextArea();
+			notesTA2.setPromptText("comments");
+			notesTA2.setPrefSize(195, 80);
+			reserveGP.add(notesTA2, 3, 12);
+			
 			
 //Grid 4. column			
 			Label dateLabel = new Label("Insurance");
@@ -551,27 +564,32 @@ public class Main extends Application {
 				}
 			});		
 			
-//EXTRAS		
-			Label extrasLB = new Label("Extras");
-			reserveGP.add(extrasLB, 3, 8);
+//EXTRAS LISTVIEW		
+    		   LinkedHashMap<String, ObservableValue<Boolean>> featuresMap = new LinkedHashMap<>();
+//			    try {
+//			    	ArrayList<String> features = Database.readFeaturesTable();
+//			    	Collections.sort(features);
+//					 for(String e : features) {
+//						    featuresMap.put(e, new SimpleBooleanProperty(false));
+//						    }			 
+//				} catch (SQLException e2) {
+//					System.out.println("Something is wrong with creating list view from features database");
+//					e2.printStackTrace();
+//				}
+			   
+			   Label extrasLB = new Label("Extras");
+   			   reserveGP.add(extrasLB, 4, 11);
+			   
+			    ListView<String> extrasLV = new ListView<>();
+			    extrasLV.setEditable(true);
+			    extrasLV.getItems().addAll(featuresMap.keySet());
+			    
+			    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> featuresMap.get(item);
+			    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
+			    extrasLV.setPrefSize(195, 80);
+			    reserveGP.add(extrasLV, 4, 12);
 			
-			CheckBox cb1 = new CheckBox("GPS");
-			CheckBox cb2 = new CheckBox("Additional driver");
-			CheckBox cb3 = new CheckBox("Child seat");
-			CheckBox cb4 = new CheckBox("Border crossing");
-			reserveGP.add(cb1, 3, 9);
-			reserveGP.add(cb2, 3, 10);
-			reserveGP.add(cb3, 4, 9);
-			reserveGP.add(cb4, 4, 10);	
-			
-//Notes, Comments			
-			Label notesLabel2 = new Label("Notes");
-			reserveGP.add(notesLabel2, 3, 11);
-			
-			TextArea notesTA2 = new TextArea();
-			notesTA2.setPromptText("comments");
-			notesTA2.setPrefSize(195, 70);
-			reserveGP.add(notesTA2, 3, 12);
+
 	
 //PRICE TODO
 			
@@ -581,11 +599,11 @@ public class Main extends Application {
 			Label priceLabel2 =    new Label("Extras	   = ");
 			Label priceLabel3 =    new Label("Total price  = ");
 			priceVBox.getChildren().addAll(priceDaysLabel, priceLabel1, priceLabel2, priceLabel3);
-			reserveGP.add(priceVBox, 4, 12);
+			reserveGP.add(priceVBox, 4, 13);
 			
 			Button calcPriceButton = new Button("Calculate price");
 			calcPriceButton.setId("calcPriceButton");
-			reserveGP.add(calcPriceButton, 4, 13);
+			reserveGP.add(calcPriceButton, 4, 14);
 
 			calcPriceButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
@@ -601,17 +619,6 @@ public class Main extends Application {
 			        	  calcPriceButton.setEffect(null);
 			          }
 			        });
-
-			
-			
-			
-//ON ACTION FUNCTIONS
-			 carComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-					@Override
-					public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-						priceLabel1.setText("Price * days = " + getCategoryPrice(newValue));
-					}
-				});
 			
 			
 //Reserve BorderPane BOTTOM BUTTONS
@@ -840,22 +847,38 @@ public class Main extends Application {
 			});
 			
 //RESERVE BUTTON ON ACTION	
+			//Enable the calculate price button
+			ObservableValue<Boolean> calcObs = carComboBox.valueProperty().isNull().
+						or(datePickupPicker.valueProperty().isNull()).
+						or(pickupHourTF.textProperty().isEmpty()).
+						or(pickupMinTF.textProperty().isEmpty()).
+						or(dateReturnPicker.valueProperty().isNull()).
+						or(returnHourTF.textProperty().isEmpty()).
+						or(returnMinTF.textProperty().isEmpty());
 			
-			ObservableValue<Boolean> resObs = carComboBox.valueProperty().isNull().
-					or(custIdLabel.textProperty().length().lessThan(6).
-					or(pickupLocTF.textProperty().isEmpty()).
-					or(datePickupPicker.valueProperty().isNull()).
-					or(pickupHourTF.textProperty().isEmpty()).
-					or(pickupMinTF.textProperty().isEmpty()).
-					or(returnLocTF.textProperty().isEmpty()).
-					or(dateReturnPicker.valueProperty().isNull()).
-					or(returnHourTF.textProperty().isEmpty()).
-					or(returnMinTF.textProperty().isEmpty()));
-			reserveButton.disableProperty().bind(resObs);
-
+			//Enable with calculate price + other details the reserve button 
+			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(6).
+															or(pickupLocTF.textProperty().isEmpty()).
+															or(returnLocTF.textProperty().isEmpty()).
+															or(tg.selectedToggleProperty().isNull()).
+															or((ObservableBooleanValue) calcObs);
+			reserveButton.disableProperty().bind(resCustObs);
 			
 			
+			
+//RESERVE BUTTON ON ACTION			
 			reserveButton.setOnAction(e -> {
+			
+				
+			    
+			});
+			
+//CALCULATE PRICE ON ACTION	
+			calcPriceButton.disableProperty().bind(calcObs);
+			
+			calcPriceButton.setOnAction(e -> {
+				priceLabel1.setText("Price * days = " + getCategoryPrice(carComboBox.getValue()));
+				
 				ldtPickup = LocalDateTime.of(datePickupPicker.getValue().getYear(),
 						datePickupPicker.getValue().getMonth(),
 						datePickupPicker.getValue().getDayOfMonth(),
@@ -870,8 +893,8 @@ public class Main extends Application {
 						Integer.parseInt(returnMinTF.getText()));
 				
 			    System.out.println(Duration.between(ldtPickup, ldtReturn).toHours());
-				
 			    
+				
 			});
 			
 			
@@ -966,12 +989,14 @@ public class Main extends Application {
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
+					searchTF.setDisable(false);
 				}
 				else {
 					filteredListCars.setPredicate(s -> s.getModellObject().getCarCategory().contains(newV));
+					searchTF.setDisable(true);
 				}
 			});
-		 
+		    
 			searchTF.textProperty().addListener((obs2, oldV2, newV2) -> {
 				if(newV2 == null || newV2.length() == 0) {
 					filteredListCars.setPredicate(s -> true);
@@ -992,6 +1017,7 @@ public class Main extends Application {
 		return carsLeftVBox;	
 }
 
+	
 	
 	
 	
@@ -1166,7 +1192,7 @@ public class Main extends Application {
 	        });
 		      
 	
-//Features LISTVIEW CHECKBOX		
+//Features LISTVIEW CHECKBOX	 TODO	
 		    Label featuresLB = new Label("Features");
 		    carsGP.add(featuresLB, 1, 7);
 
@@ -1188,8 +1214,27 @@ public class Main extends Application {
 		    
 		    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> featuresMap.get(item);
 		    featuresLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
-		    featuresLV.setPrefSize(195, 130);
+		    featuresLV.setPrefSize(195, 245);
 		    carsGP.add(featuresLV, 1, 8);
+		    
+		    	    
+//			featuresLV.setCellFactory(CheckBoxListCell.forListView(new Callback<String, ObservableValue<Boolean>>() {
+//				@Override
+//				public ObservableValue<Boolean> call(String param) {
+//					if(selectedCar != null) {
+//						for(String s: selectedCar.getModellObject().getCarFeatures()) {
+//							if(param.equals(s)) {
+//							   // System.out.println(param);
+//							  
+//							    return new SimpleBooleanProperty(true);
+//							}
+//						}
+//						return new SimpleBooleanProperty(false);
+//					}
+//					return new SimpleBooleanProperty(false);
+//					}
+//			}));
+		       
 		   
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
@@ -1291,13 +1336,26 @@ public class Main extends Application {
 					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
 					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
 					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
-					
+		//Clear features map, then fill it with the cars features			
+					try {
+					    ArrayList<String> features = Database.readFeaturesTable();
+					    Collections.sort(features);
+							for(String e : features) {
+								  featuresLV.getItems().clear();
+								  featuresMap.put(e, new SimpleBooleanProperty(false));
+							      featuresLV.getItems().addAll(featuresMap.keySet());
+						     }			 
+						} catch (SQLException e2) {
+							System.out.println("Something is wrong with creating list view from features database");
+							e2.printStackTrace();
+					}
 					for(String key : featuresMap.keySet()) {
-//						ObservableValue<Boolean> featuresCheckedValue = featuresMap.get(key);
 						for(String s: selectedCar.getModellObject().getCarFeatures()) {
-						if(key.equals(s)) {
-							System.out.println("Extras= " + s);
-						}
+							if(key.equals(s)) {
+								featuresLV.getItems().clear();
+								featuresMap.put(s, new SimpleBooleanProperty(true));
+								featuresLV.getItems().addAll(featuresMap.keySet());
+							}
 						} 
 					}
 				}
@@ -1355,11 +1413,13 @@ public class Main extends Application {
 				
 				ArrayList<String> features = new ArrayList<>();
 				for(String key : featuresMap.keySet()) {
+					
 					ObservableValue<Boolean> val = featuresMap.get(key);
 					if(val.getValue()) {
 						features.add(key);
 					}
 				}
+
 				
 				CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 										category, color, fuel, transm, manufDate, 
@@ -1508,6 +1568,7 @@ public class Main extends Application {
 	
 	
 		
+	
 	
 //RESERVATIONS MENU	
 	public BorderPane openReservationsMenu() {
@@ -1744,6 +1805,7 @@ public class Main extends Application {
 		return price;
 	}
 	
+
 	
 	
 	
