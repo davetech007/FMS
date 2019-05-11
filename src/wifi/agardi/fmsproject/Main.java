@@ -77,7 +77,6 @@ public class Main extends Application {
 	CarFX selectedCar;
 
 	TextField carLicensePlateTF;
-	TextField carWishTF;
 	ComboBox<String> carComboBox;
 
 	int minEngineSize = 500;
@@ -365,23 +364,12 @@ public class Main extends Application {
 			dLicenseTF.setPromptText("Driver's license nr.");
 			reserveGP.add(dLicenseTF, 0, 7);
 			
-			Label contactLabel = new Label("Contact");		
-			reserveGP.add(contactLabel, 0, 8);
-			
-			TextField telefonTF = new TextField();
-			telefonTF.setPromptText("Telefon nr.");
-			reserveGP.add(telefonTF, 0, 9);
-			
-			TextField emailTF = new TextField();
-			emailTF.setPromptText("E-mail");
-			reserveGP.add(emailTF, 0, 10);
-
 			
 //Grid 1. column	
 			Label custIdLabel = new Label("ID = ");
 			reserveGP.add(custIdLabel, 1, 0);
 			
-			Label addressLabel = new Label("Address");
+			Label addressLabel = new Label("Address / Contact");
 			reserveGP.add(addressLabel, 1, 1);
 			
 			TextField landTF = new TextField();
@@ -401,6 +389,15 @@ public class Main extends Application {
 			postCodeTF.setPromptText("Postal code");
 			reserveGP.add(postCodeTF, 1, 5);
 						
+			TextField telefonTF = new TextField();
+			telefonTF.setId("telefonTF");
+			telefonTF.setPromptText("Telefon nr.");
+			reserveGP.add(telefonTF, 1, 6);
+			
+			TextField emailTF = new TextField();
+			emailTF.setId("emailTF");
+			emailTF.setPromptText("E-mail");
+			reserveGP.add(emailTF, 1, 7);
 			
 //Grid 3. column
 //Searching for a car	
@@ -426,12 +423,6 @@ public class Main extends Application {
 			        	  chooseCarButton.setEffect(null);
 			          }
 			        });
-					
-			
-			carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
-			carComboBox.setId("carSearchBox");
-			carComboBox.setPromptText("Reserve a category");
-			reserveGP.add(carComboBox, 4, 0);
 	
 			Label carLabel = new Label("Car details");
 			reserveGP.add(carLabel, 3, 1);
@@ -440,21 +431,18 @@ public class Main extends Application {
 			carLicensePlateTF.setPromptText("Reserved car's license pl.");
 			reserveGP.add(carLicensePlateTF, 3, 2);
 			
-			carWishTF = new TextField();
-			carWishTF.setPromptText("Type wish");
-			reserveGP.add(carWishTF, 3, 3);
 			
 //PICKUP DETAILS
 			Label pickupLabel = new Label("Pick up");
-			reserveGP.add(pickupLabel, 3, 4);
+			reserveGP.add(pickupLabel, 3, 3);
 			
 			TextField pickupLocTF = new TextField();
 			pickupLocTF.setPromptText("Pickup location");
-			reserveGP.add(pickupLocTF, 3, 5);
+			reserveGP.add(pickupLocTF, 3, 4);
 			
 			DatePicker datePickupPicker = new DatePicker();
 			datePickupPicker.setPromptText("Pickup date");
-			reserveGP.add(datePickupPicker, 3, 6);
+			reserveGP.add(datePickupPicker, 3, 5);
 			
 			HBox pickupHBox = new HBox();
 			pickupHBox.setSpacing(5);
@@ -467,7 +455,7 @@ public class Main extends Application {
 			pickupMinTF.setMaxWidth(40);
 			Label pickupMinuteLB = new Label("minutes");
 			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
-			reserveGP.add(pickupHBox, 3, 7);
+			reserveGP.add(pickupHBox, 3, 6);
 			//PUCKUP TIME REGEX			
 			pickupHourTF.textProperty().addListener(new ChangeListener<String>() {
 		            @Override
@@ -490,38 +478,61 @@ public class Main extends Application {
 			
 			//Notes, Comments			
 			Label notesLabel2 = new Label("Notes");
-			reserveGP.add(notesLabel2, 3, 11);
+			reserveGP.add(notesLabel2, 3, 8);
 			
 			TextArea notesTA2 = new TextArea();
-			notesTA2.setPromptText("comments");
-			notesTA2.setPrefSize(195, 80);
-			reserveGP.add(notesTA2, 3, 12);
+			notesTA2.setPromptText("Comments, category wish,...");
+			notesTA2.setPrefSize(195, 100);
+			reserveGP.add(notesTA2, 3, 9);
 			
+//Calculate price button			
+			Button calcPriceButton = new Button("Calculate price");
+			calcPriceButton.setId("calcPriceButton");
+			reserveGP.add(calcPriceButton, 3, 10);
+
+			calcPriceButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  calcPriceButton.setEffect(shadow);
+			          }
+			        });
+			calcPriceButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  calcPriceButton.setEffect(null);
+			          }
+			        });
+			
+			
+			carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
+			carComboBox.setId("carSearchBox");
+			carComboBox.setPromptText("Reserve a category");
+			reserveGP.add(carComboBox, 4, 0);
 			
 //Grid 4. column			
 			Label dateLabel = new Label("Insurance");
 			reserveGP.add(dateLabel, 4, 1);
 //INSURANCE		
-			ToggleGroup tg = new ToggleGroup();
-			RadioButton cascoRB = new RadioButton("Casco");
-			cascoRB.setToggleGroup(tg);
-			RadioButton fullCascoRB = new RadioButton("Full Casco");
-			fullCascoRB.setToggleGroup(tg);
-			reserveGP.add(cascoRB, 4, 2);
-			reserveGP.add(fullCascoRB, 4, 3);
+			ComboBox<String> insuranceComboBox = new ComboBox<>(FXCollections.observableArrayList(insurancesList()));
+			insuranceComboBox.setPromptText("Choose insurance");
+			insuranceComboBox.setPrefWidth(195);
+			reserveGP.add(insuranceComboBox, 4, 2);
+	
 			
 //RETURN DETAILS			
 			Label returnLabel = new Label("Return");
-			reserveGP.add(returnLabel, 4, 4);
+			reserveGP.add(returnLabel, 4, 3);
 			
 			TextField returnLocTF = new TextField();
 			returnLocTF.setPromptText("Return location");
-			reserveGP.add(returnLocTF, 4, 5);
+			reserveGP.add(returnLocTF, 4, 4);
 			
 			DatePicker dateReturnPicker = new DatePicker();
 			dateReturnPicker.setDisable(true);
 			dateReturnPicker.setPromptText("Return date");
-			reserveGP.add(dateReturnPicker, 4, 6);
+			reserveGP.add(dateReturnPicker, 4, 5);
 			
 			HBox returnHBox = new HBox();
 			returnHBox.setSpacing(5);
@@ -533,7 +544,7 @@ public class Main extends Application {
 			returnMinTF.setMaxWidth(40);
 			Label returnMinuteLB = new Label("minutes");
 			returnHBox.getChildren().addAll(returnHourTF, returnHourLB, returnMinTF, returnMinuteLB);
-			reserveGP.add(returnHBox, 4, 7);
+			reserveGP.add(returnHBox, 4, 6);
 			//RETURN TIME REGEX			
 			returnHourTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
@@ -565,32 +576,23 @@ public class Main extends Application {
 			});		
 			
 //EXTRAS LISTVIEW		
-    		   LinkedHashMap<String, ObservableValue<Boolean>> featuresMap = new LinkedHashMap<>();
-//			    try {
-//			    	ArrayList<String> features = Database.readFeaturesTable();
-//			    	Collections.sort(features);
-//					 for(String e : features) {
-//						    featuresMap.put(e, new SimpleBooleanProperty(false));
-//						    }			 
-//				} catch (SQLException e2) {
-//					System.out.println("Something is wrong with creating list view from features database");
-//					e2.printStackTrace();
-//				}
-			   
-			   Label extrasLB = new Label("Extras");
-   			   reserveGP.add(extrasLB, 4, 11);
+    		   LinkedHashMap<String, ObservableValue<Boolean>> extrasMap = new LinkedHashMap<>();
+				      for(String e : extrasList()) {
+				    	  extrasMap.put(e, new SimpleBooleanProperty(false));
+					  }			 
+				      
+			    Label extrasLB = new Label("Extras");
+   			    reserveGP.add(extrasLB, 4, 8);
 			   
 			    ListView<String> extrasLV = new ListView<>();
 			    extrasLV.setEditable(true);
-			    extrasLV.getItems().addAll(featuresMap.keySet());
+			    extrasLV.getItems().addAll(extrasMap.keySet());
 			    
-			    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> featuresMap.get(item);
+			    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> extrasMap.get(item);
 			    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
-			    extrasLV.setPrefSize(195, 80);
-			    reserveGP.add(extrasLV, 4, 12);
-			
-
-	
+			    extrasLV.setPrefSize(195, 100);
+			    reserveGP.add(extrasLV, 4, 9);
+		
 //PRICE TODO
 			
 			VBox priceVBox = new VBox();
@@ -599,26 +601,9 @@ public class Main extends Application {
 			Label priceLabel2 =    new Label("Extras	   = ");
 			Label priceLabel3 =    new Label("Total price  = ");
 			priceVBox.getChildren().addAll(priceDaysLabel, priceLabel1, priceLabel2, priceLabel3);
-			reserveGP.add(priceVBox, 4, 13);
+			reserveGP.add(priceVBox, 4, 10);
 			
-			Button calcPriceButton = new Button("Calculate price");
-			calcPriceButton.setId("calcPriceButton");
-			reserveGP.add(calcPriceButton, 4, 14);
-
-			calcPriceButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
-			        new EventHandler<MouseEvent>() {
-			          @Override
-			          public void handle(MouseEvent e) {
-			        	  calcPriceButton.setEffect(shadow);
-			          }
-			        });
-			calcPriceButton.addEventHandler(MouseEvent.MOUSE_EXITED,
-			        new EventHandler<MouseEvent>() {
-			          @Override
-			          public void handle(MouseEvent e) {
-			        	  calcPriceButton.setEffect(null);
-			          }
-			        });
+			
 			
 			
 //Reserve BorderPane BOTTOM BUTTONS
@@ -653,7 +638,6 @@ public class Main extends Application {
 			          }
 			        });
 			saveCustomerButton.disableProperty().bind(custObs);
-			
 			
 		Button updateCustomerButton = new Button("Update");
 			updateCustomerButton.setId("updateCustomerButton");	
@@ -849,6 +833,7 @@ public class Main extends Application {
 //RESERVE BUTTON ON ACTION	
 			//Enable the calculate price button
 			ObservableValue<Boolean> calcObs = carComboBox.valueProperty().isNull().
+					    or(insuranceComboBox.valueProperty().isNull()).
 						or(datePickupPicker.valueProperty().isNull()).
 						or(pickupHourTF.textProperty().isEmpty()).
 						or(pickupMinTF.textProperty().isEmpty()).
@@ -860,7 +845,6 @@ public class Main extends Application {
 			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(6).
 															or(pickupLocTF.textProperty().isEmpty()).
 															or(returnLocTF.textProperty().isEmpty()).
-															or(tg.selectedToggleProperty().isNull()).
 															or((ObservableBooleanValue) calcObs);
 			reserveButton.disableProperty().bind(resCustObs);
 			
@@ -901,7 +885,7 @@ public class Main extends Application {
 			
 				
 			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
-			bottomHBoxRes.setPadding(new Insets(0, 0, 0, 0));
+			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
 			
@@ -1367,8 +1351,6 @@ public class Main extends Application {
 				mainTabPane.getSelectionModel().select(reserveTab);
 				selectedCar = carsTableView.getSelectionModel().getSelectedItem();
 				carLicensePlateTF.setText(selectedCar.getModellObject().getCarLicensePlate());
-				carWishTF.setText(selectedCar.getModellObject().getCarBrand() + " " + 
-								  selectedCar.getModellObject().getCarModel());
 				carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
 			});			
 			
@@ -1500,7 +1482,8 @@ public class Main extends Application {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a new car");
 						alertWarn.setHeaderText("Please check again, it's an existing car!");
-						alertWarn.setContentText("Car with the VIN number '"+ vinNumber + "' already exists!");
+						alertWarn.setContentText("Car with the VIN number '"+ vinNumber + "' already exists!\n\n" +
+												 "This car is a " + Database.checkExistingCarVINGetCar(vinNumber));
 						alertWarn.showAndWait();
 						return;
 					}
@@ -1508,7 +1491,8 @@ public class Main extends Application {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a new car");
 						alertWarn.setHeaderText("Please check again, it's an existing car!");
-						alertWarn.setContentText("Car with the license plate '"+ licPlate + "' already exists!");
+						alertWarn.setContentText("Car with the license plate '"+ licPlate + "' already exists!\n\n" +
+												 "This car is a " + Database.checkExistingCarLicPGetCar(licPlate));
 						alertWarn.showAndWait();
 						return;
 					}
@@ -1774,7 +1758,7 @@ public class Main extends Application {
 		}
 	
 	
-	
+//Categories	
 	public ArrayList<String> categoriesList(){
 		ArrayList<String> categoryNames = new ArrayList<>();
 		try {
@@ -1806,6 +1790,68 @@ public class Main extends Application {
 	}
 	
 
+//Insurances	
+	public ArrayList<String> insurancesList(){
+		ArrayList<String> insuranceTypes = new ArrayList<>();
+		try {
+			for(String key: Database.readInsurancesTable().keySet()) {
+				insuranceTypes.add(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the reading of insurances table from database");
+			e.printStackTrace();
+		}
+		Collections.sort(insuranceTypes);
+		return insuranceTypes;
+	}
+	
+	
+	
+	public int getInsurancePrice(String insurance) {
+		int price = 0;
+		try {
+			for(String key: Database.readInsurancesTable().keySet()) {
+				if(insurance.equals(key))
+				price = Database.readInsurancesTable().get(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the getInsurancePrice method's database connection");
+			e.printStackTrace();
+		}
+		return price;
+	}
+	
+	
+//Extras
+	public ArrayList<String> extrasList(){
+		ArrayList<String> extras = new ArrayList<>();
+		try {
+			for(String key: Database.readExtrasTable().keySet()) {
+				extras.add(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the reading of extras table from database");
+			e.printStackTrace();
+		}
+		Collections.sort(extras);
+		return extras;
+	}
+	
+	
+	
+	public int getExtraPrice(String extraName) {
+		int price = 0;
+		try {
+			for(String key: Database.readExtrasTable().keySet()) {
+				if(extraName.equals(key))
+				price = Database.readExtrasTable().get(key);
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the getExtraPrice method's database connection");
+			e.printStackTrace();
+		}
+		return price;
+	}
 	
 	
 	
@@ -1813,25 +1859,33 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		try {
 			Database.createUsersTable();
-			System.out.println("Created users table, or already exists");
+				System.out.println("Created users table, or already exists");
 			Database.createCarCategoriesTable();
-			System.out.println("Created car categories table, or alresy exists");
+				System.out.println("Created car categories table, or alresy exists");
 			Database.createCarFuelTypeTable();
-			System.out.println("Created car fuel types table, or already exists");
+				System.out.println("Created car fuel types table, or already exists");
 			Database.createCarTransmissionTypeTable();
-			System.out.println("Created car transmission types table, or already exists");
+				System.out.println("Created car transmission types table, or already exists");
 			Database.createCarColorsTable();
-			System.out.println("Created car color types table, or already exists");
+				System.out.println("Created car color types table, or already exists");
 			Database.createCarsTable();
-			System.out.println("Created cars table, or already exists");
+				System.out.println("Created cars table, or already exists");
 			Database.createFeaturesTable();
-			System.out.println("Created features table, or already exists");
+				System.out.println("Created features table, or already exists");
 		    Database.createCarFeaturesTable();
-			System.out.println("Created car features junction table, or already exists");
+				System.out.println("Created car features junction table, or already exists");
 			Database.createNationalitiesTable();
-			System.out.println("Created nationalities table, or already exists");
+				System.out.println("Created nationalities table, or already exists");
 			Database.createCustomersTable();
-			System.out.println("Created customers table, or already exists");
+				System.out.println("Created customers table, or already exists");
+			Database.createInsurancesTable();
+				System.out.println("Created insurances table, or already exists");
+			Database.createExtrasTable();
+				System.out.println("Created extras table, or already exists");
+			Database.createReservationsTable();
+				System.out.println("Created reservations table, or already exists");
+			Database.createReservationExtrasTable();
+				System.out.println("Created reservation extras junction table, or already exists");
 			
 		} catch (SQLException e) {
 			System.out.println(e);

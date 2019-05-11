@@ -97,6 +97,33 @@ public class Database {
 	public static final String addressStreetCol = "AddressStreet";
 	public static final String addressPostCodeCol = "AddressPostalCode";
 	
+//RESERVATIONS
+	public static final String insurancesTable = "Insurances";
+	public static final String insuranceIDCol = "Insurance_ID";
+	public static final String insuranceTypeCol = "InsuranceType";
+	public static final String insurancePriceCol = "InsurancePrice";
+	
+	public static final String extrasTable = "Extras";
+	public static final String extraIDCol = "Extra_ID";
+	public static final String extraNameCol = "ExtraName";
+	public static final String extraPriceCol = "ExtraPrice";
+	
+	public static final String reservationExtrasTable = "ReservationExtras";
+	public static final String reservationExtraIDCol = "ReservationExtra_ID";
+	
+	public static final String reservationsTable = "Reservations";
+	public static final String reservationNumberIDCol = "ReservationNumber_ID";
+	public static final String pickupLocationCol = "PickupLocation";
+	public static final String pickupDateCol = "PickupDate";
+	public static final String pickupHourCol = "PickupHour";
+	public static final String pickupMinCol = "PickupMinutes";
+	public static final String returnLocationCol = "ReturnLocation";
+	public static final String returnDateCol = "ReturnDate";
+	public static final String returnHourCol = "ReturnHour";
+	public static final String returnMinCol = "ReturnMinutes";
+	public static final String resNotesCol = "ReservationNotes";
+	
+	
 	
 	
 //USERS TABLE	
@@ -249,7 +276,7 @@ public class Database {
 	}
 	
     
-	
+//CARS
 	
 //CATEGORIES TABLE	
 	public static void createCarCategoriesTable() throws SQLException {
@@ -428,7 +455,6 @@ public class Database {
 		  }
 		  return catName;
 	   }
-	
 	
 	
 	
@@ -761,7 +787,6 @@ public class Database {
 		  }
 		  return transName;
 	   }
-	
 	
 	
 	
@@ -1146,7 +1171,7 @@ public class Database {
 			pstmt.executeUpdate();
 			}
 		} catch (SQLException e) {
-			System.out.println("Something is wrong with the addCarFeature database connection...");
+			System.out.println("Something is wrong with the addCarFeatures database connection...");
 			e.printStackTrace();
 		}finally {
 			try {
@@ -1594,6 +1619,37 @@ public class Database {
 	}
 	
 	
+	public static String checkExistingCarVINGetCar(String vinID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String car = "";
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + brandCol + ", " + modelCol + ", " + licensePlateCol + 
+								   " FROM "+ carsTable +" WHERE " + vinNumberIDCol + " = '" + vinID + "'");
+		    if(rs.next()) {
+		    	car = "'" + rs.getString(brandCol) + " " + rs.getString(modelCol) + "', with the license plate '" + rs.getString(licensePlateCol) + "'.";
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCarVINGetCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return car;
+	}
+	
+	
 	public static boolean checkExistingCarLicP(String licPlateID) throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
@@ -1624,6 +1680,37 @@ public class Database {
 	}
 	
 	
+	public static String checkExistingCarLicPGetCar(String licPlateID) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String car = "";
+		try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + brandCol + ", " + modelCol + ", " + vinNumberIDCol + 
+								   " FROM "+ carsTable +" WHERE " + licensePlateCol + " = '" + licPlateID + "'");
+		    if(rs.next()) {
+		    	car = "'" + rs.getString(brandCol) + " " + rs.getString(modelCol) + "', with the VIN number '" + rs.getString(vinNumberIDCol) + "'.";
+		    }
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with checkExistingCarLicPGetCar database connection");
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)
+				  stmt.close();
+				if(conn != null)
+				  conn.close();
+			}
+		catch(SQLException e) {
+			throw e;
+		  }
+		}
+		return car;
+	}
+	
+	
 	public static void activateDeletedCar(String vinNum) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -1650,6 +1737,7 @@ public class Database {
 	}
 	
 	
+//CUSTOMERS	
 	
 //NATIONALITY	
 	public static void createNationalitiesTable() throws SQLException {
@@ -2275,6 +2363,536 @@ public class Database {
 		}
 	}
 	
+	
+	
+	
+//RESERVATIONS
+	public static void createReservationsTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + reservationsTable + "(" +
+						reservationNumberIDCol + " VARCHAR(100), " +
+						customerIDCol + " VARCHAR(100), " +
+						vinNumberIDCol + " VARCHAR(17), " +
+						categoryIDCol + " INTEGER, " +
+						insuranceIDCol + " INTEGER, " +
+						pickupLocationCol + " VARCHAR(200), " +
+						pickupDateCol + " DATE, " +
+						pickupHourCol + " INTEGER, " +
+						pickupMinCol + " INTEGER, " + 
+						returnLocationCol + " VARCHAR(200), " +
+						returnDateCol + " DATE, " +
+						returnHourCol + " INTEGER, " +
+						returnMinCol + " INTEGER, " +
+						resNotesCol + " VARCHAR(300), " +
+						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
+						"PRIMARY KEY (" + reservationNumberIDCol + "), " +
+						"FOREIGN KEY (" + customerIDCol + ") REFERENCES " + customersTable + "(" + customerIDCol + "), " +
+						"FOREIGN KEY (" + vinNumberIDCol + ") REFERENCES " + carsTable + "(" + vinNumberIDCol + "), " +
+						"FOREIGN KEY (" + categoryIDCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
+						"FOREIGN KEY (" + insuranceIDCol + ") REFERENCES " + insurancesTable + "(" + insuranceIDCol + "))";
+						
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, reservationsTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createReservationsTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+		   }
+	}
+	
+	
+	
+	
+	
+	
+//INSURANCES
+	public static void createInsurancesTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + insurancesTable + "(" +
+						insuranceIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+						insuranceTypeCol + " VARCHAR(50), "+ insurancePriceCol +" INTEGER)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, insurancesTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+			
+			LinkedHashMap<String, Integer> insurances = new LinkedHashMap<>();
+				insurances.put("CDW", 0);
+				insurances.put("Super CDW", 35);
+				insurances.put("LDW", 30);
+				insurances.put("Super LDW", 55);
+			for(String key: insurances.keySet()) {
+				Integer price = insurances.get(key);
+				addInsuranceType(key, price);
+			}
+			System.out.println("Adding basic insurances completed");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createInsurancesTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void addInsuranceType(String insurance, int price) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "INSERT INTO " + insurancesTable + " (" + insuranceTypeCol + ", " + insurancePriceCol + ") VALUES(?, ?)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, insurance);
+			pstmt.setInt(2, price);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addInsuranceType database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static LinkedHashMap<String, Integer> readInsurancesTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  LinkedHashMap<String, Integer> insurances = new LinkedHashMap<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + insurancesTable);
+			while(rs.next()) {
+				insurances.put(rs.getString(insuranceTypeCol), rs.getInt(insurancePriceCol));
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readInsurancesTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return insurances;
+	   }
+	
+	
+	public static int readInsuraceID(String insurance) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int insuranceID = 0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + insuranceIDCol + " FROM " +
+									insurancesTable + " WHERE " + insuranceTypeCol + " = '" + insurance + "'");
+			if(rs.next()) {
+				insuranceID = rs.getInt(insuranceIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readInsuranceID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return insuranceID;
+	   }
+	
+	
+	public static String readInsuranceType(int insuranceID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String insuranceType = "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + insuranceTypeCol + " FROM " +
+									insurancesTable + " WHERE " + insuranceIDCol + " = " + insuranceID);
+			if(rs.next()) {
+				insuranceType = rs.getString(insuranceTypeCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readInsuranceType database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return insuranceType;
+	   }
+	
+	
+//EXTRAS	
+	public static void createExtrasTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + extrasTable + "(" +
+						extraIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+						extraNameCol + " VARCHAR(50), "+ extraPriceCol +" INTEGER)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, extrasTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+
+			LinkedHashMap<String, Integer> extras = new LinkedHashMap<>();
+				extras.put("Child seat", 20);
+				extras.put("Navigation", 25);
+				extras.put("Border crossing", 30);
+				extras.put("Young driver", 30);
+				extras.put("Additional driver", 20);
+				
+			for(String key: extras.keySet()) {
+				Integer price = extras.get(key);
+				addExtraType(key, price);
+			}
+			System.out.println("Adding basic extras completed");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createExtrasTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void addExtraType(String extraName, int price) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "INSERT INTO " + extrasTable + " (" + extraNameCol + ", " + extraPriceCol + ") VALUES(?, ?)";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, extraName);
+			pstmt.setInt(2, price);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addExtraType database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static LinkedHashMap<String, Integer> readExtrasTable() throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  LinkedHashMap<String, Integer> extras = new LinkedHashMap<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM " + extrasTable);
+			while(rs.next()) {
+				extras.put(rs.getString(extraNameCol), rs.getInt(extraPriceCol));
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readExtrasTable database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return extras;
+	   }
+	
+	
+	public static int readExtraID(String extraName) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  int extraID = 0;
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + extraIDCol + " FROM " +
+									extrasTable + " WHERE " + extraNameCol + " = '" + extraName + "'");
+			if(rs.next()) {
+				extraID = rs.getInt(extraIDCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readExtraID database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return extraID;
+	   }
+	
+	
+	public static String readExtraName(int extraID) throws SQLException{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  String extraName = "";
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + extraNameCol + " FROM " +
+									extrasTable + " WHERE " + extraIDCol + " = " + extraID);
+			if(rs.next()) {
+				extraName = rs.getString(extraNameCol);
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readExtraName database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return extraName;
+	   }
+
+	
+//RESERVATION EXTRAS JUNCTION TABLE	
+	public static void createReservationExtrasTable() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String create = "CREATE TABLE " + reservationExtrasTable + "(" +
+				reservationExtraIDCol + " INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+				reservationNumberIDCol + " VARCHAR(100), "+
+				extraIDCol + " INTEGER, " +
+				"FOREIGN KEY (" + reservationNumberIDCol + ") REFERENCES " + reservationsTable +" (" + reservationNumberIDCol + "), " +
+				"FOREIGN KEY (" + extraIDCol + ") REFERENCES " + extrasTable +" (" + extraIDCol + "))";
+								
+		try {
+			conn = DriverManager.getConnection(connString);
+			rs = conn.getMetaData().getTables(null, null, reservationExtrasTable.toUpperCase(), new String[] {"TABLE"});
+			if(rs.next()) {
+				return;
+			}
+			stmt = conn.createStatement();
+			stmt.executeUpdate(create);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the createReservationExtrasTable database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void addReservationExtras(ArrayList<String> extraNames, String resNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "INSERT INTO " + reservationExtrasTable + " (" + reservationNumberIDCol + ", " + extraIDCol + ") VALUES (?,?)";
+				
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			for(String s : extraNames) {
+			 pstmt.setString(1, resNum);
+			 pstmt.setInt(2, readExtraID(s));
+			 pstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the addReservationExtras database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void updateReservationExtras(ArrayList<String> extraNames, String resNum) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String update = "DELETE FROM " + reservationExtrasTable + " WHERE " + reservationNumberIDCol + " = '" + resNum + "'";	
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(update);
+			pstmt.executeUpdate();
+			addReservationExtras(extraNames, resNum);
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateReservationExtras database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static ArrayList<String> readReservationExtras(String resNum) throws SQLException {
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		  ArrayList<String> extras = new ArrayList<>();
+		  try {
+			conn = DriverManager.getConnection(connString);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT " + extraIDCol + " FROM " +
+					reservationExtrasTable + " WHERE " + reservationNumberIDCol + " = '" + resNum + "'");
+			while(rs.next()) {
+				extras.add(readExtraName(rs.getInt(extraIDCol)));
+			}
+			rs.close();	
+		   }	  
+		catch(SQLException e) {
+			System.out.println("Something is wrong with the readReservationExtras database connection...");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(conn != null)
+					conn.close();
+				}
+			catch(SQLException e) {
+				throw e;
+			}
+		  }
+		  return extras;
+	   }
 	
 	
 	

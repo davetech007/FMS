@@ -97,6 +97,18 @@
   -fx-font-size: 15px;
   -fx-pref-width: 220px;
 }
+#telefonTF{
+  -fx-background-image:url("IconTelefon.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 20px;
+  -fx-background-position: right center;
+}
+#emailTF{
+  -fx-background-image:url("IconEmail.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 20px;
+  -fx-background-position: right center;
+}
 
 #searchLB {
   -fx-font-size: 15px;
