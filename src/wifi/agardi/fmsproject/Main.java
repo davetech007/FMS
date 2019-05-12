@@ -65,30 +65,37 @@ public class Main extends Application {
 	DropShadow shadow = new DropShadow();  //Effect for the buttons
 	LocalDate minDate = LocalDate.of(1900, 01, 01);
 	
+	int minEngineSize = 500;
+	int minEnginePower = 40;
+	
+	LocalDateTime ldtPickup;
+	LocalDateTime ldtReturn;
+	
 	TabPane mainTabPane;
 	Tab carsTab;
 	Tab reserveTab;
 
-	private ObservableList<CarFX> observCar;
+	TableView<CarFX> carsTableView;
+	CarFX selectedCar;
+	private ObservableList<CarFX> observCars;
 	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
 	private SortedList<CarFX> sortedListCars;
 	
-	TableView<CarFX> carsTableView;
-	CarFX selectedCar;
-
 	TextField carLicensePlateTF;
 	ComboBox<String> carComboBox;
 
-	int minEngineSize = 500;
-	int minEnginePower = 40;
 	
-
 	CustomerFX selectedCust;
 	
 	
+	TableView<ReservationFX> reservTableView;
+	ReservationFX selectedRes;
+	private ObservableList<ReservationFX> observReservations;
+	private FilteredList<ReservationFX> filteredListReservations;
+	private SortedList<ReservationFX> sortedListReservations;
 	
-	LocalDateTime ldtPickup;
-	LocalDateTime ldtReturn;
+	
+	
 
 //LOGIN WINDOW	
 	@Override
@@ -234,7 +241,7 @@ public class Main extends Application {
 			reserveTab.setClosable(false);
 			reserveTab.setId("reserveTab");
 			
-			fillCarsObservableList();
+			fillCarsObservableList("active", "");
 			carsTab = new Tab("Cars");
 			carsTab.setContent(openCarsMenu());
 			carsTab.setClosable(false);
@@ -742,25 +749,25 @@ public class Main extends Application {
 														nationality, passportNum, driversLicenseNum, telefon, eMail,
 														addressLand, addressCity, addressStreet, addressPostalCode));
 			
-				if(Database.checkExistingCustomerPassport(passportNum)) {
+				if(Database.checkExistingCustomer(passportNum, "", "") != "") {
 					Alert alertWarn= new Alert(AlertType.WARNING);
 					alertWarn.setTitle("Adding a customer");
 					alertWarn.setHeaderText("Please check again, PASSPORT number already exists!");
 					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
 											 "', but his/her passport number '" + passportNum +
 											 "' already exists under this name '" + 
-											 Database.checkExistingCustomerPassportGetName(passportNum) + "'");
+											 Database.checkExistingCustomer(passportNum, "", "") + "'");
 					alertWarn.showAndWait();
 					return;
 				}
-				if(Database.checkExistingCustomerDLicense(driversLicenseNum)) {
+				if(Database.checkExistingCustomer("", driversLicenseNum, "") != "") {
 					Alert alertWarn= new Alert(AlertType.WARNING);
 					alertWarn.setTitle("Adding a customer");
 					alertWarn.setHeaderText("Please check again, DRIVER'S LICENSE number already exists!");
 					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
 											 "', but his/her driver's license number '" + driversLicenseNum +
 											 "' already exists under this name '" +
-											 Database.checkExistingCustomerDLicenseGetName(driversLicenseNum) + "'");
+											 Database.checkExistingCustomer("", driversLicenseNum, "") + "'");
 					alertWarn.showAndWait();
 					return;
 				}
@@ -815,8 +822,8 @@ public class Main extends Application {
 				confirmUpdate.setTitle("Updating customer");
 				confirmUpdate.setHeaderText("Please confirm!");
 				confirmUpdate.setContentText("Would you really want to UPDATE the selected customer?\n\n" +
-											"Customer with this ID '" + customerID + "' existing under this name '" +
-											 Database.checkExistingCustomerIDGetName(customerID) + "'.\n" +
+											"Customer with this ID '" + customerID + "' exists under this name '" +
+											 Database.checkExistingCustomer("", "", customerID) + "'.\n\n" +
 											 "Update to '" + firstName + " " + lastName + "'?");
 				Optional<ButtonType> result = confirmUpdate.showAndWait();
 				if(result.get() == ButtonType.OK) {
@@ -852,7 +859,7 @@ public class Main extends Application {
 			
 //RESERVE BUTTON ON ACTION			
 			reserveButton.setOnAction(e -> {
-			
+					
 				
 			    
 			});
@@ -938,7 +945,7 @@ public class Main extends Application {
     	onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
     
   
-    	carsTableView = new TableView<>(observCar);
+    	carsTableView = new TableView<>(observCars);
 		carsTableView.setPrefHeight(570);
 		carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 		carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -1368,7 +1375,7 @@ public class Main extends Application {
 				if(result.get() == ButtonType.OK) {
 					try {
 						Database.deleteCar(selectedCar.getModellObject().getCarVinNumber());
-						observCar.remove(selectedCar);
+						observCars.remove(selectedCar);
 					} catch (SQLException e1) {
 						System.out.println("Something is wrong with the delete car database connection");
 						e1.printStackTrace();
@@ -1407,7 +1414,7 @@ public class Main extends Application {
 										category, color, fuel, transm, manufDate, 
 										carKM, engSize, engPower, false, features));
 				
-				if(!Database.checkExistingCarVIN(vinNumber)) {
+				if(Database.checkExistingCar(vinNumber, "") == "") {
 					Alert alertWarn= new Alert(AlertType.WARNING);
 					alertWarn.setTitle("Updating a car");
 					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
@@ -1426,8 +1433,8 @@ public class Main extends Application {
 					Optional<ButtonType> result = alertUpdate.showAndWait();
 					if(result.get() == ButtonType.OK) {
 							Database.updateCar(car.getModellObject());
-							observCar.remove(selectedCar);
-							observCar.add(car);
+							observCars.remove(selectedCar);
+							observCars.add(car);
 						}
 				}
 			  } catch (SQLException e1) {
@@ -1478,21 +1485,21 @@ public class Main extends Application {
 											category, color, fuel, transm, manufDate, 
 											carKM, engSize, engPower, false, features));
 					//ALERT					
-					if(Database.checkExistingCarVIN(vinNumber)) {
+					if(Database.checkExistingCar(vinNumber, "") != "") {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a new car");
 						alertWarn.setHeaderText("Please check again, it's an existing car!");
 						alertWarn.setContentText("Car with the VIN number '"+ vinNumber + "' already exists!\n\n" +
-												 "This car is a " + Database.checkExistingCarVINGetCar(vinNumber));
+												 "This car is a " + Database.checkExistingCar(vinNumber, ""));
 						alertWarn.showAndWait();
 						return;
 					}
-					if(Database.checkExistingCarLicP(licPlate)) {
+					if(Database.checkExistingCar("", licPlate) != "") {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a new car");
 						alertWarn.setHeaderText("Please check again, it's an existing car!");
 						alertWarn.setContentText("Car with the license plate '"+ licPlate + "' already exists!\n\n" +
-												 "This car is a " + Database.checkExistingCarLicPGetCar(licPlate));
+												 "This car is a " + Database.checkExistingCar("", licPlate));
 						alertWarn.showAndWait();
 						return;
 					}
@@ -1529,7 +1536,7 @@ public class Main extends Application {
 						Optional<ButtonType> result = alertAdd.showAndWait();
 						if(result.get() == ButtonType.OK) {
 								Database.addNewCar(newCar.getModellObject());
-								observCar.add(newCar);
+								observCars.add(newCar);
 							}
 					}	
 				} catch (SQLException e1) {
@@ -1572,56 +1579,73 @@ public class Main extends Application {
 		reservationsBP.setTop(resSearchHB);
 		
 //TableView
-		TableColumn<String, String> resNumCol = new TableColumn<>("Reservation nr.");
+		TableColumn<ReservationFX, String> resNumCol = new TableColumn<>("Reservation nr.");
 		resNumCol.setPrefWidth(120);
 		resNumCol.setMinWidth(30);
-		resNumCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		resNumCol.setCellValueFactory(new PropertyValueFactory<>("resNumberID"));
 	    
-		TableColumn<String, String> custNameCol = new TableColumn<>("Customer name");
-		custNameCol.setPrefWidth(140);
+		TableColumn<ReservationFX, String> custNameCol = new TableColumn<>("Customer name");
+		custNameCol.setPrefWidth(120);
 		custNameCol.setMinWidth(30);
 		custNameCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		
-		TableColumn<String, String> carCatCol = new TableColumn<>("Category");
+		TableColumn<ReservationFX, String> carCatCol = new TableColumn<>("Category");
 		carCatCol.setPrefWidth(80);
 		carCatCol.setMinWidth(30);
-		carCatCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		carCatCol.setCellValueFactory(new PropertyValueFactory<>("reservedCategory"));
 		
-		TableColumn<String, String> carLicensePlateCol = new TableColumn<>("Lic. plate nr.");
-		carLicensePlateCol.setPrefWidth(100);
+		TableColumn<ReservationFX, String> carLicensePlateCol = new TableColumn<>("Lic. plate nr.");
+		carLicensePlateCol.setPrefWidth(80);
 		carLicensePlateCol.setMinWidth(30);
 		carLicensePlateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		
-		TableColumn<String, String> pickupDateCol = new TableColumn<>("Pickup date");
-		pickupDateCol.setPrefWidth(100);
-		pickupDateCol.setMinWidth(30);
-		pickupDateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
 		
-		TableColumn<String, String> pickupLocCol = new TableColumn<>("Pickup location");
+		TableColumn<ReservationFX, String> pickupLocCol = new TableColumn<>("PICKUP location");
 		pickupLocCol.setPrefWidth(140);
 		pickupLocCol.setMinWidth(30);
-		pickupLocCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		pickupLocCol.setCellValueFactory(new PropertyValueFactory<>("pickupLocation"));
+		
+		TableColumn<ReservationFX, String> pickupDateCol = new TableColumn<>("Pickup date");
+		pickupDateCol.setPrefWidth(80);
+		pickupDateCol.setMinWidth(30);
+		pickupDateCol.setCellValueFactory(new PropertyValueFactory<>("pickupDate"));
+			
+		TableColumn<ReservationFX, Integer> pickupHourCol = new TableColumn<>("Hour");
+		pickupHourCol.setPrefWidth(40);
+		pickupHourCol.setMinWidth(30);
+		pickupHourCol.setCellValueFactory(new PropertyValueFactory<>("pickupHour"));
+		
+		TableColumn<ReservationFX, Integer> pickupMinCol = new TableColumn<>("Min");
+		pickupMinCol.setPrefWidth(40);
+		pickupMinCol.setMinWidth(30);
+		pickupMinCol.setCellValueFactory(new PropertyValueFactory<>("pickupMin"));
 		
 		
-		TableColumn<String, String> returnDateCol = new TableColumn<>("Return date");
-		returnDateCol.setPrefWidth(100);
-		returnDateCol.setMinWidth(30);
-		returnDateCol.setCellValueFactory(new PropertyValueFactory<>("?"));
-		
-		TableColumn<String, String> returnLocCol = new TableColumn<>("Return location");
+	
+		TableColumn<ReservationFX, String> returnLocCol = new TableColumn<>("RETURN location");
 		returnLocCol.setPrefWidth(140);
 		returnLocCol.setMinWidth(30);
-		returnLocCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		returnLocCol.setCellValueFactory(new PropertyValueFactory<>("returnLocation"));
 		
-		TableColumn<String, String> insuranceCol = new TableColumn<>("Insurance");
-		insuranceCol.setPrefWidth(70);
-		insuranceCol.setMinWidth(30);
-		insuranceCol.setCellValueFactory(new PropertyValueFactory<>("?"));
+		TableColumn<ReservationFX, String> returnDateCol = new TableColumn<>("Return date");
+		returnDateCol.setPrefWidth(80);
+		returnDateCol.setMinWidth(30);
+		returnDateCol.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
 		
-	    
-	    TableView<String> reservTableView = new TableView<>();
-	    reservTableView.getColumns().addAll(resNumCol, custNameCol, carCatCol, carLicensePlateCol, pickupDateCol,	
-	    									pickupLocCol, returnDateCol, returnLocCol, insuranceCol);
+		TableColumn<ReservationFX, Integer> returnHourCol = new TableColumn<>("Hour");
+		returnHourCol.setPrefWidth(40);
+		returnHourCol.setMinWidth(30);
+		returnHourCol.setCellValueFactory(new PropertyValueFactory<>("returnHour"));
+		
+		TableColumn<ReservationFX, Integer> returnMinCol = new TableColumn<>("Min");
+		returnMinCol.setPrefWidth(40);
+		returnMinCol.setMinWidth(30);
+		returnMinCol.setCellValueFactory(new PropertyValueFactory<>("returnMin"));
+		
+	
+	    reservTableView = new TableView<>(observReservations);
+	    reservTableView.getColumns().addAll(resNumCol, custNameCol, carCatCol, carLicensePlateCol, pickupLocCol, pickupDateCol,	
+	    							pickupHourCol, pickupMinCol, returnLocCol, returnDateCol, returnHourCol, returnMinCol);
 	    
 	    reservTableView.setPrefSize(1000, 570);
 		reservationsBP.setCenter(reservTableView);
@@ -1723,38 +1747,20 @@ public class Main extends Application {
 	
 //METHODS for CARS menu
 //Initialize lists, reading data out from cars database	
-	public void fillCarsObservableList() {
-		 observCar = FXCollections.observableArrayList();
+	public void fillCarsObservableList(String active, String deactive) {
+		 observCars = FXCollections.observableArrayList();
 			ArrayList<Car> cars = new ArrayList<>();
 			try {
-				cars = Database.readCarsTable();
+				cars = Database.readCarsTable(active, deactive);
 			} catch (SQLException e) {
 				System.out.println("Something is wrong with the filling observable list with cars database");
 				e.printStackTrace();
 			}
 			 for(Car c : cars) {
-			    observCar.add(new CarFX(c));
+			    observCars.add(new CarFX(c));
 			 }
-			  filteredListCars = new FilteredList<>(observCar, p -> true);
+			  filteredListCars = new FilteredList<>(observCars, p -> true);
 			  sortedListCars = new SortedList<>(filteredListCars);
-		}
-	
-	
-	
-	public void fillCarsObservableListDeactivedCars() {
-		  observCar = FXCollections.observableArrayList();
-		  ArrayList<Car> cars = new ArrayList<>();
-			try {
-				cars = Database.readDeactiveCarsTable();
-			} catch (SQLException e) {
-				System.out.println("Something is wrong with the filling observable list with deactive cars database");
-				e.printStackTrace();
-			}
-		    for(Car c : cars) {
-		    	observCar.add(new CarFX(c));
-		    }
-		    filteredListCars = new FilteredList<>(observCar, p -> true);
-		    sortedListCars = new SortedList<>(filteredListCars);
 		}
 	
 	
@@ -1852,6 +1858,10 @@ public class Main extends Application {
 		}
 		return price;
 	}
+
+	
+	
+	
 	
 	
 	
@@ -1886,6 +1896,8 @@ public class Main extends Application {
 				System.out.println("Created reservations table, or already exists");
 			Database.createReservationExtrasTable();
 				System.out.println("Created reservation extras junction table, or already exists");
+			
+				
 			
 		} catch (SQLException e) {
 			System.out.println(e);

@@ -40,7 +40,7 @@ import javafx.util.Callback;
 public class CustomerListDialog extends Dialog<CustomerFX> {
 	DropShadow shadow = new DropShadow();
 	
-	private ObservableList<CustomerFX> customerObs;
+	private ObservableList<CustomerFX> observCustomers;
 	TableView<CustomerFX> customersTableView;
 	private FilteredList<CustomerFX> filteredListCustomers;  //Filtered and sorted list are connected with the observable list, needed to make because the id search
 	private SortedList<CustomerFX> sortedListCustomers;
@@ -153,7 +153,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 					System.out.println("Something is wrong with the customer delete database connection");
 					e1.printStackTrace();
 				}
-				customerObs.remove(selectedCustomer);
+				observCustomers.remove(selectedCustomer);
 			}
 		});
 		    
@@ -178,18 +178,18 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 	
 	
 	public void fillCustomersObservableList() {
-		customerObs = FXCollections.observableArrayList();
+		observCustomers = FXCollections.observableArrayList();
 		  ArrayList<Customer> customers = new ArrayList<>();
 			try {
-				customers = Database.readCustomersTable();
+				customers = Database.readCustomersTable("active", "");
 			} catch (SQLException e) {
 				System.out.println("Something is wrong with the filling observable list with customers database");
 				e.printStackTrace();
 			}
 		    for(Customer c : customers) {
-		    	customerObs.add(new CustomerFX(c));
+		    	observCustomers.add(new CustomerFX(c));
 		    }
-		    filteredListCustomers = new FilteredList<>(customerObs, p -> true);
+		    filteredListCustomers = new FilteredList<>(observCustomers, p -> true);
 		    sortedListCustomers = new SortedList<>(filteredListCustomers);
 		}
 	
@@ -235,7 +235,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
     driversLCol.setCellValueFactory(new PropertyValueFactory<>("driversLicenseNum"));
     
    
-    customersTableView = new TableView<>(customerObs);
+    customersTableView = new TableView<>(observCustomers);
     customersTableView.setPrefHeight(570);
     customersTableView.getColumns().addAll(custIDCol, firstNameCol, lastNameCol, nationalCol,dateOfBornCol, passportCol, driversLCol);
     customersTableView.setPlaceholder(new Label("Customer not found!"));

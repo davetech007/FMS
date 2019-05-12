@@ -25,9 +25,6 @@ public class Car {
 	}
 
 
-	
-
-
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
 			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
 			int carEngineSize, int carEnginePower, boolean carIsOnRent, ArrayList<String> carFeatures) {
