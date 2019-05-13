@@ -270,6 +270,16 @@
   -fx-padding: 0 0 0 20;
   -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
 }
+#showResButton {
+  -fx-background-image:url("IconResDetails.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#ffeed1, #FFA500);	
+}
 #returnCarButton {
   -fx-background-image:url("IconReturnCar.png");
   -fx-background-repeat: no-repeat;

@@ -1,23 +1,19 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew7";
+	public static final String DBlocation = "DatabaseTestNew8";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 //USERS
 	public static final String usersTable = "Users";
@@ -61,10 +57,6 @@ public class Database {
 	public static final String licensePlateCol = "LicensePlate";
 	public static final String brandCol = "Brand";
 	public static final String modelCol = "Model";
-//	public static final String categoryCol = "Category_ID";
-//	public static final String colorCol = "Color_ID";
-//	public static final String fuelTypeCol = "FuelType_ID";
-//	public static final String transmissionCol = "Transmission_ID";
 	public static final String manufactureDateCol = "ManufactureDate";
 	public static final String actualKMCol = "ActualKM";
 	public static final String engineSizeCol = "EngineSize";
@@ -114,13 +106,9 @@ public class Database {
 	public static final String reservationsTable = "Reservations";
 	public static final String reservationNumberIDCol = "ReservationNumber_ID";
 	public static final String pickupLocationCol = "PickupLocation";
-	public static final String pickupDateCol = "PickupDate";
-	public static final String pickupHourCol = "PickupHour";
-	public static final String pickupMinCol = "PickupMinutes";
+	public static final String pickupTimeCol = "PickupTime";
 	public static final String returnLocationCol = "ReturnLocation";
-	public static final String returnDateCol = "ReturnDate";
-	public static final String returnHourCol = "ReturnHour";
-	public static final String returnMinCol = "ReturnMinutes";
+	public static final String returnTimeCol = "ReturnTime";
 	public static final String resNotesCol = "ReservationNotes";
 	
 	
@@ -2117,13 +2105,9 @@ public class Database {
 						categoryIDCol + " INTEGER, " +
 						insuranceIDCol + " INTEGER, " +
 						pickupLocationCol + " VARCHAR(200), " +
-						pickupDateCol + " DATE, " +
-						pickupHourCol + " INTEGER, " +
-						pickupMinCol + " INTEGER, " + 
+						pickupTimeCol + " TIMESTAMP, " +
 						returnLocationCol + " VARCHAR(200), " +
-						returnDateCol + " DATE, " +
-						returnHourCol + " INTEGER, " +
-						returnMinCol + " INTEGER, " +
+						returnTimeCol + " TIMESTAMP, " +
 						resNotesCol + " VARCHAR(300), " +
 						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						"PRIMARY KEY (" + reservationNumberIDCol + "), " +
@@ -2160,9 +2144,7 @@ public class Database {
 	public static void addNewReservation(Reservation res) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		
-		String add = "INSERT INTO " + reservationsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		
+		String add = "INSERT INTO " + reservationsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 		try {
 			conn = DriverManager.getConnection(connString);
 			pstmt = conn.prepareStatement(add);
@@ -2173,23 +2155,23 @@ public class Database {
 			pstmt.setInt(4, readCarCategoriesID(res.getReservedCategory()));
 			pstmt.setInt(5, readInsuraceID(res.getInsuranceType()));
 			pstmt.setString(6, res.getPickupLocation());
-			LocalDateTime pdate = LocalDateTime.of(res.getPickupDate().getYear(),
-												   res.getPickupDate().getMonth(),
-												   res.getPickupDate().getDayOfMonth(),0,0,0,0);
-			java.sql.Date sqlpdate = new java.sql.Date(pdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-			pstmt.setDate(7, sqlpdate);
-			pstmt.setInt(8, res.getPickupHour());
-			pstmt.setInt(9, res.getPickupMin());
-			pstmt.setString(10, res.getReturnLocation());
-			LocalDateTime rdate = LocalDateTime.of(res.getReturnDate().getYear(),
-					  							   res.getReturnDate().getMonth(),
-					  							   res.getReturnDate().getDayOfMonth(),0,0,0,0);
-			java.sql.Date sqlrdate = new java.sql.Date(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-			pstmt.setDate(11, sqlrdate);
-			pstmt.setInt(12, res.getReturnHour());
-			pstmt.setInt(13, res.getReturnMin());
-			pstmt.setString(14, res.getResNotes());
-			pstmt.setBoolean(15, false);
+			LocalDateTime pdate = LocalDateTime.of(res.getPickupTime().getYear(),
+												   res.getPickupTime().getMonth(),
+												   res.getPickupTime().getDayOfMonth(),
+												   res.getPickupTime().getHour(),
+												   res.getPickupTime().getMinute(),0,0);
+			java.sql.Timestamp sqlpTime = new java.sql.Timestamp(pdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setTimestamp(7, sqlpTime);
+			pstmt.setString(8, res.getReturnLocation());
+			LocalDateTime rdate = LocalDateTime.of(res.getReturnTime().getYear(),
+					  							   res.getReturnTime().getMonth(),
+					  							   res.getReturnTime().getDayOfMonth(),
+					  							   res.getReturnTime().getHour(),
+					  							   res.getReturnTime().getMinute(),0,0);
+			java.sql.Timestamp sqlrTime = new java.sql.Timestamp(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setTimestamp(9, sqlrTime);
+			pstmt.setString(10, res.getResNotes());
+			pstmt.setBoolean(11, false);
 			pstmt.executeUpdate();
 			
 			addReservationExtras(res.getResExtras(), res.getResNumberID());
@@ -2220,13 +2202,9 @@ public class Database {
 												categoryIDCol + " = ?, " + 
 												insuranceIDCol + " = ?, " + 
 												pickupLocationCol + " = ?, " + 
-												pickupDateCol + " = ?, " + 
-												pickupHourCol + " = ?, " + 
-												pickupMinCol + " = ?, " + 
+												pickupTimeCol + " = ?, " + 
 												returnLocationCol + " = ?, " + 
-												returnDateCol + " = ?, " + 
-												returnHourCol + " = ?, " + 
-												returnMinCol + " = ?, " + 
+												returnTimeCol + " = ?, " + 
 												resNotesCol + " = ? " + 
 												"WHERE " + reservationNumberIDCol + " = ?";
 		
@@ -2239,22 +2217,22 @@ public class Database {
 			pstmt.setInt(3, readCarCategoriesID(res.getReservedCategory()));
 			pstmt.setInt(4, readInsuraceID(res.getInsuranceType()));
 			pstmt.setString(5, res.getPickupLocation());
-			LocalDateTime pdate = LocalDateTime.of(res.getPickupDate().getYear(),
-												   res.getPickupDate().getMonth(),
-												   res.getPickupDate().getDayOfMonth(),0,0,0,0);
-			java.sql.Date sqlpdate = new java.sql.Date(pdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-			pstmt.setDate(6, sqlpdate);
-			pstmt.setInt(7, res.getPickupHour());
-			pstmt.setInt(8, res.getPickupMin());
-			pstmt.setString(9, res.getReturnLocation());
-			LocalDateTime rdate = LocalDateTime.of(res.getReturnDate().getYear(),
-					  							   res.getReturnDate().getMonth(),
-					  							   res.getReturnDate().getDayOfMonth(),0,0,0,0);
-			java.sql.Date sqlrdate = new java.sql.Date(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-			pstmt.setDate(10, sqlrdate);
-			pstmt.setInt(11, res.getReturnHour());
-			pstmt.setInt(12, res.getReturnMin());
-			pstmt.setString(13, res.getResNotes());
+			LocalDateTime pdate = LocalDateTime.of(res.getPickupTime().getYear(),
+												   res.getPickupTime().getMonth(),
+												   res.getPickupTime().getDayOfMonth(),
+												   res.getPickupTime().getHour(),
+												   res.getPickupTime().getMinute(),0,0);
+			java.sql.Timestamp sqlpTime = new java.sql.Timestamp(pdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setTimestamp(6, sqlpTime);
+			pstmt.setString(7, res.getReturnLocation());
+			LocalDateTime rdate = LocalDateTime.of(res.getReturnTime().getYear(),
+					  							   res.getReturnTime().getMonth(),
+					  							   res.getReturnTime().getDayOfMonth(),
+					  							   res.getReturnTime().getHour(),
+					  							   res.getReturnTime().getMinute(),0,0);
+			java.sql.Timestamp sqlrTime = new java.sql.Timestamp(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+			pstmt.setTimestamp(8, sqlrTime);
+			pstmt.setString(9, res.getResNotes());
 			pstmt.executeUpdate();
 	
 			updateReservationExtras(res.getResExtras(), res.getResNumberID());
@@ -2312,60 +2290,38 @@ public class Database {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM " + reservationsTable);
 			while(rs.next()) {
-				java.sql.Date sqlpDate = rs.getDate(pickupDateCol);
-				java.time.LocalDate pickupDate = sqlpDate.toLocalDate();
+				java.sql.Timestamp sqlpTime = rs.getTimestamp(pickupTimeCol);
+				java.time.LocalDateTime pickupTime = sqlpTime.toLocalDateTime();
 				
-				java.sql.Date sqlrDate = rs.getDate(returnDateCol);
-				java.time.LocalDate returnDate = sqlrDate.toLocalDate();
+				java.sql.Timestamp sqlrTime = rs.getTimestamp(returnTimeCol);
+				java.time.LocalDateTime returnTime = sqlrTime.toLocalDateTime();
 				
 				String resNum = rs.getString(reservationNumberIDCol);
 				
-				Customer customer;
-				Car car;
-//				
-//				ArrayList<Customer> customers;
-//				for(Customer cust1 : Database.readCustomersTable()) {
-//					customers.add(cust1);
-//				}
-//				for(Customer cust2 : Database.readDeactiveCustomersTable()) {
-//					customers.add(cust2);
-//				}
-//				for(Customer s : customers) {
-//					if(s.getCustomerID().equals(rs.getString(customerIDCol))) {
-//						customer = s;
-//					}
-//				}
-//				
-//				ArrayList<Car> cars;
-//				for(Car car1 : Database.readCarsTable()) {
-//					cars.add(car1);
-//				}
-//				for(Car car2 : Database.readDeactiveCarsTable()) {
-//					cars.add(car2);
-//				}
-//				for(Car c : cars) {
-//					if(c.getCarVinNumber().equals(rs.getString(vinNumberIDCol))) {
-//						car = c;
-//					}
-//				}
-//				
-//				Reservation res = new Reservation(resNum, 
-//												  customer,
-//												  car,
-//												  readCarCategoryName(rs.getInt(categoryIDCol)),
-//												  readInsuranceType(rs.getInt(insuranceIDCol)),
-//												  rs.getString(pickupLocationCol),
-//												  pickupDate,
-//												  rs.getInt(pickupHourCol),
-//												  rs.getInt(pickupMinCol),
-//												  rs.getString(returnLocationCol),
-//												  returnDate,
-//												  rs.getInt(returnHourCol),
-//												  rs.getInt(returnMinCol),
-//												  rs.getString(resNotesCol),
-//												  readReservationExtras(resNum));
-//						
-//				reservations.add(res);
+				Customer customer = null;
+				for(Customer s : Database.readCustomersTable("", "")) {
+					if(s.getCustomerID().equals(rs.getString(customerIDCol))) {
+						customer = s;
+					}
+				}
+				Car car = new Car();
+				for(Car c : Database.readCarsTable("", "")) {
+					if(c.getCarVinNumber().equals(rs.getString(vinNumberIDCol))) {
+					    car = c;
+					} 
+				}
+				Reservation res = new Reservation(resNum, 
+												  customer,
+												  car,
+												  readCarCategoryName(rs.getInt(categoryIDCol)),
+												  readInsuranceType(rs.getInt(insuranceIDCol)),
+												  rs.getString(pickupLocationCol),
+												  pickupTime,
+												  rs.getString(returnLocationCol),
+												  returnTime,
+												  rs.getString(resNotesCol),
+												  readReservationExtras(resNum));
+				reservations.add(res);
 			}
 			rs.close();	
 		   }	  

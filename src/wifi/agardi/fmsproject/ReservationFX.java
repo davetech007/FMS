@@ -1,11 +1,9 @@
 package wifi.agardi.fmsproject;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -14,17 +12,14 @@ public class ReservationFX {
 	private Reservation modellObject;
 	private StringProperty resNumberID;
 	private StringProperty firstName;
+	private StringProperty lastName;
 	private StringProperty carLicensePlate;
 	private StringProperty reservedCategory;
 	private StringProperty insuranceType;
 	private StringProperty pickupLocation;
-	private ObjectProperty<LocalDate> pickupDate;
-	private IntegerProperty pickupHour;
-	private IntegerProperty pickupMin;
+	private ObjectProperty<LocalDateTime> pickupTime;
 	private StringProperty returnLocation;
-	private ObjectProperty<LocalDate> returnDate;
-	private IntegerProperty returnHour;
-	private IntegerProperty returnMin;
+	private ObjectProperty<LocalDateTime> returnTime;
 	private StringProperty resNotes;
 	private ArrayList<String> resExtras;
 	
@@ -33,17 +28,14 @@ public class ReservationFX {
 		modellObject = res;
 		resNumberID = new SimpleStringProperty(res.getResNumberID());
 		firstName = new SimpleStringProperty(res.getCustomer().getFirstName());
+		lastName = new SimpleStringProperty(res.getCustomer().getLastName());
 		carLicensePlate = new SimpleStringProperty(res.getCar().getCarLicensePlate());
 		reservedCategory = new SimpleStringProperty(res.getReservedCategory());
 		insuranceType = new SimpleStringProperty(res.getInsuranceType());
 		pickupLocation = new SimpleStringProperty(res.getPickupLocation());
-		pickupDate = new SimpleObjectProperty<>(res.getPickupDate());
-		pickupHour = new SimpleIntegerProperty(res.getPickupHour());
-		pickupMin = new SimpleIntegerProperty(res.getPickupMin());
+		pickupTime = new SimpleObjectProperty<>(res.getPickupTime());
 		returnLocation = new SimpleStringProperty(res.getReturnLocation());
-		returnDate = new SimpleObjectProperty<>(res.getReturnDate());
-		returnHour = new SimpleIntegerProperty(res.getReturnHour());
-		returnMin = new SimpleIntegerProperty(res.getReturnMin());
+		returnTime = new SimpleObjectProperty<>(res.getReturnTime());
 		resNotes = new SimpleStringProperty(res.getResNotes());
 	}
 	
@@ -72,6 +64,15 @@ public class ReservationFX {
 	}
 	public StringProperty firstNameProperty() {
 		return firstName;
+	}
+	
+	
+	
+	public String getLastName() {
+		return lastName.get();
+	}
+	public StringProperty lastNameProperty() {
+		return lastName;
 	}
 	
 	
@@ -123,45 +124,20 @@ public class ReservationFX {
 		return pickupLocation;
 	}
 	
+
 	
-	
-	public LocalDate getPickupDate() {
-		return pickupDate.get();
+	public LocalDateTime getPickupTime() {
+		return pickupTime.get();
 	}
-	public void setPickupDate(LocalDate v) {
-		pickupDate.set(v);
-		modellObject.setPickupDate(v);
+	public void setPickupTime(LocalDateTime v) {
+		pickupTime.set(v);
+		modellObject.setPickupTime(v);
 	}
-	public ObjectProperty<LocalDate> pickupDateProperty() {
-		return pickupDate;
-	}
-	
-	
-	
-	public int getPickupHour() {
-		return pickupHour.get();
-	}
-	public void setPickupHour(int v) {
-		pickupHour.set(v);
-		modellObject.setPickupHour(v);
-	}
-	public IntegerProperty pickupHourProperty() {
-		return pickupHour;
+	public ObjectProperty<LocalDateTime> pickupTimeProperty() {
+		return pickupTime;
 	}
 	
-	
-	
-	public int getPickupMin() {
-		return pickupMin.get();
-	}
-	public void setPickupMin(int v) {
-		pickupMin.set(v);
-		modellObject.setPickupMin(v);
-	}
-	public IntegerProperty pickupMinProperty() {
-		return pickupMin;
-	}
-	
+
 	
 	
 	public String getReturnLocation() {
@@ -177,42 +153,18 @@ public class ReservationFX {
 	
 	
 	
-	public LocalDate getReturnDate() {
-		return returnDate.get();
+	
+	public LocalDateTime getReturnTime() {
+		return returnTime.get();
 	}
-	public void setReturnDate(LocalDate v) {
-		returnDate.set(v);
-		modellObject.setReturnDate(v);
+	public void setReturnTime(LocalDateTime v) {
+		returnTime.set(v);
+		modellObject.setReturnTime(v);
 	}
-	public ObjectProperty<LocalDate> returnDateProperty() {
-		return returnDate;
+	public ObjectProperty<LocalDateTime> returnTimeProperty() {
+		return returnTime;
 	}
 	
-	
-	
-	public int getReturnHour() {
-		return returnHour.get();
-	}
-	public void setReturnHour(int v) {
-		returnHour.set(v);
-		modellObject.setReturnHour(v);
-	}
-	public IntegerProperty returnHourProperty() {
-		return returnHour;
-	}
-	
-	
-	
-	public int getReturnMin() {
-		return returnMin.get();
-	}
-	public void setReturnMin(int v) {
-		returnMin.set(v);
-		modellObject.setReturnMin(v);
-	}
-	public IntegerProperty returnMinProperty() {
-		return returnMin;
-	}
 	
 	
 	
@@ -235,6 +187,8 @@ public class ReservationFX {
 	public void setResExtras(ArrayList<String> resExtras) {
 		this.resExtras = resExtras;
 	}
+
+	
 	
 	
 

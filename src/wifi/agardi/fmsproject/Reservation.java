@@ -1,6 +1,6 @@
 package wifi.agardi.fmsproject;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Reservation {
@@ -10,13 +10,9 @@ public class Reservation {
 	private String reservedCategory;
 	private String insuranceType;
 	private String pickupLocation;
-	private LocalDate pickupDate;
-	private int pickupHour;
-	private int pickupMin;
+	private LocalDateTime pickupTime;
 	private String returnLocation;
-	private LocalDate returnDate;
-	private int returnHour;
-	private int returnMin;
+	private LocalDateTime returnTime;
 	private String resNotes;
 	private ArrayList<String> resExtras;
 	
@@ -25,8 +21,8 @@ public class Reservation {
 	}
 
 	public Reservation(String resNumberID, Customer customer, Car car, String reservedCategory,
-			String insuranceType, String pickupLocation, LocalDate pickupDate, int pickupHour, int pickupMin,
-			String returnLocation, LocalDate returnDate, int returnHour, int returnMin, String resNotes,
+			String insuranceType, String pickupLocation, LocalDateTime pickupTime,
+			String returnLocation, LocalDateTime returnTime, String resNotes,
 			ArrayList<String> resExtras) {
 		super();
 		this.resNumberID = resNumberID;
@@ -35,34 +31,9 @@ public class Reservation {
 		this.reservedCategory = reservedCategory;
 		this.insuranceType = insuranceType;
 		this.pickupLocation = pickupLocation;
-		this.pickupDate = pickupDate;
-		this.pickupHour = pickupHour;
-		this.pickupMin = pickupMin;
+		this.pickupTime = pickupTime;
 		this.returnLocation = returnLocation;
-		this.returnDate = returnDate;
-		this.returnHour = returnHour;
-		this.returnMin = returnMin;
-		this.resNotes = resNotes;
-		this.resExtras = resExtras;
-	}
-	
-	public Reservation(String resNumberID, Customer customer, String reservedCategory,
-			String insuranceType, String pickupLocation, LocalDate pickupDate, int pickupHour, int pickupMin,
-			String returnLocation, LocalDate returnDate, int returnHour, int returnMin, String resNotes,
-			ArrayList<String> resExtras) {
-		super();
-		this.resNumberID = resNumberID;
-		this.customer = customer;
-		this.reservedCategory = reservedCategory;
-		this.insuranceType = insuranceType;
-		this.pickupLocation = pickupLocation;
-		this.pickupDate = pickupDate;
-		this.pickupHour = pickupHour;
-		this.pickupMin = pickupMin;
-		this.returnLocation = returnLocation;
-		this.returnDate = returnDate;
-		this.returnHour = returnHour;
-		this.returnMin = returnMin;
+		this.returnTime = returnTime;
 		this.resNotes = resNotes;
 		this.resExtras = resExtras;
 	}
@@ -117,29 +88,16 @@ public class Reservation {
 		this.pickupLocation = pickupLocation;
 	}
 
-	public LocalDate getPickupDate() {
-		return pickupDate;
+	public LocalDateTime getPickupTime() {
+		return pickupTime;
 	}
 
-	public void setPickupDate(LocalDate pickupDate) {
-		this.pickupDate = pickupDate;
+	public void setPickupTime(LocalDateTime pickupTime) {
+		this.pickupTime = pickupTime;
 	}
 
-	public int getPickupHour() {
-		return pickupHour;
-	}
 
-	public void setPickupHour(int pickupHour) {
-		this.pickupHour = pickupHour;
-	}
 
-	public int getPickupMin() {
-		return pickupMin;
-	}
-
-	public void setPickupMin(int pickupMin) {
-		this.pickupMin = pickupMin;
-	}
 
 	public String getReturnLocation() {
 		return returnLocation;
@@ -149,29 +107,15 @@ public class Reservation {
 		this.returnLocation = returnLocation;
 	}
 
-	public LocalDate getReturnDate() {
-		return returnDate;
+	public LocalDateTime getReturnTime() {
+		return returnTime;
 	}
 
-	public void setReturnDate(LocalDate returnDate) {
-		this.returnDate = returnDate;
+	public void setReturnTime(LocalDateTime returnTime) {
+		this.returnTime = returnTime;
 	}
 
-	public int getReturnHour() {
-		return returnHour;
-	}
 
-	public void setReturnHour(int returnHour) {
-		this.returnHour = returnHour;
-	}
-
-	public int getReturnMin() {
-		return returnMin;
-	}
-
-	public void setReturnMin(int returnMin) {
-		this.returnMin = returnMin;
-	}
 
 	public String getResNotes() {
 		return resNotes;

@@ -59,6 +59,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		searchCB.setId("carSearchBox");
 
 		TextField custSearchTF = new TextField();
+		custSearchTF.setDisable(true);
 		custSearchTF.promptTextProperty().bind(searchCB.valueProperty());
 		custSearchTF.setId("searchTF");
 		
@@ -102,6 +103,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if(newValue.contains("Customer ID")) {
+					custSearchTF.setDisable(false);
 					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
 						if(newV == null || newV.length() == 0) {
 							filteredListCustomers.setPredicate(s -> true);
@@ -112,6 +114,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 					});
 				} 
 				if(newValue.contains("First name")) {
+					custSearchTF.setDisable(false);
 					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
 						if(newV == null || newV.length() == 0) {
 							filteredListCustomers.setPredicate(s -> true);
@@ -122,7 +125,8 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 						}
 					});
 				}
-				if(newValue.contains("Last name")){
+				if(newValue.contains("Last name")) {
+					custSearchTF.setDisable(false);
 					custSearchTF.textProperty().addListener((obs, oldV, newV) -> {
 						if(newV == null || newV.length() == 0) {
 							filteredListCustomers.setPredicate(s -> true);
