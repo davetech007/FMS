@@ -3,7 +3,9 @@ package wifi.agardi.fmsproject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -22,6 +24,7 @@ public class ReservationFX {
 	private ObjectProperty<LocalDateTime> returnTime;
 	private StringProperty resNotes;
 	private ArrayList<String> resExtras;
+	private BooleanProperty status;
 	
 	
 	public ReservationFX(Reservation res) {
@@ -37,6 +40,7 @@ public class ReservationFX {
 		returnLocation = new SimpleStringProperty(res.getReturnLocation());
 		returnTime = new SimpleObjectProperty<>(res.getReturnTime());
 		resNotes = new SimpleStringProperty(res.getResNotes());
+		status = new SimpleBooleanProperty(res.isStatus());
 	}
 	
 	
@@ -189,6 +193,14 @@ public class ReservationFX {
 	}
 
 	
+	
+	public boolean isStatus() {
+		return status.get();
+	}
+	public BooleanProperty isStatusProperty() {
+		return status;
+	}
+
 	
 	
 

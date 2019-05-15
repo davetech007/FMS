@@ -2233,6 +2233,7 @@ public class Database {
 			java.sql.Timestamp sqlrTime = new java.sql.Timestamp(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
 			pstmt.setTimestamp(8, sqlrTime);
 			pstmt.setString(9, res.getResNotes());
+			pstmt.setString(10, res.getResNumberID());
 			pstmt.executeUpdate();
 	
 			updateReservationExtras(res.getResExtras(), res.getResNumberID());
@@ -2280,15 +2281,28 @@ public class Database {
 	}
 	
 	
-	public static ArrayList<Reservation> readReservationsTable() throws SQLException{
+	public static ArrayList<Reservation> readReservationsTable(String active, String cancelled) throws SQLException{
 		  Connection conn = null;
 		  Statement stmt = null;
 		  ResultSet rs = null;
 		  ArrayList<Reservation> reservations = new ArrayList<>();
+		  
+		  String select = "SELECT * FROM " + reservationsTable;
+		  String where = "";
+		   if(active.equals("active") && cancelled == "") {
+			   where = isDeactiveCol + " = FALSE";
+		   }
+		   if(cancelled.equals("cancelled") && active == "") {
+			   where = isDeactiveCol + " = TRUE";
+		   }
+		   if(where.length() > 0) {
+			   select += " WHERE " + where;
+		   }
+		  
 		  try {
 			conn = DriverManager.getConnection(connString);
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM " + reservationsTable);
+			rs = stmt.executeQuery(select);
 			while(rs.next()) {
 				java.sql.Timestamp sqlpTime = rs.getTimestamp(pickupTimeCol);
 				java.time.LocalDateTime pickupTime = sqlpTime.toLocalDateTime();
@@ -2320,7 +2334,8 @@ public class Database {
 												  rs.getString(returnLocationCol),
 												  returnTime,
 												  rs.getString(resNotesCol),
-												  readReservationExtras(resNum));
+												  readReservationExtras(resNum),
+												  rs.getBoolean(isDeactiveCol));
 				reservations.add(res);
 			}
 			rs.close();	

@@ -15,6 +15,7 @@ public class Reservation {
 	private LocalDateTime returnTime;
 	private String resNotes;
 	private ArrayList<String> resExtras;
+	private boolean status;
 	
 	public Reservation() {
 		super();
@@ -23,7 +24,7 @@ public class Reservation {
 	public Reservation(String resNumberID, Customer customer, Car car, String reservedCategory,
 			String insuranceType, String pickupLocation, LocalDateTime pickupTime,
 			String returnLocation, LocalDateTime returnTime, String resNotes,
-			ArrayList<String> resExtras) {
+			ArrayList<String> resExtras, boolean status) {
 		super();
 		this.resNumberID = resNumberID;
 		this.customer = customer;
@@ -36,6 +37,7 @@ public class Reservation {
 		this.returnTime = returnTime;
 		this.resNotes = resNotes;
 		this.resExtras = resExtras;
+		this.status = status;
 	}
 	
 	
@@ -133,6 +135,21 @@ public class Reservation {
 		this.resExtras = resExtras;
 	}
 	
+	
+	
+	
+	
 
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+	
+
+	
+	
 
 }

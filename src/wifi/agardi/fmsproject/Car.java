@@ -23,6 +23,8 @@ public class Car {
 	public Car() {
 		super();
 	}
+	
+	
 
 
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
@@ -45,7 +47,7 @@ public class Car {
 		this.carFeatures = carFeatures;
 	}
 
-
+	
 
 
 
@@ -189,6 +191,39 @@ public class Car {
 		this.carFeatures = carFeatures;
 	}
 
+
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((carLicensePlate == null) ? 0 : carLicensePlate.hashCode());
+		return result;
+	}
+
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Car other = (Car) obj;
+		if (carLicensePlate == null) {
+			if (other.carLicensePlate != null)
+				return false;
+		} else if (!carLicensePlate.equals(other.carLicensePlate))
+			return false;
+		return true;
+	}
+
+	
+	
 	
 
 }

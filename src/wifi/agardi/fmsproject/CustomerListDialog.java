@@ -143,12 +143,31 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		
 //DELETE Customer
 		deleteCustomerButton.setOnAction(e -> {
+			try {
+				for(Reservation r : Database.readReservationsTable("active", "")) {
+					if(r.getCustomer().getCustomerID().equals(selectedCustomer.getCustomerID())) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Deleting a customer");
+						alertWarn.setHeaderText("You can't delete this customer!");
+						alertWarn.setContentText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName() +
+												" still has a reservation (ID = '" + r.getResNumberID() + "').\n" +
+												"You should first cancel the reservation.");
+						alertWarn.showAndWait();
+						return;
+					}
+				}
+			} catch (SQLException e2) {
+				System.out.println("Something is wrong with the customer delete");
+				e2.printStackTrace();
+			}
+
 			Alert confirmDel = new Alert(AlertType.CONFIRMATION);
 			confirmDel.setTitle("Delete customer");
 			confirmDel.setHeaderText("Please confirm!");
 			confirmDel.setContentText("Would you really want to DELETE this customer '" + 
 									  selectedCustomer.getModellObject().getFirstName() + 
-									  " " + selectedCustomer.getModellObject().getLastName() + "'?");
+									  " " + selectedCustomer.getModellObject().getLastName() + "'?" +
+									  "\n\nNote, that the customer stays in the database, and you can check his/her reservations from the past.");
 			Optional<ButtonType> result = confirmDel.showAndWait();
 			if(result.get() == ButtonType.OK) {
 				try {
@@ -158,6 +177,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 					e1.printStackTrace();
 				}
 				observCustomers.remove(selectedCustomer);
+				selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
 			}
 		});
 		    
