@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew8";
+	public static final String DBlocation = "DatabaseTestNew9";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 //USERS
 	public static final String usersTable = "Users";
@@ -2205,7 +2205,8 @@ public class Database {
 												pickupTimeCol + " = ?, " + 
 												returnLocationCol + " = ?, " + 
 												returnTimeCol + " = ?, " + 
-												resNotesCol + " = ? " + 
+												resNotesCol + " = ?, "+
+												isDeactiveCol + " = ? " +
 												"WHERE " + reservationNumberIDCol + " = ?";
 		
 		try {
@@ -2233,7 +2234,8 @@ public class Database {
 			java.sql.Timestamp sqlrTime = new java.sql.Timestamp(rdate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
 			pstmt.setTimestamp(8, sqlrTime);
 			pstmt.setString(9, res.getResNotes());
-			pstmt.setString(10, res.getResNumberID());
+			pstmt.setBoolean(10, res.isStatus());
+			pstmt.setString(11, res.getResNumberID());
 			pstmt.executeUpdate();
 	
 			updateReservationExtras(res.getResExtras(), res.getResNumberID());
@@ -2262,7 +2264,7 @@ public class Database {
 		try {
 			conn = DriverManager.getConnection(connString);
 			pstmt = conn.prepareStatement(cancel);
-			pstmt.setBoolean(1, true);
+		    pstmt.setBoolean(1, true);
 		    pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with cancelReservation database connection");

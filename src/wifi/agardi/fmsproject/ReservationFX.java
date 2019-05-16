@@ -25,6 +25,7 @@ public class ReservationFX {
 	private StringProperty resNotes;
 	private ArrayList<String> resExtras;
 	private BooleanProperty status;
+	private StringProperty statusName;
 	
 	
 	public ReservationFX(Reservation res) {
@@ -41,6 +42,7 @@ public class ReservationFX {
 		returnTime = new SimpleObjectProperty<>(res.getReturnTime());
 		resNotes = new SimpleStringProperty(res.getResNotes());
 		status = new SimpleBooleanProperty(res.isStatus());
+		statusName = new SimpleStringProperty(res.getStatusName());
 	}
 	
 	
@@ -201,6 +203,13 @@ public class ReservationFX {
 		return status;
 	}
 
+	
+	public String getStatusName() {
+		return statusName.get();
+	}
+	public StringProperty statusNameProperty() {
+		return statusName;
+	}
 	
 	
 

@@ -16,6 +16,7 @@ public class Reservation {
 	private String resNotes;
 	private ArrayList<String> resExtras;
 	private boolean status;
+	private String statusName;
 	
 	public Reservation() {
 		super();
@@ -135,10 +136,6 @@ public class Reservation {
 		this.resExtras = resExtras;
 	}
 	
-	
-	
-	
-	
 
 	public boolean isStatus() {
 		return status;
@@ -147,6 +144,33 @@ public class Reservation {
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
+	
+	
+	
+	
+
+	public String getStatusName() {
+		if(getPickupTime().isBefore(LocalDateTime.now())) {
+			return "Expired";
+		}
+		if(getCar().isCarIsOnRent() == true) {
+			return "On rent";
+		}
+		if(isStatus() == false) {
+			return "Active";
+		}
+		if(isStatus() == true){
+			return "Cancelled";
+		}
+		return "";
+	}
+	
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+	
+	
 	
 
 	

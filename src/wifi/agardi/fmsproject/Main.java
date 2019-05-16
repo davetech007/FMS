@@ -40,6 +40,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
@@ -88,16 +89,16 @@ public class Main extends Application {
 	ComboBox<String> carComboBox;
 
 	Label custIdLabel;
-	
+	Label resIdLabel;
+	Label rentStatusLabel;
 	CustomerFX selectedCust;
-	
 	
 	TableView<ReservationFX> reservTableView;
 	ReservationFX selectedRes;
 	private ObservableList<ReservationFX> observReservations;
 	private FilteredList<ReservationFX> filteredListReservations;
 	private SortedList<ReservationFX> sortedListReservations;
-	Label resIdLabel;
+	
 	
 	
 
@@ -139,7 +140,7 @@ public class Main extends Application {
 			logInHBox.setAlignment(Pos.BOTTOM_CENTER);
 			logInHBox.getChildren().add(logInButton);
 			loginGP.add(logInHBox, 0, 6);
-			
+
 //ActionTarget			
 			Label actionTarget = new Label();
 			actionTarget.setId("actionTarget");
@@ -301,6 +302,17 @@ public class Main extends Application {
 	
 //RESERVE MENU	
 	public BorderPane openReserveMenu() {
+		ArrayList<String> hours = new ArrayList<>();
+		for(int i = 0; i<24; i++) {
+			hours.add(Integer.toString(i));
+		}
+		ArrayList<String> minutes = new ArrayList<>();
+			minutes.add("00");
+			minutes.add("15");
+			minutes.add("30");
+			minutes.add("45");
+
+		
 			BorderPane reserveBP = new BorderPane();
 			GridPane reserveGP = new GridPane();
 			reserveGP.setAlignment(Pos.BOTTOM_CENTER);
@@ -440,7 +452,7 @@ public class Main extends Application {
 			
 			carComboBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
 			carComboBox.setId("carSearchBox");
-			carComboBox.setPromptText("Reserve a category");
+			carComboBox.setPromptText("Category");
 			reserveGP.add(carComboBox, 3, 2);
 			
 			
@@ -459,43 +471,24 @@ public class Main extends Application {
 			HBox pickupHBox = new HBox();
 			pickupHBox.setSpacing(5);
 			pickupHBox.setAlignment(Pos.CENTER_LEFT);
-			TextField pickupHourTF = new TextField();
-			Label pickupHourLB = new Label("hours");
+			ComboBox<String> pickupHourCB = new ComboBox<>(FXCollections.observableArrayList(hours));
+			Label pickupHourLB = new Label("hrs.");
 			pickupHourLB.setAlignment(Pos.CENTER);
-			pickupHourTF.setMaxWidth(40);
-			TextField pickupMinTF = new TextField();
-			pickupMinTF.setMaxWidth(40);
-			Label pickupMinuteLB = new Label("minutes");
-			pickupHBox.getChildren().addAll(pickupHourTF,pickupHourLB, pickupMinTF, pickupMinuteLB);
-			reserveGP.add(pickupHBox, 3, 6);
-			//PUCKUP TIME REGEX			
-			pickupHourTF.textProperty().addListener(new ChangeListener<String>() {
-		            @Override
-		            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-		                if (!newValue.matches("([01]?[0-9]|2[0-3])?")) {
-		                	pickupHourTF.setText(oldValue);
-		                }
-		            }
-		        });  
-			
-			pickupMinTF.textProperty().addListener(new ChangeListener<String>() {
-	            @Override
-	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("([0-5]?[0-9])?")) {
-	                	pickupMinTF.setText(oldValue);
-	                }
-	            }
-	        }); 
-			
+			pickupHourCB.setMaxWidth(65);
+			ComboBox<String> pickupMinCB = new ComboBox<>(FXCollections.observableArrayList(minutes));
+			pickupMinCB.setMaxWidth(65);
+			Label pickupMinuteLB = new Label("min.");
+			pickupHBox.getChildren().addAll(pickupHourCB,pickupHourLB, pickupMinCB, pickupMinuteLB);
+			reserveGP.add(pickupHBox, 3, 6);		
 			
 			//Notes, Comments			
 			Label notesLabel2 = new Label("Notes");
-			reserveGP.add(notesLabel2, 3, 8);
+			reserveGP.add(notesLabel2, 3, 7);
 			
 			TextArea notesTA2 = new TextArea();
 			notesTA2.setPromptText("Comments, category wish,...");
 			notesTA2.setPrefSize(195, 100);
-			reserveGP.add(notesTA2, 3, 9);
+			reserveGP.add(notesTA2, 3, 8);
 			notesTA2.setOnKeyTyped(e -> {
 			    	int maxChar = 299;
 			    	if(notesTA2.getText().length() == maxChar) 
@@ -529,6 +522,7 @@ public class Main extends Application {
 			carLicensePlateTF.setPromptText("License plate");
 			
 			Button clearLpBT = new Button("Clear");
+			clearLpBT.setDisable(true);
 			clearLpBT.setPrefWidth(65);
 			clearLpBT.setOnAction(e -> {
 				carLicensePlateTF.setText("");
@@ -562,32 +556,14 @@ public class Main extends Application {
 			HBox returnHBox = new HBox();
 			returnHBox.setSpacing(5);
 			returnHBox.setAlignment(Pos.CENTER_LEFT);
-			TextField returnHourTF = new TextField();
-			returnHourTF.setMaxWidth(40);
-			Label returnHourLB = new Label("hours");
-			TextField returnMinTF = new TextField();
-			returnMinTF.setMaxWidth(40);
-			Label returnMinuteLB = new Label("minutes");
-			returnHBox.getChildren().addAll(returnHourTF, returnHourLB, returnMinTF, returnMinuteLB);
-			reserveGP.add(returnHBox, 4, 6);
-			//RETURN TIME REGEX			
-			returnHourTF.textProperty().addListener(new ChangeListener<String>() {
-	            @Override
-	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("([01]?[0-9]|2[0-3])?")) {
-	                	returnHourTF.setText(oldValue);
-	                }
-	            }
-	        }); 
-			
-			returnMinTF.textProperty().addListener(new ChangeListener<String>() {
-	            @Override
-	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	                if (!newValue.matches("([0-5]?[0-9])?")) {
-	                	returnMinTF.setText(oldValue);
-	                }
-	            }
-	        }); 
+			ComboBox<String> returnHourCB = new ComboBox<>(FXCollections.observableArrayList(hours));
+			returnHourCB.setMaxWidth(65);
+			Label returnHourLB = new Label("hrs.");
+			ComboBox<String> returnMinCB = new ComboBox<>(FXCollections.observableArrayList(minutes));
+			returnMinCB.setMaxWidth(65);
+			Label returnMinuteLB = new Label("min.");
+			returnHBox.getChildren().addAll(returnHourCB, returnHourLB, returnMinCB, returnMinuteLB);
+			reserveGP.add(returnHBox, 4, 6);	
 			
 			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
 			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
@@ -607,7 +583,7 @@ public class Main extends Application {
 					  }			 
 				      
 			    Label extrasLB = new Label("Extras");
-   			    reserveGP.add(extrasLB, 4, 8);
+   			    reserveGP.add(extrasLB, 4, 7);
 			   
 			    ListView<String> extrasLV = new ListView<>();
 			    extrasLV.setEditable(true);
@@ -616,19 +592,19 @@ public class Main extends Application {
 			    Callback<String, ObservableValue<Boolean>> itemToBoolean = (String item) -> extrasMap.get(item);
 			    extrasLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
 			    extrasLV.setPrefSize(195, 100);
-			    reserveGP.add(extrasLV, 4, 9);
+			    reserveGP.add(extrasLV, 4, 8);
 		
 //PRICE TODO
 			
 			VBox priceVBox = new VBox();
-			resIdLabel =     new Label("ResID = ");
+			resIdLabel =           new Label("ResID = ");
+			rentStatusLabel =      new Label("Status       = ");
 			Label priceDaysLabel = new Label("Total days   = ");
 			Label priceLabel1 =    new Label("Price days   = ");
 			Label priceLabel2 =    new Label("Extras	   = ");
 			Label priceLabel3 =    new Label("Total price  = ");
-			priceVBox.getChildren().addAll(resIdLabel, priceDaysLabel, priceLabel1, priceLabel2, priceLabel3);
+			priceVBox.getChildren().addAll(resIdLabel, rentStatusLabel, priceDaysLabel, priceLabel1, priceLabel2, priceLabel3);
 			reserveGP.add(priceVBox, 4, 10);
-			
 			
 			
 			
@@ -860,14 +836,15 @@ public class Main extends Application {
 			ObservableValue<Boolean> calcObs = carComboBox.valueProperty().isNull().
 					    or(insuranceComboBox.valueProperty().isNull()).
 						or(datePickupPicker.valueProperty().isNull()).
-						or(pickupHourTF.textProperty().isEmpty()).
-						or(pickupMinTF.textProperty().isEmpty()).
+						or(pickupHourCB.valueProperty().isNull()).
+						or(pickupMinCB.valueProperty().isNull()).
 						or(dateReturnPicker.valueProperty().isNull()).
-						or(returnHourTF.textProperty().length().lessThan(2)).
-						or(returnMinTF.textProperty().length().lessThan(2));
+						or(returnHourCB.valueProperty().isNull()).
+						or(returnMinCB.valueProperty().isNull());
 			
 			//Enable with calculate price + other details the reserve button 
 			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(6).
+															or(carLicensePlateTF.textProperty().isEmpty()).
 															or(pickupLocTF.textProperty().isEmpty()).
 															or(returnLocTF.textProperty().isEmpty()).
 															or((ObservableBooleanValue) calcObs);
@@ -875,65 +852,6 @@ public class Main extends Application {
 			
 			
 			
-//RESERVE BUTTON ON ACTION			
-			reserveButton.setOnAction(e -> {
-			  try {	
-				String resNumberID = "RESID" + String.valueOf(System.currentTimeMillis() / 1000);
-				String reservedCategory = carComboBox.getSelectionModel().getSelectedItem().toString();
-				String insuranceType = insuranceComboBox.getSelectionModel().getSelectedItem().toString();
-				String pickupLocation = pickupLocTF.getText();
-				LocalDateTime pickupTime = LocalDateTime.of(datePickupPicker.getValue().getYear(),
-															datePickupPicker.getValue().getMonth(),
-															datePickupPicker.getValue().getDayOfMonth(),
-															Integer.parseInt(pickupHourTF.getText()), 
-															Integer.parseInt(pickupMinTF.getText()));
-				String returnLocation = returnLocTF.getText();
-				LocalDateTime returnTime = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
-															dateReturnPicker.getValue().getMonth(),
-															dateReturnPicker.getValue().getDayOfMonth(),
-															Integer.parseInt(returnHourTF.getText()), 
-															Integer.parseInt(returnMinTF.getText()));
-				String resNotes = notesTA2.getText();
-				
-				ArrayList<String> extras = new ArrayList<>();
-				for(String key : extrasMap.keySet()) {
-					ObservableValue<Boolean> val = extrasMap.get(key);
-					if(val.getValue()) {
-						extras.add(key);
-					}
-				}
-				Car car = new Car();
-				
-				if(selectedCar != null && selectedCar.getModellObject().getCarLicensePlate().equals(carLicensePlateTF.getText().toUpperCase())) {
-					car = selectedCar.getModellObject();
-				} 
-				
-				ReservationFX newRes = new ReservationFX(new Reservation(resNumberID, selectedCust.getModellObject(), 
-						     car, reservedCategory, insuranceType, pickupLocation, pickupTime, returnLocation, returnTime, resNotes, extras, false));
-				
-				
-				Alert alertAdd = new Alert(AlertType.CONFIRMATION);
-				alertAdd.setTitle("Adding a new reservation");
-				alertAdd.setHeaderText("Please confirm!");
-				alertAdd.setContentText("Would you really want to ADD this new reservation?\n\n" +
-										"Reserved category: '" + reservedCategory + "'\n" + 
-										"For: '" + selectedCust.getModellObject().getFirstName() + " " +
-												   selectedCust.getModellObject().getLastName() +"'");
-				Optional<ButtonType> result = alertAdd.showAndWait();
-				if(result.get() == ButtonType.OK) {
-						Database.addNewReservation(newRes.getModellObject());
-						observReservations.add(newRes);
-						selectedRes = newRes;
-						resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
-					}
-				
-		   } catch (SQLException e1) {
-			   System.out.println("Something is wrong with the database - adding a new reservation");
-			   e1.printStackTrace();
-		}		
-	});
-				
-				
 			
 //CALCULATE PRICE ON ACTION	
 			calcPriceButton.disableProperty().bind(calcObs);
@@ -944,18 +862,20 @@ public class Main extends Application {
 				ldtPickup = LocalDateTime.of(datePickupPicker.getValue().getYear(),
 						datePickupPicker.getValue().getMonth(),
 						datePickupPicker.getValue().getDayOfMonth(),
-						Integer.parseInt(pickupHourTF.getText()),
-						Integer.parseInt(pickupMinTF.getText()));
+						Integer.parseInt(pickupHourCB.getValue()),
+						Integer.parseInt(pickupMinCB.getValue()));
 				
 				
 			    ldtReturn = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
 						dateReturnPicker.getValue().getMonth(),
 						dateReturnPicker.getValue().getDayOfMonth(),
-						Integer.parseInt(returnHourTF.getText()),
-						Integer.parseInt(returnMinTF.getText()));
+						Integer.parseInt(returnHourCB.getValue()),
+						Integer.parseInt(returnMinCB.getValue()));
 				
 			    System.out.println(Duration.between(ldtPickup, ldtReturn).toHours());
 			});
+			
+			
 			
 			
 //RES ID LABEL WHEN A RESERVATION IS SELECTED, set selected CUSTOMER and CAR 			
@@ -979,7 +899,6 @@ public class Main extends Application {
 							System.out.println("Something is wrong with the reading customers");
 							e1.printStackTrace();
 						}
-						
 						custIdLabel.setText("ID = " + selectedRes.getModellObject().getCustomer().getCustomerID());
 						firstNameTF.setText(selectedRes.getModellObject().getCustomer().getFirstName());
 					    lastNameTF.setText(selectedRes.getModellObject().getCustomer().getLastName());
@@ -1000,10 +919,10 @@ public class Main extends Application {
 					    returnLocTF.setText(selectedRes.getModellObject().getReturnLocation());
 					    datePickupPicker.setValue(selectedRes.getModellObject().getPickupTime().toLocalDate());
 					    dateReturnPicker.setValue(selectedRes.getModellObject().getReturnTime().toLocalDate());
-					    pickupHourTF.setText(String.valueOf(selectedRes.getModellObject().getPickupTime().getHour()));
-					    pickupMinTF.setText(String.valueOf(selectedRes.getModellObject().getPickupTime().getMinute()));
-					    returnHourTF.setText(String.valueOf(selectedRes.getModellObject().getReturnTime().getHour()));
-					    returnMinTF.setText(String.valueOf(selectedRes.getModellObject().getReturnTime().getMinute()));
+					    pickupHourCB.setValue(String.valueOf(selectedRes.getModellObject().getPickupTime().getHour()));
+					    pickupMinCB.setValue(String.valueOf(selectedRes.getModellObject().getPickupTime().getMinute()));
+					    returnHourCB.setValue(String.valueOf(selectedRes.getModellObject().getReturnTime().getHour()));
+					    returnMinCB.setValue(String.valueOf(selectedRes.getModellObject().getReturnTime().getMinute()));
 					    notesTA2.setText(selectedRes.getModellObject().getResNotes());
 
 						ArrayList<String> extras = extrasList();
@@ -1028,6 +947,61 @@ public class Main extends Application {
 				
 			});
 			
+			
+			
+//RESERVE BUTTON ON ACTION			
+			reserveButton.setOnAction(e -> {
+			  try {	
+				String resNumberID = "RESID" + String.valueOf(System.currentTimeMillis() / 1000);
+				String reservedCategory = carComboBox.getSelectionModel().getSelectedItem().toString();
+				String insuranceType = insuranceComboBox.getSelectionModel().getSelectedItem().toString();
+				String pickupLocation = pickupLocTF.getText();
+				LocalDateTime pickupTime = LocalDateTime.of(datePickupPicker.getValue().getYear(),
+															datePickupPicker.getValue().getMonth(),
+															datePickupPicker.getValue().getDayOfMonth(),
+															Integer.parseInt(pickupHourCB.getValue()), 
+															Integer.parseInt(pickupMinCB.getValue()));
+				String returnLocation = returnLocTF.getText();
+				LocalDateTime returnTime = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
+															dateReturnPicker.getValue().getMonth(),
+															dateReturnPicker.getValue().getDayOfMonth(),
+															Integer.parseInt(returnHourCB.getValue()), 
+															Integer.parseInt(returnMinCB.getValue()));
+				String resNotes = notesTA2.getText();
+				
+				ArrayList<String> extras = new ArrayList<>();
+				for(String key : extrasMap.keySet()) {
+					ObservableValue<Boolean> val = extrasMap.get(key);
+					if(val.getValue()) {
+						extras.add(key);
+					}
+				}
+				ReservationFX newRes = new ReservationFX(new Reservation(resNumberID, selectedCust.getModellObject(), 
+						     selectedCar.getModellObject(), reservedCategory, insuranceType, pickupLocation, pickupTime, returnLocation, returnTime, resNotes, extras, false));
+				
+				Alert alertAdd = new Alert(AlertType.CONFIRMATION);
+				alertAdd.setTitle("Adding a new reservation");
+				alertAdd.setHeaderText("Please confirm!");
+				alertAdd.setContentText("Would you really want to ADD this new reservation?\n\n" +
+										"Reserved category: '" + reservedCategory + "'\n" + 
+										"For: '" + selectedCust.getModellObject().getFirstName() + " " +
+												   selectedCust.getModellObject().getLastName() +"'");
+				Optional<ButtonType> result = alertAdd.showAndWait();
+				if(result.get() == ButtonType.OK) {
+						Database.addNewReservation(newRes.getModellObject());
+						observReservations.add(newRes);
+						selectedRes = newRes;
+						resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
+						rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
+					}
+				
+		   } catch (SQLException e1) {
+			   System.out.println("Something is wrong with the database - adding a new reservation");
+			   e1.printStackTrace();
+		}		
+	});
+				
+			
 //UPDATE RES BUTTON ON ACTION
 			updateResButton.setOnAction(e -> {
 				  try {	
@@ -1038,14 +1012,14 @@ public class Main extends Application {
 						LocalDateTime pickupTime = LocalDateTime.of(datePickupPicker.getValue().getYear(),
 																	datePickupPicker.getValue().getMonth(),
 																	datePickupPicker.getValue().getDayOfMonth(),
-																	Integer.parseInt(pickupHourTF.getText()), 
-																	Integer.parseInt(pickupMinTF.getText()));
+																	Integer.parseInt(pickupHourCB.getValue()), 
+																	Integer.parseInt(pickupMinCB.getValue()));
 						String returnLocation = returnLocTF.getText();
 						LocalDateTime returnTime = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
 																	dateReturnPicker.getValue().getMonth(),
 																	dateReturnPicker.getValue().getDayOfMonth(),
-																	Integer.parseInt(returnHourTF.getText()), 
-																	Integer.parseInt(returnMinTF.getText()));
+																	Integer.parseInt(returnHourCB.getValue()), 
+																	Integer.parseInt(returnMinCB.getValue()));
 						String resNotes = notesTA2.getText();
 						
 						ArrayList<String> extras = new ArrayList<>();
@@ -1055,14 +1029,8 @@ public class Main extends Application {
 								extras.add(key);
 							}
 						}
-						Car car = new Car();
-						
-						if(selectedCar != null && selectedCar.getModellObject().getCarLicensePlate().equals(carLicensePlateTF.getText().toUpperCase())) {
-							car = selectedCar.getModellObject();
-						} 
-					
 						ReservationFX updateRes = new ReservationFX(new Reservation(resNumberID, selectedCust.getModellObject(), 
-								     car, reservedCategory, insuranceType, pickupLocation, pickupTime, returnLocation, returnTime, resNotes, extras, false));
+								     selectedCar.getModellObject(), reservedCategory, insuranceType, pickupLocation, pickupTime, returnLocation, returnTime, resNotes, extras, false));
 				
 						Alert alertUpdate = new Alert(AlertType.CONFIRMATION);
 						alertUpdate.setTitle("Updating a reservation");
@@ -1077,6 +1045,7 @@ public class Main extends Application {
 								observReservations.remove(selectedRes);
 								observReservations.add(updateRes);
 								selectedRes = updateRes;
+								rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
 							}
 
 				   } catch (SQLException e1) {
@@ -1084,8 +1053,7 @@ public class Main extends Application {
 					   e1.printStackTrace();
 				}
 			});
-		
-				
+
 			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
 			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
@@ -1134,11 +1102,18 @@ public class Main extends Application {
     	fuelTypeCol.setMinWidth(30);
     	fuelTypeCol.setCellValueFactory(new PropertyValueFactory<>("carFuelType"));
     
-    	TableColumn<CarFX, String> onRentCol = new TableColumn<>("OnRent");
+    	TableColumn<CarFX, Boolean> onRentCol = new TableColumn<>("OnRent");
     	onRentCol.setPrefWidth(60);
     	onRentCol.setMinWidth(30);
     	onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
     
+    	onRentCol.setCellFactory(col -> new TableCell<CarFX, Boolean>() {
+	    @Override
+	    	protected void updateItem(Boolean item, boolean empty) {
+	    		super.updateItem(item, empty) ;
+	    		setText(empty ? null : item ? "OnRent" : "Ready" );
+	    	}
+    	});
   
     	carsTableView = new TableView<>(observCars);
 		carsTableView.setPrefHeight(570);
@@ -1512,11 +1487,7 @@ public class Main extends Application {
 								  featuresLV.getItems().clear();
 								  featuresMap.put(e, new SimpleBooleanProperty(false));
 							      featuresLV.getItems().addAll(featuresMap.keySet());
-						     }			 
-						} catch (SQLException e2) {
-							System.out.println("Something is wrong with creating list view from features database");
-							e2.printStackTrace();
-					}
+						     }
 					for(String key : featuresMap.keySet()) {
 						for(String s: selectedCar.getModellObject().getCarFeatures()) {
 							if(key.equals(s)) {
@@ -1525,6 +1496,20 @@ public class Main extends Application {
 								featuresLV.getItems().addAll(featuresMap.keySet());
 							}
 						} 
+					}
+			//Active reservations for car
+					reservationsLV.getItems().clear();
+					  ArrayList<String> ls = new ArrayList<>();
+						for(Reservation r : Database.readReservationsTable("active", "")) {
+							if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())) {
+							   ls.add(r.getPickupTime() + " - " + r.getReturnTime());
+							}
+						}
+						Collections.sort(ls);
+						reservationsLV.getItems().addAll(ls);
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the reading reservations, features for cars database");
+						e1.printStackTrace();
 					}
 				}
 			});
@@ -1541,26 +1526,19 @@ public class Main extends Application {
 //DELETE ACTION			
 			deleteCarButton.setOnAction(e -> {
 			   try {
-				   ArrayList<Car> cars = new ArrayList<>();
-				 for(Reservation r : Database.readReservationsTable("active", "")) {
-					 if(!r.getCar().getCarLicensePlate().equals(null))
-					   cars.add(r.getCar());
-				 }
-				 
-				 for(Car c : cars) {
-					 System.out.println(c.getCarLicensePlate());
-				 }
-//					if(.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())) {
-//						Alert alertWarn= new Alert(AlertType.WARNING);
-//						alertWarn.setTitle("Deleting a car");
-//						alertWarn.setHeaderText("You can't delete this car!");
-//						alertWarn.setContentText(selectedCar.getCarLicensePlate() + " still has a reservation (ID = '"
-//												 + r.getResNumberID() + "').\n" + "You should first cancel the reservation.");
-//						alertWarn.showAndWait();
-//						return;
-//						}
+				    for(Reservation r : Database.readReservationsTable("active", "")) {
+					  if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Deleting a car");
+						alertWarn.setHeaderText("You can't delete this car!");
+						alertWarn.setContentText(selectedCar.getCarLicensePlate() + " still has a reservation (ID = '"
+												 + r.getResNumberID() + "').\n" + "You should first cancel the reservation.");
+						alertWarn.showAndWait();
+						return;
+						}
+				    }
 				} catch (SQLException e2) {
-				System.out.println("Something is wrong with the customer delete");
+				System.out.println("Something is wrong with the delete car");
 				e2.printStackTrace();
 				}
 
@@ -1816,7 +1794,7 @@ public class Main extends Application {
 		carCatCol.setCellValueFactory(new PropertyValueFactory<>("reservedCategory"));
 		
 		TableColumn<ReservationFX, String> carLicensePlateCol = new TableColumn<>("Lic. plate");
-		carLicensePlateCol.setPrefWidth(70);
+		carLicensePlateCol.setPrefWidth(80);
 		carLicensePlateCol.setMinWidth(30);
 		carLicensePlateCol.setCellValueFactory(new PropertyValueFactory<>("carLicensePlate"));
 		
@@ -1827,7 +1805,7 @@ public class Main extends Application {
 		pickupTimeCol.setSortType(TableColumn.SortType.ASCENDING);
 		
 		TableColumn<ReservationFX, String> pickupLocCol = new TableColumn<>("Pickup location");
-		pickupLocCol.setPrefWidth(120);
+		pickupLocCol.setPrefWidth(115);
 		pickupLocCol.setMinWidth(30);
 		pickupLocCol.setCellValueFactory(new PropertyValueFactory<>("pickupLocation"));
 		
@@ -1837,22 +1815,14 @@ public class Main extends Application {
 		returnTimeCol.setCellValueFactory(new PropertyValueFactory<>("returnTime"));
 		
 		TableColumn<ReservationFX, String> returnLocCol = new TableColumn<>("Return location");
-		returnLocCol.setPrefWidth(120);
+		returnLocCol.setPrefWidth(115);
 		returnLocCol.setMinWidth(30);
 		returnLocCol.setCellValueFactory(new PropertyValueFactory<>("returnLocation"));
 		
-		TableColumn<ReservationFX, Boolean> statusCol = new TableColumn<>("Status");
-		statusCol.setPrefWidth(60);
+		TableColumn<ReservationFX, String> statusCol = new TableColumn<>("Status");
+		statusCol.setPrefWidth(70);
 		statusCol.setMinWidth(30);
-		statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));	
-		
-		statusCol.setCellFactory(col -> new TableCell<ReservationFX, Boolean>() {
-		    @Override
-		    protected void updateItem(Boolean item, boolean empty) {
-		        super.updateItem(item, empty) ;
-		        setText(empty ? null : item ? "Cancelled" : "Active" );
-		    }
-		});
+		statusCol.setCellValueFactory(new PropertyValueFactory<>("statusName"));	
 		
 		
 	    reservTableView = new TableView<>(observReservations);
@@ -2006,7 +1976,44 @@ public class Main extends Application {
 		
 		
 //DELETE RES ON ACTION
-		
+		deleteResButton.setOnAction(e -> {
+			Alert alertCancel = new Alert(AlertType.CONFIRMATION);
+			alertCancel.setTitle("Cancelling a reservation");
+			alertCancel.setHeaderText("Please confirm!");
+			alertCancel.setContentText("Would you really want to CANCEL the selected '" 
+									   + selectedRes.getModellObject().getResNumberID() + 
+								       "' reservation?");
+			Optional<ButtonType> result = alertCancel.showAndWait();
+			if(result.get() == ButtonType.OK) {
+				try {
+					Database.cancelReservation(selectedRes.getModellObject().getResNumberID());
+					for(Reservation r : Database.readReservationsTable("", "cancelled")) {
+						if(r.getResNumberID().equals(selectedRes.getResNumberID())) {
+							observReservations.remove(selectedRes);
+							ReservationFX newRes = new ReservationFX(new Reservation(r.getResNumberID(),
+																	r.getCustomer(),
+																	r.getCar(),
+																	r.getReservedCategory(),
+																	r.getInsuranceType(),
+																	r.getPickupLocation(),
+																	r.getPickupTime(),
+																	r.getReturnLocation(),
+																	r.getReturnTime(),
+																	r.getResNotes(),
+																	r.getResExtras(),
+																	r.isStatus()));
+							observReservations.add(newRes);
+							selectedRes = newRes;
+						}
+					}
+				} catch (SQLException e1) {
+					System.out.println("Something is wrong with the cancel res database connection");
+					e1.printStackTrace();
+				}
+			}
+			
+			
+		});
 		
 	
 		
@@ -2014,6 +2021,7 @@ public class Main extends Application {
 		showResButton.setOnAction(e -> {
 			mainTabPane.getSelectionModel().select(reserveTab);
 			resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
+			rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
 		});
 
 		
@@ -2207,6 +2215,7 @@ public class Main extends Application {
 				System.out.println("Created reservations table, or already exists");
 			Database.createReservationExtrasTable();
 				System.out.println("Created reservation extras junction table, or already exists");
+
 
 				
 		} catch (SQLException e) {
