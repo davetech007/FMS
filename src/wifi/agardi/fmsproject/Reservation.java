@@ -150,7 +150,7 @@ public class Reservation {
 	
 
 	public String getStatusName() {
-		if(getPickupTime().isBefore(LocalDateTime.now())) {
+		if(getReturnTime().isBefore(LocalDateTime.now())) {
 			return "Expired";
 		}
 		if(getCar().isCarIsOnRent() == true) {
