@@ -67,13 +67,9 @@ import javafx.scene.layout.VBox;
 
 public class Main extends Application {
 	DropShadow shadow = new DropShadow();  //Effect for the buttons
-	LocalDate minDate = LocalDate.of(1900, 01, 01);
 	
 	int minEngineSize = 500;
 	int minEnginePower = 40;
-	
-	LocalDateTime ldtPickup;
-	LocalDateTime ldtReturn;
 	
 	TabPane mainTabPane;
 	Tab carsTab;
@@ -87,7 +83,7 @@ public class Main extends Application {
 	private SortedList<CarFX> sortedListCars;
 	
 	TextField carLicensePlateTF;
-	ComboBox<String> carComboBox;
+    ComboBox<String> carComboBox;
 
 	Label custIdLabel;
 	Label resIdLabel;
@@ -100,7 +96,12 @@ public class Main extends Application {
 	private FilteredList<ReservationFX> filteredListReservations;
 	private SortedList<ReservationFX> sortedListReservations;
 	
+	BorderPane reservationsBP;
 	
+	Button printPdfButton;
+	Button deleteResButton;
+	Button showResButton;
+	Button returnCarButton;
 
 //LOGIN WINDOW	
 	@Override
@@ -220,6 +221,7 @@ public class Main extends Application {
 	}
 	
 
+	
 
 //MAIN WINDOW after login
 	public void mainMenu() {
@@ -280,6 +282,8 @@ public class Main extends Application {
 			reservationsTab.setOnSelectionChanged(e -> {
 				if(reservationsTab.isSelected()) {
 					mainTitle.setText("Manage reservations");
+//					reservationsBP.setCenter(null);
+					reservationsBP.setCenter(showReservationsTableView());
 				}
 			});
 			dashboardTab.setOnSelectionChanged(e -> {
@@ -362,7 +366,7 @@ public class Main extends Application {
 			
 			DatePicker dateBornPicker = new DatePicker();
 			dateBornPicker.setPromptText("Date of Born");
-			dateBornPicker.setDayCellFactory(dp -> new DateCellFactory(minDate, LocalDate.now()));
+			dateBornPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.MIN, LocalDate.now()));
 			reserveGP.add(dateBornPicker, 0, 4);
 			
 //NATIONALITY		
@@ -565,16 +569,7 @@ public class Main extends Application {
 			returnHBox.getChildren().addAll(returnHourCB, returnHourLB, returnMinCB, returnMinuteLB);
 			reserveGP.add(returnHBox, 4, 6);	
 			
-			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
-			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
-			
-			datePickupPicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
-				@Override
-				public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue,
-						LocalDate newValue) {
-					dateReturnPicker.setDayCellFactory(dp -> new DateCellFactory(newValue, LocalDate.MAX));
-				}
-			});		
+				
 			
 //EXTRAS LISTVIEW		
     		   LinkedHashMap<String, ObservableValue<Boolean>> extrasMap = new LinkedHashMap<>();
@@ -658,6 +653,26 @@ public class Main extends Application {
 			          }
 			        });
 			
+//RETURN CAR		
+			returnCarButton = new Button("Return car");
+			returnCarButton.setId("returnCarButton");
+			returnCarButton.setDisable(true);
+			
+			returnCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  returnCarButton.setEffect(shadow);
+			          }
+			        });
+			returnCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  returnCarButton.setEffect(null);
+			          }
+			        });	
+			
 			
 		Button updateResButton = new Button("Update");
 			updateResButton.setId("updateResButton");
@@ -695,6 +710,22 @@ public class Main extends Application {
 			        	  reserveButton.setEffect(null);
 			          }
 			        });
+			
+			
+			
+			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
+			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
+			
+			datePickupPicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
+				@Override
+				public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue,
+						LocalDate newValue) {
+					dateReturnPicker.setDayCellFactory(dp -> new DateCellFactory(newValue, LocalDate.MAX));
+						if(dateReturnPicker.getValue() != null && newValue.isAfter(dateReturnPicker.getValue())) {
+							dateReturnPicker.setValue(newValue);
+						}
+				}
+			});	
 		
 
 //SearchDriver ACTION			
@@ -716,9 +747,18 @@ public class Main extends Application {
 					cityTF.setText(selectedCust.getModellObject().getAddressCity());
 					streetTF.setText(selectedCust.getModellObject().getAddressStreet());
 					postCodeTF.setText(selectedCust.getModellObject().getAddressPostalCode());	
-					updateCustomerButton.setDisable(false);
+					
 				}
 			});	
+			
+			custIdLabel.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					if(newValue.length() > 8) {
+						updateCustomerButton.disableProperty().bind(custObs);
+					}
+				}
+			});
 	
 			
 //SAVE CUSTOMER ON ACTION			
@@ -742,37 +782,39 @@ public class Main extends Application {
 														nationality, passportNum, driversLicenseNum, telefon, eMail,
 														addressLand, addressCity, addressStreet, addressPostalCode));
 			
-				if(Database.checkExistingCustomer(passportNum, "", "") != "") {
-					Alert alertWarn= new Alert(AlertType.WARNING);
-					alertWarn.setTitle("Adding a customer");
-					alertWarn.setHeaderText("Please check again, PASSPORT number already exists!");
-					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
-											 "', but his/her passport number '" + passportNum +
-											 "' already exists under this name '" + 
-											 Database.checkExistingCustomer(passportNum, "", "") + "'");
-					alertWarn.showAndWait();
-					return;
+				for(Customer c : Database.readCustomersTable("", "")) {
+					if(c.getPassportNum().equals(passportNum)) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Adding a customer");
+						alertWarn.setHeaderText("Please check again, PASSPORT number already exists!");
+						alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
+												"', but his/her passport number '" + passportNum +
+												"' already exists under this name '" + 
+												c.getFirstName() + " " + c.getLastName() + "'");
+						alertWarn.showAndWait();
+						return;
+					}
+					if(c.getDriversLicenseNum().equals(driversLicenseNum)) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Adding a customer");
+						alertWarn.setHeaderText("Please check again, DRIVER'S LICENSE number already exists!");
+						alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
+												"', but his/her driver's license number '" + driversLicenseNum +
+												"' already exists under this name '" +
+												c.getFirstName() + " " + c.getLastName() + "'");
+						alertWarn.showAndWait();
+						return;
+					}
 				}
-				if(Database.checkExistingCustomer("", driversLicenseNum, "") != "") {
-					Alert alertWarn= new Alert(AlertType.WARNING);
-					alertWarn.setTitle("Adding a customer");
-					alertWarn.setHeaderText("Please check again, DRIVER'S LICENSE number already exists!");
-					alertWarn.setContentText("You wanted to add a new customer '"+ firstName + " " + lastName + 
-											 "', but his/her driver's license number '" + driversLicenseNum +
-											 "' already exists under this name '" +
-											 Database.checkExistingCustomer("", driversLicenseNum, "") + "'");
-					alertWarn.showAndWait();
-					return;
-				}
-				 if (!(eMail.length() > 3 && eMail.contains("@") && eMail.contains("."))){
+				if (!(eMail.length() > 3 && eMail.contains("@") && eMail.contains("."))){
 					 Alert alertWarn = new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Adding a customer");
 						alertWarn.setHeaderText("Please check again, e-mail address looks invalid!");
 						alertWarn.setContentText("Please give a real e-mail address (contains '@' and '.')!");
 						alertWarn.showAndWait();
 						return;
-				 }
-				else {
+				}
+				
 					Alert confirmAdd = new Alert(AlertType.CONFIRMATION);
 					confirmAdd.setTitle("Adding a new customer");
 					confirmAdd.setHeaderText("Please confirm!");
@@ -783,7 +825,6 @@ public class Main extends Application {
 					custIdLabel.setText("ID = " + newCustomer.getModellObject().getCustomerID());
 					selectedCust = newCustomer;
 					}
-				}
 			  } catch (SQLException e1) {
 				  System.out.println("Something is wrong with the database - add custormer");
 				  e1.printStackTrace();
@@ -792,7 +833,7 @@ public class Main extends Application {
 			});
 //UPDATE CUSTOMER ON ACTION			
 			updateCustomerButton.setOnAction(e -> {
-			 try {
+				try {
 				String customerID = selectedCust.getModellObject().getCustomerID();
 				String firstName = firstNameTF.getText().substring(0, 1).toUpperCase() + firstNameTF.getText().substring(1);
 				String lastName = lastNameTF.getText().substring(0, 1).toUpperCase() + lastNameTF.getText().substring(1);
@@ -811,27 +852,64 @@ public class Main extends Application {
 														nationality, passportNum, driversLicenseNum, telefon, eMail,
 														addressLand, addressCity, addressStreet, addressPostalCode));
 				
-				Alert confirmUpdate = new Alert(AlertType.CONFIRMATION);
-				confirmUpdate.setTitle("Updating customer");
-				confirmUpdate.setHeaderText("Please confirm!");
-				confirmUpdate.setContentText("Would you really want to UPDATE the selected customer?\n\n" +
-											"Customer with this ID '" + customerID + "' exists under this name '" +
-											 Database.checkExistingCustomer("", "", customerID) + "'.\n\n" +
-											 "Update to '" + firstName + " " + lastName + "'?");
-				Optional<ButtonType> result = confirmUpdate.showAndWait();
-				if(result.get() == ButtonType.OK) {
-					Database.updateCustomer(updateCustomer.getModellObject());
-					selectedCust = updateCustomer;
-				}
+				for(Customer c : Database.readCustomersTable("", "")) {
+					if(!selectedCust.getModellObject().getCustomerID().equals(c.getCustomerID()) && c.getPassportNum().equals(passportNum)) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a customer");
+						alertWarn.setHeaderText("Please check again, PASSPORT number already exists!");
+						alertWarn.setContentText("You wanted to update a customer '"+ firstName + " " + lastName + 
+												"', but his/her passport number '" + passportNum +
+												"' already exists under this name '" + 
+												c.getFirstName() + " " + c.getLastName() + "'");
+						alertWarn.showAndWait();
+						return;
+					}
+					if(!selectedCust.getModellObject().getCustomerID().equals(c.getCustomerID()) && c.getDriversLicenseNum().equals(driversLicenseNum)) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a customer");
+						alertWarn.setHeaderText("Please check again, DRIVER'S LICENSE number already exists!");
+						alertWarn.setContentText("You wanted to update a customer '"+ firstName + " " + lastName + 
+												"', but his/her driver's license number '" + driversLicenseNum +
+												"' already exists under this name '" +
+												c.getFirstName() + " " + c.getLastName() + "'");
+						alertWarn.showAndWait();
+						return;
+					}
+				    if (!(eMail.length() > 3 && eMail.contains("@") && eMail.contains("."))){
+					    Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a customer");
+						alertWarn.setHeaderText("Please check again, e-mail address looks invalid!");
+						alertWarn.setContentText("Please give a real e-mail address (contains '@' and '.')!");
+						alertWarn.showAndWait();
+						return;
+				    }
+				 } 	
 				
-			 } catch (SQLException e1) {
-					  System.out.println("Something is wrong with the database - update custormer");
-					  e1.printStackTrace();
-				  }
-			});
+					for(Customer c : Database.readCustomersTable("", "")) {
+						if(c.getCustomerID().equals(customerID)) {
+							Alert confirmUpdate = new Alert(AlertType.CONFIRMATION);
+							confirmUpdate.setTitle("Updating customer");
+							confirmUpdate.setHeaderText("Please confirm!");
+							confirmUpdate.setContentText("Would you really want to UPDATE the selected customer?\n\n" +
+														"Customer with this ID '" + customerID + "' exists under this name '" +
+														 c.getFirstName() + " " + c.getLastName() + "'.\n\n" +
+														"Update to '" + firstName + " " + lastName + "'?");
+							Optional<ButtonType> result = confirmUpdate.showAndWait();
+							if(result.get() == ButtonType.OK) {
+								Database.updateCustomer(updateCustomer.getModellObject());
+								selectedCust = updateCustomer;
+							}
+					}
+				}
+			  }
+			  catch (SQLException e1) {
+			  System.out.println("Something is wrong with the database - update custormer");
+			  e1.printStackTrace();
+			  }
+		});
 			
-//RESERVE BUTTON ON ACTION	
-			//Enable the calculate price button
+
+		//Enable the calculate price button
 			ObservableValue<Boolean> calcObs = carComboBox.valueProperty().isNull().
 					    or(insuranceComboBox.valueProperty().isNull()).
 						or(datePickupPicker.valueProperty().isNull()).
@@ -850,25 +928,32 @@ public class Main extends Application {
 			reserveButton.disableProperty().bind(resCustObs);
 			
 			
-			
-			
 //CALCULATE PRICE ON ACTION	
 			calcPriceButton.disableProperty().bind(calcObs);
 			
 			calcPriceButton.setOnAction(e -> {
-				ldtPickup = LocalDateTime.of(datePickupPicker.getValue().getYear(),
+				LocalDateTime ldtPickup = LocalDateTime.of(datePickupPicker.getValue().getYear(),
 						datePickupPicker.getValue().getMonth(),
 						datePickupPicker.getValue().getDayOfMonth(),
 						Integer.parseInt(pickupHourCB.getValue()),
 						Integer.parseInt(pickupMinCB.getValue()));
 				
-			    ldtReturn = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
+				LocalDateTime ldtReturn = LocalDateTime.of(dateReturnPicker.getValue().getYear(),
 						dateReturnPicker.getValue().getMonth(),
 						dateReturnPicker.getValue().getDayOfMonth(),
 						Integer.parseInt(returnHourCB.getValue()),
 						Integer.parseInt(returnMinCB.getValue()));
+			    ldtReturn = ldtReturn.minusMinutes(45);
+			    //1 day = 24 hours, and it is possible a 30 minutes late
+			    int days = 0;
+			    long hrs = Duration.between(ldtPickup, ldtReturn).toHours();
+			    if(hrs < 24) {
+			    	days = 1;
+			    }
+			    if(hrs >= 24) {
+			    	days = (int) (hrs/24) + 1;
+			    }
 			    
-			    long days = Duration.between(ldtPickup, ldtReturn).toDays() + 1;
 			    int dailyPrice = getCategoryPrice(carComboBox.getValue());
 			    int insurancePrice = (int) (getInsurancePrice(insuranceComboBox.getValue()) * days);
 			    int rentPrice = (int) (days * dailyPrice);
@@ -885,9 +970,7 @@ public class Main extends Application {
 			    priceLabelIns.setText("Ins.   = " + insurancePrice + " €");
 				priceLabel2.setText("Extras = " + extraPrices + " €");
 				priceLabel3.setText("Total  = " + (rentPrice + extraPrices + insurancePrice) + " €");
-			
 			});
-			
 			
 			
 			
@@ -933,9 +1016,19 @@ public class Main extends Application {
 					    datePickupPicker.setValue(selectedRes.getModellObject().getPickupTime().toLocalDate());
 					    dateReturnPicker.setValue(selectedRes.getModellObject().getReturnTime().toLocalDate());
 					    pickupHourCB.setValue(String.valueOf(selectedRes.getModellObject().getPickupTime().getHour()));
-					    pickupMinCB.setValue(String.valueOf(selectedRes.getModellObject().getPickupTime().getMinute()));
+					    String pMin = String.valueOf(selectedRes.getModellObject().getPickupTime().getMinute());
+					    if(pMin.equals("0")) {
+					    	 pickupMinCB.setValue("00");
+					    } else {
+					    	pickupMinCB.setValue(pMin);
+					    }
 					    returnHourCB.setValue(String.valueOf(selectedRes.getModellObject().getReturnTime().getHour()));
-					    returnMinCB.setValue(String.valueOf(selectedRes.getModellObject().getReturnTime().getMinute()));
+					    String rMin = String.valueOf(selectedRes.getModellObject().getReturnTime().getMinute());
+					    if(rMin.equals("0")) {
+					    	returnMinCB.setValue("00");
+					    } else {
+					    	returnMinCB.setValue(rMin);
+					    }
 					    notesTA2.setText(selectedRes.getModellObject().getResNotes());
 
 						ArrayList<String> extras = extrasList();
@@ -954,11 +1047,39 @@ public class Main extends Application {
 								}
 							} 
 						}
-						updateResButton.setDisable(false); 
+						updateResButton.disableProperty().bind(resCustObs); 
 						calcPriceButton.fire();
+						
+						dateReturnPicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
+							@Override
+							public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue,
+									LocalDate newValue) {
+									if(selectedRes != null && newValue.isBefore(LocalDate.now().plusDays(1)) && 
+													selectedRes.getModellObject().getStatusName().equals("OnRent")) {
+										returnCarButton.setDisable(false);
+									} 
+									else {
+										returnCarButton.setDisable(true);
+									}
+							  }
+						});	
 					}
 				}
 				
+			});
+			
+			
+//RETURN CAR ON ACTION		
+			returnCarButton.setOnAction(e -> {
+				ReturnCarDialog retCar = new ReturnCarDialog(selectedRes, dateReturnPicker.getValue());
+				Optional<ButtonType> result = retCar.showAndWait();
+				if (result.isPresent())
+					if (result.get() == ButtonType.OK) {
+						
+					}
+					else {
+						
+					}
 			});
 			
 			
@@ -993,6 +1114,17 @@ public class Main extends Application {
 				ReservationFX newRes = new ReservationFX(new Reservation(resNumberID, selectedCust.getModellObject(), 
 											selectedCar.getModellObject(), reservedCategory, insuranceType, pickupLocation,
 											pickupTime, returnLocation, returnTime, resNotes, extras, false));
+				
+				
+				if(pickupTime.isAfter(returnTime)) {
+					 Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Make a reservation");
+						alertWarn.setHeaderText("Please check again!");
+						alertWarn.setContentText("The return time should be after the pickup time!");
+						alertWarn.showAndWait();
+					 return;
+				}
+				
 				
 
 				for(Reservation r : Database.readReservationsTable("active", "")) {
@@ -1065,6 +1197,14 @@ public class Main extends Application {
 												selectedCar.getModellObject(), reservedCategory, insuranceType, pickupLocation, 
 												pickupTime, returnLocation, returnTime, resNotes, extras, false));
 				
+						if(pickupTime.isAfter(returnTime)) {
+							 Alert alertWarn= new Alert(AlertType.WARNING);
+								alertWarn.setTitle("Update a reservation");
+								alertWarn.setHeaderText("Please check again!");
+								alertWarn.setContentText("The return time should be after the pickup time!");
+								alertWarn.showAndWait();
+							 return;
+						}
 						
 						for(Reservation r : Database.readReservationsTable("active", "")) {
 							if((selectedCar.getModellObject().getCarVinNumber().equals(r.getCar().getCarVinNumber()) && !resNumberID.equals(r.getResNumberID()))) {
@@ -1104,7 +1244,7 @@ public class Main extends Application {
 				}
 			});
 
-			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
+			HBox bottomHBoxRes = new HBox(returnCarButton, updateResButton, reserveButton);
 			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
@@ -1123,7 +1263,7 @@ public class Main extends Application {
 	
 
 	
-//CARS MENU	
+
 //CARS MENU	
 	public VBox showCarsTableView() {
 		TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
@@ -1155,7 +1295,7 @@ public class Main extends Application {
     	TableColumn<CarFX, Boolean> onRentCol = new TableColumn<>("OnRent");
     	onRentCol.setPrefWidth(60);
     	onRentCol.setMinWidth(30);
-    	onRentCol.setCellValueFactory(new PropertyValueFactory<>("carIsOnRent"));
+    	onRentCol.setCellValueFactory(new PropertyValueFactory<>("isOnRent"));
     
     	onRentCol.setCellFactory(col -> new TableCell<CarFX, Boolean>() {
 	    @Override
@@ -1230,8 +1370,6 @@ public class Main extends Application {
 
 	
 	
-	
-	
 	public BorderPane openCarsMenu() {
 		Label basePriceLB = new Label("Base price = ");
 		    BorderPane carsBP = new BorderPane();
@@ -1264,7 +1402,7 @@ public class Main extends Application {
 		    
 		    DatePicker yearPicker = new DatePicker();
 		    yearPicker.setPromptText("Manuf. date");
-		    yearPicker.setDayCellFactory(dp -> new DateCellFactory(minDate, LocalDate.now()));
+		    yearPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.MIN, LocalDate.now()));
 		    carsGP.add(yearPicker, 0, 3);
 		    
 		    HBox kmHB = new HBox();
@@ -1316,7 +1454,7 @@ public class Main extends Application {
 		    carsGP.add(carTransmBox, 0, 6);
 	    
 //Reservations
-		    Label reservationsLB = new Label("Reservations");
+		    Label reservationsLB = new Label("Active reservations");
 		    carsGP.add(reservationsLB, 0, 7);
 			
 			ListView<String> reservationsLV = new ListView<>();
@@ -1509,14 +1647,28 @@ public class Main extends Application {
 			          }
 			        });
 			
-			
+		ObservableValue<Boolean> carBT = brandTF.textProperty().isEmpty()
+					.or(modelTF.textProperty().isEmpty())
+					.or(kmTF.textProperty().isEmpty())
+					.or(yearPicker.valueProperty().isNull())
+					.or(carFuelBox.valueProperty().isNull())
+					.or(carTransmBox.valueProperty().isNull())
+					.or(carCategorieBox.valueProperty().isNull())
+					.or(licPlateTF.textProperty().isEmpty())
+					.or(vinNumTF.textProperty().isEmpty())
+					.or(carColorBox.valueProperty().isNull())
+					.or(engineSizeTF.textProperty().isEmpty())
+					.or(enginePowerTF.textProperty().isEmpty());
+		
+		addCarButton.disableProperty().bind(carBT);
+		
 //Filling text fields from table view selected items, enable buttons
 			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
 				if (newS != null) {
 					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
 					deleteCarButton.setDisable(false);
 					makeResButton.setDisable(false);
-					updateCarButton.setDisable(false);
+					updateCarButton.disableProperty().bind(carBT);
 					
 					brandTF.setText(selectedCar.getModellObject().getCarBrand());
 					modelTF.setText(selectedCar.getModellObject().getCarModel());
@@ -1552,7 +1704,7 @@ public class Main extends Application {
 					reservationsLV.getItems().clear();
 					  ArrayList<String> ls = new ArrayList<>();
 						for(Reservation r : Database.readReservationsTable("active", "")) {
-							if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())) {
+							if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber()) && !r.getStatusName().equals("Expired")) {
 							   ls.add(r.getPickupTime() + " - " + r.getReturnTime());
 							}
 						}
@@ -1641,30 +1793,75 @@ public class Main extends Application {
 
 				CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 										category, color, fuel, transm, manufDate, 
-										carKM, engSize, engPower, selectedCar.isCarIsOnRent(), features));
+										carKM, engSize, engPower, features));
 				
-				if(Database.checkExistingCar(vinNumber, "") == "") {
-					Alert alertWarn = new Alert(AlertType.WARNING);
-					alertWarn.setTitle("Updating a car");
-					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
-					alertWarn.setContentText("Car with the VIN number '" + vinNumber + 
-							                 "' doesn't exists! Please add as a new car! " +
-							                 "\n\nNote, that it is NOT possible to update the VIN number. " +
-							                 "In this case, please delete this car, and add as a new one!");
-					alertWarn.showAndWait();
-					return;
-				}
-				if(Database.checkExistingCar("", licPlate) == "") {
-					Alert alertWarn2 = new Alert(AlertType.WARNING);
-					alertWarn2.setTitle("Updating a car");
-					alertWarn2.setHeaderText("Please check again, it seems it's a new car!");
-					alertWarn2.setContentText("Car with the license plate '" + licPlate + 
-							                 "' doesn't exists! Please add as a new car! " +
-							                 "\n\nNote, that it is NOT possible to update the license plate. " +
-							                 "In this case, please delete this car, and add as a new one!");
-					alertWarn2.showAndWait();
-					return;
-				} else {
+					if(Database.checkExistingCar(vinNumber, "").equals("")) {
+						Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a car");
+						alertWarn.setHeaderText("Please check again, it seems it's a new car!");
+						alertWarn.setContentText("Car with the VIN number '" + vinNumber + 
+												"' doesn't exists! Please add as a new car! " +
+												"\n\nNote, that it is NOT possible to update the VIN number. " +
+												"In this case, please delete this car, and add as a new one!");
+						alertWarn.showAndWait();
+						return;
+					}
+					if(!selectedCar.getCarVinNumber().equals(vinNumber) && !Database.checkExistingCar(vinNumber, "").equals("")) {
+						Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a car");
+						alertWarn.setHeaderText("Please check again, it's an existing car!");
+						alertWarn.setContentText("Car with the VIN number '" + vinNumber + 
+												"' already exists!\n\n" +
+												"This car is a " + Database.checkExistingCar(vinNumber, ""));
+						alertWarn.showAndWait();
+						return;
+					}
+					if(Database.checkExistingCar("", licPlate).equals("")) {
+						Alert alertWarn2 = new Alert(AlertType.WARNING);
+						alertWarn2.setTitle("Updating a car");
+						alertWarn2.setHeaderText("Please check again, it seems it's a new car!");
+						alertWarn2.setContentText("Car with the license plate '" + licPlate + 
+												"' doesn't exists! Please add as a new car! " +
+												"\n\nNote, that it is NOT possible to update the license plate. " +
+												"In this case, please delete this car, and add as a new one!");
+						alertWarn2.showAndWait();
+						return;
+					}
+					if(!selectedCar.getCarLicensePlate().equals(licPlate) && !Database.checkExistingCar("", licPlate).equals("")) {
+						Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Updating a car");
+						alertWarn.setHeaderText("Please check again, it's an existing car!");
+						alertWarn.setContentText("Car with the license plate '" + licPlate + 
+												"' already exists!\n\n" +
+												"This car is a " + Database.checkExistingCar("", licPlate));
+						alertWarn.showAndWait();
+						return;
+					}
+					if(vinNumber.length() < 11) {
+						Alert alertWarn2= new Alert(AlertType.WARNING);
+						alertWarn2.setTitle("Updating a car");
+						alertWarn2.setHeaderText("Please check again the VIN number!");
+						alertWarn2.setContentText("Car's VIN number should be at least 11 characters " +
+												  "(in cars made after 1981 every VIN number should be 17 characters)!");
+						alertWarn2.showAndWait();
+						return;
+						
+					} if(engSize < minEngineSize) {
+						Alert alertWarn3= new Alert(AlertType.WARNING);
+						alertWarn3.setTitle("Updating a car");
+						alertWarn3.setHeaderText("Please check again the engine size!");
+						alertWarn3.setContentText("Is the engine size is really so small? Only " + engSize + " CCM?");
+						alertWarn3.showAndWait();
+						return;
+					} if(engPower < minEnginePower) {
+						Alert alertWarn4= new Alert(AlertType.WARNING);
+						alertWarn4.setTitle("Updating a car");
+						alertWarn4.setHeaderText("Please check again the engine power!");
+						alertWarn4.setContentText("Is the engine so weak? Engine power only " + engPower + " KW?");
+						alertWarn4.showAndWait();
+						return;
+					}
+					
 					Alert alertUpdate = new Alert(AlertType.CONFIRMATION);
 					alertUpdate.setTitle("Updating a car");
 					alertUpdate.setHeaderText("Please confirm!");
@@ -1677,7 +1874,7 @@ public class Main extends Application {
 							observCars.add(car);
 							selectedCar = car;
 						}
-				}
+				
 			  } catch (SQLException e1) {
 				  System.out.println("Something is wrong with the database - update car");
 				  e1.printStackTrace();
@@ -1686,18 +1883,6 @@ public class Main extends Application {
 					
 			
 //ADD NEW CAR ACTION
-			addCarButton.disableProperty().bind(brandTF.textProperty().isEmpty()
-											.or(modelTF.textProperty().isEmpty())
-											.or(kmTF.textProperty().isEmpty())
-											.or(yearPicker.valueProperty().isNull())
-											.or(carFuelBox.valueProperty().isNull())
-											.or(carTransmBox.valueProperty().isNull())
-											.or(carCategorieBox.valueProperty().isNull())
-											.or(licPlateTF.textProperty().isEmpty())
-											.or(vinNumTF.textProperty().isEmpty())
-											.or(carColorBox.valueProperty().isNull())
-											.or(engineSizeTF.textProperty().isEmpty())
-											.or(enginePowerTF.textProperty().isEmpty()));
 			
 			addCarButton.setOnAction(e -> {
 				try {
@@ -1723,7 +1908,7 @@ public class Main extends Application {
 					}
 					CarFX newCar = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 											category, color, fuel, transm, manufDate, 
-											carKM, engSize, engPower, false, features));
+											carKM, engSize, engPower, features));
 					//ALERT					
 					if(Database.checkExistingCar(vinNumber, "") != "") {
 						Alert alertWarn= new Alert(AlertType.WARNING);
@@ -1767,7 +1952,7 @@ public class Main extends Application {
 						alertWarn4.showAndWait();
 						return;
 					}
-					else {
+				
 						Alert alertAdd = new Alert(AlertType.CONFIRMATION);
 						alertAdd.setTitle("Adding a new car");
 						alertAdd.setHeaderText("Please confirm!");
@@ -1779,7 +1964,6 @@ public class Main extends Application {
 								observCars.add(newCar);
 								selectedCar = newCar;
 							}
-					}	
 				} catch (SQLException e1) {
 					System.out.println("Something is wrong with the database - adding a new car");
 					e1.printStackTrace();
@@ -1798,30 +1982,10 @@ public class Main extends Application {
 	}
 	
 	
-
 	
 	
 //RESERVATIONS MENU	
-	public BorderPane openReservationsMenu() {
-		BorderPane reservationsBP = new BorderPane();			
-//Search		
-		ComboBox<String> searchCB = new ComboBox<>();
-		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Reservation ID", "First name", "Last name"));
-		searchCB.getSelectionModel().selectFirst();
-		searchCB.setId("carSearchBox");
-		
-		TextField resSearchTF = new TextField();
-		resSearchTF.setDisable(true);
-		resSearchTF.setId("searchTF");
-		resSearchTF.promptTextProperty().bind(searchCB.valueProperty());
-		
-		HBox resSearchHB = new HBox(searchCB, resSearchTF);
-		resSearchHB.setPadding(new Insets(15, 0, 5, 0));
-		resSearchHB.setAlignment(Pos.CENTER);
-		resSearchHB.setSpacing(5);	
-		reservationsBP.setTop(resSearchHB);
-		
-//TableView
+	public TableView<ReservationFX> showReservationsTableView(){
 		TableColumn<ReservationFX, String> resNumCol = new TableColumn<>("Reservation nr.");
 		resNumCol.setPrefWidth(125);
 		resNumCol.setMinWidth(30);
@@ -1875,6 +2039,8 @@ public class Main extends Application {
 		statusCol.setMinWidth(30);
 		statusCol.setCellValueFactory(new PropertyValueFactory<>("statusName"));	
 		
+		observReservations.clear();
+		fillReservationsObservableList();
 		
 	    reservTableView = new TableView<>(observReservations);
 	    reservTableView.getColumns().addAll(resNumCol, custFirstNameCol, custLastNameCol, carCatCol, carLicensePlateCol,
@@ -1882,10 +2048,44 @@ public class Main extends Application {
 	    reservTableView.getSortOrder().add(pickupTimeCol);
 	    reservTableView.setPlaceholder(new Label("No reservations available!"));
 	    reservTableView.setPrefSize(1000, 570);
-		reservationsBP.setCenter(reservTableView);
 		
 		sortedListReservations.comparatorProperty().bind(reservTableView.comparatorProperty());
 		reservTableView.setItems(sortedListReservations);
+		
+		reservTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
+			if (newS != null) {
+				selectedRes = reservTableView.getSelectionModel().getSelectedItem();
+				printPdfButton.setDisable(false);
+				deleteResButton.setDisable(false);
+				showResButton.setDisable(false);
+			}
+		});
+		
+		return reservTableView;
+	}
+
+	
+
+	public BorderPane openReservationsMenu() {
+		reservationsBP = new BorderPane();			
+//Search		
+		ComboBox<String> searchCB = new ComboBox<>();
+		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Reservation ID", "First name", "Last name"));
+		searchCB.getSelectionModel().selectFirst();
+		searchCB.setId("carSearchBox");
+		
+		TextField resSearchTF = new TextField();
+		resSearchTF.setDisable(true);
+		resSearchTF.setId("searchTF");
+		resSearchTF.promptTextProperty().bind(searchCB.valueProperty());
+		
+		HBox resSearchHB = new HBox(searchCB, resSearchTF);
+		resSearchHB.setPadding(new Insets(15, 0, 5, 0));
+		resSearchHB.setAlignment(Pos.CENTER);
+		resSearchHB.setSpacing(5);	
+		reservationsBP.setTop(resSearchHB);
+		
+		reservationsBP.setCenter(showReservationsTableView());
 		
 //Searching	
 		searchCB.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -1932,7 +2132,7 @@ public class Main extends Application {
 			
 //Bottom Buttons		
 //PRINT PDF			
-		Button printPdfButton = new Button("Print PDF");
+		printPdfButton = new Button("Print PDF");
 		printPdfButton.setId("printPdfButton");
 		printPdfButton.setDisable(true);
 		
@@ -1951,7 +2151,7 @@ public class Main extends Application {
 		          }
 		        });
 //DELETE		
-		Button deleteResButton = new Button("Cancel");
+		deleteResButton = new Button("Cancel");
 		deleteResButton.setId("deleteResButton");
 		deleteResButton.setDisable(true);
 		
@@ -1970,7 +2170,7 @@ public class Main extends Application {
 		          }
 		        });
 //SHOW RES		
-		Button showResButton = new Button("Details");
+		showResButton = new Button("Details");
 		showResButton.setId("showResButton");
 		showResButton.setDisable(true);
 		
@@ -1988,38 +2188,7 @@ public class Main extends Application {
 		        	  showResButton.setEffect(null);
 		          }
 		        });
-		
-//RETURN CAR		
-		Button returnCarButton = new Button("Return car");
-		returnCarButton.setId("returnCarButton");
-		returnCarButton.setDisable(true);
-		
-		returnCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
-		        new EventHandler<MouseEvent>() {
-		          @Override
-		          public void handle(MouseEvent e) {
-		        	  returnCarButton.setEffect(shadow);
-		          }
-		        });
-		returnCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
-		        new EventHandler<MouseEvent>() {
-		          @Override
-		          public void handle(MouseEvent e) {
-		        	  returnCarButton.setEffect(null);
-		          }
-		        });
-		
-		
-		reservTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
-			if (newS != null) {
-				selectedRes = reservTableView.getSelectionModel().getSelectedItem();
-				printPdfButton.setDisable(false);
-				deleteResButton.setDisable(false);
-				showResButton.setDisable(false);
-				returnCarButton.setDisable(false);	
-			}
-		});
-				
+	
 		
 //PRINT PDF ON ACTION
 		
@@ -2028,6 +2197,20 @@ public class Main extends Application {
 		
 //DELETE RES ON ACTION
 		deleteResButton.setOnAction(e -> {
+			for(ReservationFX r : observReservations) {
+				if(r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())) {
+					if(r.getModellObject().getStatusName().equals("Cancelled")) {
+					Alert alertWarn= new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Cancelling a reservation");
+					alertWarn.setHeaderText("Please check again, already cancelled!");
+					alertWarn.setContentText("You wanted to cancel this reservation '" + r.getResNumberID() + "', " +
+											 "but it's already cancelled.");
+					alertWarn.showAndWait();
+					return;
+					}
+				}
+			}
+			
 			Alert alertCancel = new Alert(AlertType.CONFIRMATION);
 			alertCancel.setTitle("Cancelling a reservation");
 			alertCancel.setHeaderText("Please confirm!");
@@ -2065,25 +2248,18 @@ public class Main extends Application {
 			
 			
 		});
-		
-	
-		
+			
 //UPDATE RES ON ACTION
 		showResButton.setOnAction(e -> {
 			mainTabPane.getSelectionModel().select(reserveTab);
 			resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
 			rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
 		});
-
-		
-		
-//RETURN CAR ON ACTION		
-	
 		
 	    HBox bottomHBox = new HBox();
 		bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 		bottomHBox.setSpacing(10);
-		bottomHBox.getChildren().addAll(printPdfButton, deleteResButton, showResButton, returnCarButton);
+		bottomHBox.getChildren().addAll(deleteResButton, printPdfButton, showResButton);
 		bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
 		reservationsBP.setBottom(bottomHBox);
 	    
@@ -2096,7 +2272,7 @@ public class Main extends Application {
 	
 	
 	
-//METHODS for CARS menu
+//METHODS for menu
 //Initialize lists, reading data out from cars database	
 	public void fillCarsObservableList(String active, String deactive) {
 		 observCars = FXCollections.observableArrayList();
@@ -2147,7 +2323,7 @@ public class Main extends Application {
 	}
 	
 
-//METHODS for RESERVATIONS menu	
+
 //Insurances	
 	public ArrayList<String> insurancesList(){
 		ArrayList<String> insuranceTypes = new ArrayList<>();

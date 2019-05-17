@@ -1,7 +1,12 @@
 package wifi.agardi.fmsproject;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class Car {
 	private String carVinNumber;
@@ -16,20 +21,14 @@ public class Car {
 	private int carKM;
 	private int carEngineSize;
 	private int carEnginePower;
-	private boolean carIsOnRent;
 	private ArrayList<String> carFeatures;
-	
-	
-	public Car() {
-		super();
-	}
-	
+	private boolean isOnRent;
 	
 
 
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
 			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
-			int carEngineSize, int carEnginePower, boolean carIsOnRent, ArrayList<String> carFeatures) {
+			int carEngineSize, int carEnginePower, ArrayList<String> carFeatures) {
 		super();
 		this.carVinNumber = carVinNumber;
 		this.carLicensePlate = carLicensePlate;
@@ -43,7 +42,6 @@ public class Car {
 		this.carKM = carKM;
 		this.carEngineSize = carEngineSize;
 		this.carEnginePower = carEnginePower;
-		this.carIsOnRent = carIsOnRent;
 		this.carFeatures = carFeatures;
 	}
 
@@ -172,16 +170,6 @@ public class Car {
 	
 
 
-	public boolean isCarIsOnRent() {
-		return carIsOnRent;
-	}
-
-
-	public void setCarIsOnRent(boolean carIsOnRent) {
-		this.carIsOnRent = carIsOnRent;
-	}
-
-
 	public ArrayList<String> getCarFeatures() {
 		return carFeatures;
 	}
@@ -192,6 +180,26 @@ public class Car {
 	}
 
 
+	public boolean isOnRent() {
+		try {
+			for(Reservation r : Database.readReservationsTable("active", "")) {
+				if(this.getCarVinNumber().equals(r.getCar().getCarVinNumber())) {
+					if(r.getPickupTime().isBefore(LocalDateTime.now()) && r.getReturnTime().isAfter(LocalDateTime.now())) {
+					    return true;
+						}
+					} 
+				}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the read reservations table in the Car object, requesting isOnRent");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+	public void setOnRent(boolean isOnRent) {
+		this.isOnRent = isOnRent;
+	}
 
 	
 	

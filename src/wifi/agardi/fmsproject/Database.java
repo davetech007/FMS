@@ -1254,7 +1254,6 @@ public class Database {
 						actualKMCol + " INTEGER, " +
 						engineSizeCol + " INTEGER, " +
 						enginePowerCol + " INTEGER, " +
-						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						"PRIMARY KEY (" + vinNumberIDCol + "), " +
 						"FOREIGN KEY (" + categoryIDCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
@@ -1291,7 +1290,7 @@ public class Database {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try {
 			conn = DriverManager.getConnection(connString);
@@ -1314,7 +1313,6 @@ public class Database {
 			pstmt.setInt(11, car.getCarEngineSize());
 			pstmt.setInt(12, car.getCarEnginePower());
 			pstmt.setBoolean(13, false);
-			pstmt.setBoolean(14, false);
 			
 			pstmt.executeUpdate();
 			
@@ -1351,8 +1349,7 @@ public class Database {
 												manufactureDateCol + " = ?, " + 
 												actualKMCol + " = ?, " + 
 												engineSizeCol + " = ?, " + 
-												enginePowerCol + " = ?, " + 
-												isOnRentCol + " = ? " + 
+												enginePowerCol + " = ? " + 
 												"WHERE " + vinNumberIDCol + " = ?";
 		
 		try {
@@ -1374,8 +1371,7 @@ public class Database {
 			pstmt.setInt(9, car.getCarKM());
 			pstmt.setInt(10, car.getCarEngineSize());
 			pstmt.setInt(11, car.getCarEnginePower());
-			pstmt.setBoolean(12, car.isCarIsOnRent());
-			pstmt.setString(13, car.getCarVinNumber());
+			pstmt.setString(12, car.getCarVinNumber());
 			
 			pstmt.executeUpdate();
 	
@@ -1462,7 +1458,6 @@ public class Database {
 								  rs.getInt(actualKMCol),
 								  rs.getInt(engineSizeCol),
 								  rs.getInt(enginePowerCol),
-								  rs.getBoolean(isOnRentCol),
 								  readCarFeatures(vinNum));
 				cars.add(car);
 			}
@@ -1561,8 +1556,7 @@ public class Database {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		String update = "UPDATE " + carsTable + " SET " + 
-												actualKMCol + " = ?, " + 
-												isOnRentCol + " = ? " + 
+												actualKMCol + " = ? " + 
 												"WHERE " + vinNumberIDCol + " = ?";
 		
 		try {
@@ -1570,8 +1564,7 @@ public class Database {
 			pstmt = conn.prepareStatement(update);
 			
 			pstmt.setInt(1, car.getCarKM());
-			pstmt.setBoolean(2, car.isCarIsOnRent());
-			pstmt.setString(3, car.getCarVinNumber());
+			pstmt.setString(2, car.getCarVinNumber());
 			
 			pstmt.executeUpdate();
 			System.out.println("Car returned successfully");
@@ -2004,52 +1997,6 @@ public class Database {
 	   }
 	
 
-	public static String checkExistingCustomer(String passport, String dLicense, String custID) throws SQLException {
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		String customer = "";
-	    String select = "SELECT " + firstNameCol + ", " + lastNameCol + " FROM " + customersTable;
-		String where = "";
-		   if(passport != null && passport.length() > 0) {
-			   where = passportNumCol + " = '" + passport + "'";
-		   }
-		   if(dLicense != null && dLicense.length() > 0) {
-			   where = driversLicCol + " = '" + dLicense + "'";
-		   }
-		   if(custID != null && custID.length() > 0) {
-			   where = customerIDCol + " = '" + custID + "'";
-		   }
-		   if(where.length() > 0) {
-			   select += " WHERE " + where;
-		   }
-		
-		try {
-			conn = DriverManager.getConnection(connString);
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(select);
-		    if(rs.next()) {
-		    	customer = rs.getString(firstNameCol) + " " + rs.getString(lastNameCol);
-		    }
-		    return customer;
-		} catch (SQLException e) {
-			System.out.println("Something is wrong with checkExistingCustomer database connection");
-			e.printStackTrace();
-		} finally {
-			try {
-				if(stmt != null)
-				  stmt.close();
-				if(conn != null)
-				  conn.close();
-			}
-		catch(SQLException e) {
-			throw e;
-		  }
-		}
-		return null;
-	}
-	
-
 	public static void activateDeletedCustomer(String customerID) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -2273,7 +2220,8 @@ public class Database {
 		  Statement stmt = null;
 		  ResultSet rs = null;
 		  ArrayList<Reservation> reservations = new ArrayList<>();
-		  
+		  Customer customer = null;
+		  Car car = null;
 		  String select = "SELECT * FROM " + reservationsTable;
 		  String where = "";
 		   if(active.equals("active") && cancelled == "") {
@@ -2299,13 +2247,12 @@ public class Database {
 				
 				String resNum = rs.getString(reservationNumberIDCol);
 				
-				Customer customer = null;
+				
 				for(Customer s : Database.readCustomersTable("", "")) {
 					if(s.getCustomerID().equals(rs.getString(customerIDCol))) {
 						customer = s;
 					}
 				}
-				Car car = new Car();
 				for(Car c : Database.readCarsTable("", "")) {
 					if(c.getCarVinNumber().equals(rs.getString(vinNumberIDCol))) {
 					    car = c;

@@ -27,8 +27,8 @@ public class CarFX {
 	private IntegerProperty carKM;
 	private IntegerProperty carEngineSize;
 	private IntegerProperty carEnginePower;
-	private BooleanProperty carIsOnRent;
 	private ArrayList<String> carFeatures = new ArrayList<>();
+	private BooleanProperty isOnRent;
 	
 	
 	public CarFX(Car car) {
@@ -45,7 +45,7 @@ public class CarFX {
 		carKM = new SimpleIntegerProperty(car.getCarKM());
 		carEngineSize = new SimpleIntegerProperty(car.getCarEngineSize());
 		carEnginePower = new SimpleIntegerProperty(car.getCarEnginePower());
-		carIsOnRent = new SimpleBooleanProperty(car.isCarIsOnRent());
+		isOnRent = new SimpleBooleanProperty(car.isOnRent());
 	}
 	
 	
@@ -226,23 +226,7 @@ public class CarFX {
 	}
 	
 	
-	
-	
-	
-	public boolean isCarIsOnRent() {
-		return carIsOnRent.get();
-	}
-	public void setCarIsOnRent(boolean v) {
-		carIsOnRent.set(v);
-		modellObject.setCarIsOnRent(v);
-	}
-	public BooleanProperty carIsOnRentProperty() {
-		return carIsOnRent;
-	}
 
-
-	
-	
 
 	public ArrayList<String> getCarExtras() {
 		return carFeatures;
@@ -252,7 +236,12 @@ public class CarFX {
 	}
 
 
-	
+	public boolean isOnRent() {
+		return isOnRent.get();
+	}
+	public BooleanProperty isOnRentProperty() {
+		return isOnRent;
+	}
 	
 	
 

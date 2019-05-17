@@ -153,8 +153,8 @@ public class Reservation {
 		if(getReturnTime().isBefore(LocalDateTime.now())) {
 			return "Expired";
 		}
-		if(getCar().isCarIsOnRent() == true) {
-			return "On rent";
+		if(isStatus() == false && getPickupTime().isBefore(LocalDateTime.now()) && getReturnTime().isAfter(LocalDateTime.now())) {
+			return "OnRent";
 		}
 		if(isStatus() == false) {
 			return "Active";
