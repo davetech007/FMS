@@ -28,7 +28,7 @@ public class Car {
 
 	public Car(String carVinNumber, String carLicensePlate, String carBrand, String carModel, String carCategory,
 			String carColor, String carFuelType, String carTransmission, LocalDate carManufDate, int carKM,
-			int carEngineSize, int carEnginePower, ArrayList<String> carFeatures) {
+			int carEngineSize, int carEnginePower, ArrayList<String> carFeatures, boolean isOnRent) {
 		super();
 		this.carVinNumber = carVinNumber;
 		this.carLicensePlate = carLicensePlate;
@@ -43,6 +43,7 @@ public class Car {
 		this.carEngineSize = carEngineSize;
 		this.carEnginePower = carEnginePower;
 		this.carFeatures = carFeatures;
+		this.isOnRent = isOnRent;
 	}
 
 	
@@ -178,27 +179,15 @@ public class Car {
 	public void setCarFeatures(ArrayList<String> carFeatures) {
 		this.carFeatures = carFeatures;
 	}
-
-
-	public boolean isOnRent() {
-		try {
-			for(Reservation r : Database.readReservationsTable("active", "")) {
-				if(this.getCarVinNumber().equals(r.getCar().getCarVinNumber())) {
-					if(r.getPickupTime().isBefore(LocalDateTime.now()) && r.getReturnTime().isAfter(LocalDateTime.now())) {
-					    return true;
-						}
-					} 
-				}
-		} catch (SQLException e) {
-			System.out.println("Something is wrong with the read reservations table in the Car object, requesting isOnRent");
-			e.printStackTrace();
-		}
-		return false;
-	}
+	
 
 
 	public void setOnRent(boolean isOnRent) {
 		this.isOnRent = isOnRent;
+	}
+
+	public boolean isOnRent() {
+		return isOnRent;
 	}
 
 	

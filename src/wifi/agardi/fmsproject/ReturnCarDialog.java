@@ -1,9 +1,6 @@
 package wifi.agardi.fmsproject;
 
 
-import java.time.LocalDate;
-
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ButtonType;
@@ -11,24 +8,22 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
-public class ReturnCarDialog extends Dialog<ButtonType>{
-	int oldKm = 0;
+public class ReturnCarDialog extends Dialog<Integer>{
 	int newKm = 0;
 	
-	public ReturnCarDialog(ReservationFX res, LocalDate returnDate) {
+	public ReturnCarDialog(Car car) {
 		super();
-		this.setTitle("Returning a car");
-		
-		oldKm = res.getModellObject().getCar().getCarKM();
-		this.setHeaderText("Returning '" + res.getModellObject().getCar().getCarLicensePlate() + "'\n" +
-							"Return date: " + returnDate +"\n" +
-							"Old km : " + oldKm + " km");
+		this.setTitle("Check in car");
+
+		this.setHeaderText("Check in '" + car.getCarLicensePlate() + "' \n" +
+						   "Old km : " + car.getCarKM() + " km");
 		
 		Label lbMessage = new Label();
 		
 		TextField kmTF = new TextField();
-		kmTF.setPromptText("New km");
+		kmTF.setText(Integer.toString(car.getCarKM()));
 		
 		kmTF.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -39,12 +34,7 @@ public class ReturnCarDialog extends Dialog<ButtonType>{
                 }
             }
         });
-        
-		if(!kmTF.getText().isEmpty()) {
-			newKm = Integer.parseInt(kmTF.getText());
- 		}
-		
-		
+       
 		VBox vb = new VBox(kmTF,lbMessage);
 
 		this.getDialogPane().setContent(vb);
@@ -58,22 +48,20 @@ public class ReturnCarDialog extends Dialog<ButtonType>{
 		this.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(kmTF.textProperty().isEmpty());
 		
 		
-//		this.setResultConverter(new Callback<ButtonType, >(){
-//			@Override
-//			public ReservationFX call(ButtonType bt) {
-//				if(bt == ok && newKm <= oldKm) {
-//					 Alert alertWarn= new Alert(AlertType.WARNING);
-//						alertWarn.setTitle("Deleting a car");
-//						alertWarn.setHeaderText("New km should be bigger than the old km!");
-//						alertWarn.showAndWait();
-//				}
-//				return null;
-//			}
-//		});	
-	
-		
-		
+		this.setResultConverter(new Callback<ButtonType, Integer>(){
+			@Override
+			public Integer call(ButtonType bt) {
+				if(!kmTF.getText().isEmpty() && bt == ok) {
+					newKm = Integer.parseInt(kmTF.getText());
+						if(newKm > car.getCarKM()) {
+							return newKm;
+						}
+				}
+				return null;
+			}
+		});	
 	}
+
 	
 
 }

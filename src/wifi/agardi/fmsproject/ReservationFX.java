@@ -202,6 +202,7 @@ public class ReservationFX {
 	public BooleanProperty isStatusProperty() {
 		return status;
 	}
+	
 
 	
 	public String getStatusName() {

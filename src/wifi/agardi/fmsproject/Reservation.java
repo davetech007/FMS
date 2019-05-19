@@ -145,22 +145,16 @@ public class Reservation {
 		this.status = status;
 	}
 	
-	
-	
-	
 
 	public String getStatusName() {
-		if(getReturnTime().isBefore(LocalDateTime.now())) {
-			return "Expired";
-		}
-		if(isStatus() == false && getPickupTime().isBefore(LocalDateTime.now()) && getReturnTime().isAfter(LocalDateTime.now())) {
-			return "OnRent";
+		if(isStatus() == false && getReturnTime().isBefore(LocalDateTime.now())) {
+			return "2_Expired";
 		}
 		if(isStatus() == false) {
-			return "Active";
+			return "1_Active";
 		}
 		if(isStatus() == true){
-			return "Cancelled";
+			return "3_Cancelled";
 		}
 		return "";
 	}
@@ -169,11 +163,10 @@ public class Reservation {
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
 	}
-	
+
 	
 	
 
-	
 	
 
 }

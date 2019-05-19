@@ -1254,6 +1254,7 @@ public class Database {
 						actualKMCol + " INTEGER, " +
 						engineSizeCol + " INTEGER, " +
 						enginePowerCol + " INTEGER, " +
+						isOnRentCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						isDeactiveCol + " BOOLEAN DEFAULT FALSE NOT NULL, " +
 						"PRIMARY KEY (" + vinNumberIDCol + "), " +
 						"FOREIGN KEY (" + categoryIDCol + ") REFERENCES " + categoriesTable + "(" + categoryIDCol + "), " +
@@ -1290,7 +1291,7 @@ public class Database {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String add = "INSERT INTO " + carsTable + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try {
 			conn = DriverManager.getConnection(connString);
@@ -1313,6 +1314,7 @@ public class Database {
 			pstmt.setInt(11, car.getCarEngineSize());
 			pstmt.setInt(12, car.getCarEnginePower());
 			pstmt.setBoolean(13, false);
+			pstmt.setBoolean(14, false);
 			
 			pstmt.executeUpdate();
 			
@@ -1349,7 +1351,8 @@ public class Database {
 												manufactureDateCol + " = ?, " + 
 												actualKMCol + " = ?, " + 
 												engineSizeCol + " = ?, " + 
-												enginePowerCol + " = ? " + 
+												enginePowerCol + " = ?, " + 
+												isOnRentCol + " = ? " + 
 												"WHERE " + vinNumberIDCol + " = ?";
 		
 		try {
@@ -1371,7 +1374,8 @@ public class Database {
 			pstmt.setInt(9, car.getCarKM());
 			pstmt.setInt(10, car.getCarEngineSize());
 			pstmt.setInt(11, car.getCarEnginePower());
-			pstmt.setString(12, car.getCarVinNumber());
+			pstmt.setBoolean(12, car.isOnRent());
+			pstmt.setString(13, car.getCarVinNumber());
 			
 			pstmt.executeUpdate();
 	
@@ -1458,7 +1462,8 @@ public class Database {
 								  rs.getInt(actualKMCol),
 								  rs.getInt(engineSizeCol),
 								  rs.getInt(enginePowerCol),
-								  readCarFeatures(vinNum));
+								  readCarFeatures(vinNum),
+								  rs.getBoolean(isOnRentCol));
 				cars.add(car);
 			}
 			rs.close();	
@@ -1552,19 +1557,54 @@ public class Database {
 	}
 	
 	
-	public static void returnCar(Car car) throws SQLException {
+	public static void checkOutCar(String vinNum) throws SQLException {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		String update = "UPDATE " + carsTable + " SET " + 
-												actualKMCol + " = ? " + 
+												isOnRentCol + " = ? " + 
 												"WHERE " + vinNumberIDCol + " = ?";
 		
 		try {
 			conn = DriverManager.getConnection(connString);
 			pstmt = conn.prepareStatement(update);
 			
-			pstmt.setInt(1, car.getCarKM());
-			pstmt.setString(2, car.getCarVinNumber());
+			pstmt.setBoolean(1, true);
+			pstmt.setString(2, vinNum);
+			
+			pstmt.executeUpdate();
+			System.out.println("Car rented out successfully");
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the rentOutCar database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void checkInCar(String vinNum, int km) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String update = "UPDATE " + carsTable + " SET " + 
+												actualKMCol + " = ?, " + 
+												isOnRentCol + " = ? " + 
+												"WHERE " + vinNumberIDCol + " = ?";
+		
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(update);
+			
+			pstmt.setInt(1, km);
+			pstmt.setBoolean(2, false);
+			pstmt.setString(3, vinNum);
 			
 			pstmt.executeUpdate();
 			System.out.println("Car returned successfully");
@@ -1583,6 +1623,8 @@ public class Database {
 			}
 	    }
 	}
+
+	
 	
 	
 	
@@ -2104,6 +2146,7 @@ public class Database {
 			pstmt.setTimestamp(9, sqlrTime);
 			pstmt.setString(10, res.getResNotes());
 			pstmt.setBoolean(11, false);
+			
 			pstmt.executeUpdate();
 			
 			addReservationExtras(res.getResExtras(), res.getResNumberID());
@@ -2291,7 +2334,6 @@ public class Database {
 		  }
 		  return reservations;
 	   }
-	
 	
 	
 	

@@ -1,5 +1,7 @@
 package wifi.agardi.fmsproject;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ import org.apache.derby.iapi.store.raw.FetchDescriptor;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
@@ -50,6 +54,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -75,7 +80,8 @@ public class Main extends Application {
 	Tab carsTab;
 	Tab reserveTab;
 	Tab reservationsTab;
-
+	
+	
 	TableView<CarFX> carsTableView;
 	CarFX selectedCar;
 	private ObservableList<CarFX> observCars;
@@ -97,11 +103,11 @@ public class Main extends Application {
 	private SortedList<ReservationFX> sortedListReservations;
 	
 	BorderPane reservationsBP;
-	
+
 	Button printPdfButton;
 	Button deleteResButton;
 	Button showResButton;
-	Button returnCarButton;
+	
 
 //LOGIN WINDOW	
 	@Override
@@ -282,7 +288,6 @@ public class Main extends Application {
 			reservationsTab.setOnSelectionChanged(e -> {
 				if(reservationsTab.isSelected()) {
 					mainTitle.setText("Manage reservations");
-//					reservationsBP.setCenter(null);
 					reservationsBP.setCenter(showReservationsTableView());
 				}
 			});
@@ -315,7 +320,6 @@ public class Main extends Application {
 			minutes.add("15");
 			minutes.add("30");
 			minutes.add("45");
-
 		
 			BorderPane reserveBP = new BorderPane();
 			GridPane reserveGP = new GridPane();
@@ -653,26 +657,6 @@ public class Main extends Application {
 			          }
 			        });
 			
-//RETURN CAR		
-			returnCarButton = new Button("Return car");
-			returnCarButton.setId("returnCarButton");
-			returnCarButton.setDisable(true);
-			
-			returnCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
-			        new EventHandler<MouseEvent>() {
-			          @Override
-			          public void handle(MouseEvent e) {
-			        	  returnCarButton.setEffect(shadow);
-			          }
-			        });
-			returnCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
-			        new EventHandler<MouseEvent>() {
-			          @Override
-			          public void handle(MouseEvent e) {
-			        	  returnCarButton.setEffect(null);
-			          }
-			        });	
-			
 			
 		Button updateResButton = new Button("Update");
 			updateResButton.setId("updateResButton");
@@ -710,7 +694,6 @@ public class Main extends Application {
 			        	  reserveButton.setEffect(null);
 			          }
 			        });
-			
 			
 			
 			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
@@ -1049,41 +1032,11 @@ public class Main extends Application {
 						}
 						updateResButton.disableProperty().bind(resCustObs); 
 						calcPriceButton.fire();
-						
-						dateReturnPicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
-							@Override
-							public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue,
-									LocalDate newValue) {
-									if(selectedRes != null && newValue.isBefore(LocalDate.now().plusDays(1)) && 
-													selectedRes.getModellObject().getStatusName().equals("OnRent")) {
-										returnCarButton.setDisable(false);
-									} 
-									else {
-										returnCarButton.setDisable(true);
-									}
-							  }
-						});	
 					}
 				}
 				
 			});
-			
-			
-//RETURN CAR ON ACTION		
-			returnCarButton.setOnAction(e -> {
-				ReturnCarDialog retCar = new ReturnCarDialog(selectedRes, dateReturnPicker.getValue());
-				Optional<ButtonType> result = retCar.showAndWait();
-				if (result.isPresent())
-					if (result.get() == ButtonType.OK) {
-						
-					}
-					else {
-						
-					}
-			});
-			
-			
-			
+				
 //RESERVE BUTTON ON ACTION			
 			reserveButton.setOnAction(e -> {
 			  try {	
@@ -1124,7 +1077,6 @@ public class Main extends Application {
 						alertWarn.showAndWait();
 					 return;
 				}
-				
 				
 
 				for(Reservation r : Database.readReservationsTable("active", "")) {
@@ -1244,7 +1196,7 @@ public class Main extends Application {
 				}
 			});
 
-			HBox bottomHBoxRes = new HBox(returnCarButton, updateResButton, reserveButton);
+			HBox bottomHBoxRes = new HBox(updateResButton, reserveButton);
 			bottomHBoxRes.setPadding(new Insets(0, 5, 0, 0));
 			bottomHBoxRes.setSpacing(10);
 			bottomHBoxRes.setAlignment(Pos.BOTTOM_RIGHT);
@@ -1265,7 +1217,7 @@ public class Main extends Application {
 	
 
 //CARS MENU	
-	public VBox showCarsTableView() {
+	public TableView<CarFX> showCarsTableView() {
 		TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
 		categorieCol.setPrefWidth(80);
 		categorieCol.setMinWidth(30);
@@ -1283,9 +1235,10 @@ public class Main extends Application {
 		modellCol.setCellValueFactory(new PropertyValueFactory<>("carModel"));
     
 		TableColumn<CarFX, String> licPlateCol = new TableColumn<>("License Plate");
-		licPlateCol.setPrefWidth(90);
+		licPlateCol.setPrefWidth(100);
 		licPlateCol.setMinWidth(30);
     	licPlateCol.setCellValueFactory(new PropertyValueFactory<>("carLicensePlate"));
+    	licPlateCol.setSortType(TableColumn.SortType.ASCENDING);
     
     	TableColumn<CarFX, String> fuelTypeCol = new TableColumn<>("Fuel Type");
     	fuelTypeCol.setPrefWidth(80);
@@ -1304,18 +1257,32 @@ public class Main extends Application {
 	    		setText(empty ? null : item ? "OnRent" : "Ready" );
 	    	}
     	});
+
   
     	carsTableView = new TableView<>(observCars);
 		carsTableView.setPrefHeight(570);
 		carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
-		//carsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		carsTableView.getSortOrder().add(categorieCol);
+		carsTableView.getSortOrder().addAll(categorieCol, licPlateCol);
 		carsTableView.setPlaceholder(new Label("No cars available!"));
 	
 	 	sortedListCars.comparatorProperty().bind(carsTableView.comparatorProperty());
 	 	carsTableView.setItems(sortedListCars);
+
+		return carsTableView;	
+}
+
 	
-	 		VBox carsLeftVBox = new VBox();
+	
+	public BorderPane openCarsMenu() {
+		Label basePriceLB = new Label("Base price = ");
+			BorderPane carsBP = new BorderPane();
+		    GridPane carsGP = new GridPane();
+		    carsGP.setAlignment(Pos.CENTER_RIGHT);
+		    carsGP.setHgap(15);
+		    carsGP.setVgap(10);
+		    carsGP.setMinSize(0, 0);	      
+
+			VBox carsLeftVBox = new VBox();
 			carsLeftVBox.setSpacing(5);
 //Searching		
 			Label carSearchLB = new Label("Search for a car");
@@ -1326,17 +1293,24 @@ public class Main extends Application {
 			   for(String s: categoriesList()) {
 			    	categoriesAll.add(s);
 			    }
-			ComboBox<String>  carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesAll));
+			ComboBox<String> carSearchBox = new ComboBox<>(FXCollections.observableArrayList(categoriesAll));
 			carSearchBox.setId("carSearchBox");
 			carSearchBox.getSelectionModel().select(0);
 			
 			TextField searchTF = new TextField();
 			searchTF.setId("searchTF");
 			searchTF.setPromptText("License plate nr.");
+				    
+		    HBox carSearchHB = new HBox();
+			carSearchHB.setAlignment(Pos.CENTER_LEFT);
+			carSearchHB.setSpacing(5);	
+			carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, searchTF);
+			carsLeftVBox.getChildren().add(carSearchHB);
+			carsLeftVBox.getChildren().add(showCarsTableView());
+			
 
-//SEARCHING LISTENERS
-					
-				
+			//SEARCHING LISTENERS
+								
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
@@ -1347,7 +1321,7 @@ public class Main extends Application {
 					searchTF.setDisable(true);
 				}
 			});
-		    
+					    
 			searchTF.textProperty().addListener((obs2, oldV2, newV2) -> {
 				if(newV2 == null || newV2.length() == 0) {
 					filteredListCars.setPredicate(s -> true);
@@ -1355,35 +1329,13 @@ public class Main extends Application {
 				else {
 					filteredListCars.setPredicate(s -> s.getModellObject().getCarLicensePlate().toLowerCase().contains(newV2));
 				}
-			});
-		
-			HBox carSearchHB = new HBox();
-			carSearchHB.setAlignment(Pos.CENTER_LEFT);
-			carSearchHB.setSpacing(5);	
-			carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, searchTF);
-				
-			carsLeftVBox.getChildren().add(carSearchHB);
-			carsLeftVBox.getChildren().add(carsTableView);	
-		
-		return carsLeftVBox;	
-}
-
-	
-	
-	public BorderPane openCarsMenu() {
-		Label basePriceLB = new Label("Base price = ");
-		    BorderPane carsBP = new BorderPane();
-		    GridPane carsGP = new GridPane();
-		    carsGP.setAlignment(Pos.CENTER_RIGHT);
-		    carsGP.setHgap(15);
-		    carsGP.setVgap(10);
-		    carsGP.setMinSize(0, 0);
-		      
+			});	
+		    
 		    HBox carsHB = new HBox(); 
 		    carsHB.setAlignment(Pos.CENTER);
 		    carsHB.setPadding(new Insets(15,0,0,0));
 		    carsHB.setSpacing(20);
-		    carsHB.getChildren().add(showCarsTableView());
+		    carsHB.getChildren().add(carsLeftVBox);
 		    carsHB.getChildren().add(carsGP);
 		    carsBP.setCenter(carsHB);
 		    
@@ -1461,8 +1413,7 @@ public class Main extends Application {
 		    carsGP.add(reservationsLV, 0, 8);
 		    reservationsLV.setPrefSize(195, 130);
 	
-		        
-		
+		        	
 //GridPane RIGHT SIDE	
 //CATEGORIES
 		    ComboBox<String> carCategorieBox = new ComboBox<>(FXCollections.observableArrayList(categoriesList()));
@@ -1566,13 +1517,33 @@ public class Main extends Application {
 		    featuresLV.setCellFactory(CheckBoxListCell.forListView(itemToBoolean));
 		    featuresLV.setPrefSize(195, 245);
 		    carsGP.add(featuresLV, 1, 8);
-		    
-		   
+		     
 //Price		    
 		    carsGP.add(basePriceLB, 1, 9);
  
 	    
 //Bottom BUTTONS, first the design, then the function
+//ON RENT 		
+		Button onRentButton = new Button("On rent");
+		  	onRentButton.setId("onRentButton");
+		  	onRentButton.setDisable(true);
+		  		
+		  	onRentButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+		  				new EventHandler<MouseEvent>() {
+		  				  @Override
+		  				  public void handle(MouseEvent e) {
+		  					  onRentButton.setEffect(shadow);
+		  		          }
+		  		        });
+		  	onRentButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+		  		        new EventHandler<MouseEvent>() {
+		  		          @Override
+		  		          public void handle(MouseEvent e) {
+		  		        	  onRentButton.setEffect(null);
+		  		          }
+		  				});	    
+	  
+		  
 		Button makeResButton = new Button("Reserve");
 			makeResButton.setId("makeResButton");
 			makeResButton.setDisable(true);
@@ -1668,6 +1639,7 @@ public class Main extends Application {
 					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
 					deleteCarButton.setDisable(false);
 					makeResButton.setDisable(false);
+					onRentButton.setDisable(false);
 					updateCarButton.disableProperty().bind(carBT);
 					
 					brandTF.setText(selectedCar.getModellObject().getCarBrand());
@@ -1716,6 +1688,50 @@ public class Main extends Application {
 					}
 				}
 			});
+			
+			
+//ON RENT ON ACTION			
+			onRentButton.setOnAction(e -> {
+			   try {
+				String vinNum = selectedCar.getModellObject().getCarVinNumber();
+				if(selectedCar.isOnRent()) {
+					ReturnCarDialog retCar = new ReturnCarDialog(selectedCar.getModellObject());
+					Optional<Integer> result = retCar.showAndWait();
+					if(result.isPresent()) {
+						int km = result.get();
+							if(km < selectedCar.getModellObject().getCarKM()) {
+								System.out.println("The returned km must be BIGGER than the old km!");
+								return;
+							} else {
+								Database.checkInCar(vinNum, km);
+								observCars.remove(selectedCar);
+								for(Car c : Database.readCarsTable("active", "")) {
+									if(c.getCarVinNumber().equals(vinNum))
+									observCars.add(new CarFX(c));
+								}
+							}
+					}
+					return;
+				} else {
+				Alert alertConf = new Alert(AlertType.CONFIRMATION);
+				alertConf.setTitle("Check out car");
+				alertConf.setHeaderText("Please confirm!");
+				alertConf.setContentText("Check out '" + selectedCar.getModellObject().getCarLicensePlate() + "'?");
+				Optional<ButtonType> result = alertConf.showAndWait();
+					if(result.get() == ButtonType.OK) {
+						Database.checkOutCar(vinNum);
+						observCars.remove(selectedCar);
+						for(Car c : Database.readCarsTable("active", "")) {
+							if(c.getCarVinNumber().equals(vinNum))
+								observCars.add(new CarFX(c));
+						}
+					}
+				}
+				} catch (SQLException e1) {
+					System.out.println("Something is wrong with the onRent Database connection");
+					e1.printStackTrace();
+				}
+		   });
 				
 	
 //RESERVE CAR ACTION			
@@ -1793,7 +1809,7 @@ public class Main extends Application {
 
 				CarFX car = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 										category, color, fuel, transm, manufDate, 
-										carKM, engSize, engPower, features));
+										carKM, engSize, engPower, features, selectedCar.isOnRent()));
 				
 					if(Database.checkExistingCar(vinNumber, "").equals("")) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
@@ -1908,7 +1924,7 @@ public class Main extends Application {
 					}
 					CarFX newCar = new CarFX(new Car(vinNumber, licPlate, brand, model, 
 											category, color, fuel, transm, manufDate, 
-											carKM, engSize, engPower, features));
+											carKM, engSize, engPower, features, false));
 					//ALERT					
 					if(Database.checkExistingCar(vinNumber, "") != "") {
 						Alert alertWarn= new Alert(AlertType.WARNING);
@@ -1973,7 +1989,7 @@ public class Main extends Application {
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 			bottomHBox.setSpacing(10);
-			bottomHBox.getChildren().addAll(makeResButton, deleteCarButton, updateCarButton, addCarButton);
+			bottomHBox.getChildren().addAll(onRentButton, makeResButton, deleteCarButton, updateCarButton, addCarButton);
 			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
 		    carsBP.setBottom(bottomHBox);	
 			 
@@ -2037,7 +2053,8 @@ public class Main extends Application {
 		TableColumn<ReservationFX, String> statusCol = new TableColumn<>("Status");
 		statusCol.setPrefWidth(70);
 		statusCol.setMinWidth(30);
-		statusCol.setCellValueFactory(new PropertyValueFactory<>("statusName"));	
+		statusCol.setCellValueFactory(new PropertyValueFactory<>("statusName"));
+		statusCol.setSortType(TableColumn.SortType.ASCENDING);
 		
 		observReservations.clear();
 		fillReservationsObservableList();
@@ -2045,7 +2062,7 @@ public class Main extends Application {
 	    reservTableView = new TableView<>(observReservations);
 	    reservTableView.getColumns().addAll(resNumCol, custFirstNameCol, custLastNameCol, carCatCol, carLicensePlateCol,
 	    									pickupTimeCol, pickupLocCol, returnTimeCol, returnLocCol, statusCol);
-	    reservTableView.getSortOrder().add(pickupTimeCol);
+	    reservTableView.getSortOrder().addAll(statusCol, pickupTimeCol);
 	    reservTableView.setPlaceholder(new Label("No reservations available!"));
 	    reservTableView.setPrefSize(1000, 570);
 		
@@ -2056,8 +2073,8 @@ public class Main extends Application {
 			if (newS != null) {
 				selectedRes = reservTableView.getSelectionModel().getSelectedItem();
 				printPdfButton.setDisable(false);
-				deleteResButton.setDisable(false);
 				showResButton.setDisable(false);
+				deleteResButton.setDisable(false);
 			}
 		});
 		
@@ -2188,9 +2205,23 @@ public class Main extends Application {
 		        	  showResButton.setEffect(null);
 		          }
 		        });
-	
+
+		
 		
 //PRINT PDF ON ACTION
+		printPdfButton.setOnAction(e -> {
+			 if (selectedRes != null) {
+				 	PdfReservation pdfCreator = new PdfReservation();
+		 
+						try {
+							pdfCreator.pdfGenerateReservation(selectedRes.getModellObject());
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+			
+			 }
+		});
 		
 
 		
@@ -2249,17 +2280,18 @@ public class Main extends Application {
 			
 		});
 			
-//UPDATE RES ON ACTION
+//SHOW RES ON ACTION
 		showResButton.setOnAction(e -> {
 			mainTabPane.getSelectionModel().select(reserveTab);
 			resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
 			rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
 		});
 		
+		
 	    HBox bottomHBox = new HBox();
 		bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 		bottomHBox.setSpacing(10);
-		bottomHBox.getChildren().addAll(deleteResButton, printPdfButton, showResButton);
+		bottomHBox.getChildren().addAll(printPdfButton, deleteResButton, showResButton);
 		bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
 		reservationsBP.setBottom(bottomHBox);
 	    
@@ -2267,7 +2299,6 @@ public class Main extends Application {
 		return reservationsBP;
 		
 	}
-	
 	
 	
 	
