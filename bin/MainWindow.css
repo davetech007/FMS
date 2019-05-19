@@ -9,11 +9,11 @@
 }
 
 .tab {
-          
-    -fx-pref-width: 245
+    -fx-alignment: center;   
+    -fx-pref-width: 253
 } 
 .tab {
-
+    -fx-alignment: center;
     -fx-pref-height: 40
 } 
 
@@ -26,7 +26,7 @@
 }
 
 .tab-pane{
-    -fx-tab-min-width: 230.0px;
+    -fx-tab-min-width: 253.0px;
 }
 
 .tab-pane .tab {
@@ -48,6 +48,7 @@
 .tab:selected .tab-label {
      -fx-text-fill: #1e1003;
 }
+
 
 
 #reserveTab {

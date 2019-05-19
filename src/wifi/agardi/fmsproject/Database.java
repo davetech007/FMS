@@ -2533,6 +2533,7 @@ public class Database {
 				extras.put("Border crossing", 30);
 				extras.put("Young driver", 30);
 				extras.put("Additional driver", 20);
+				extras.put("Drop off abroad", 500);
 				
 			for(String key: extras.keySet()) {
 				Integer price = extras.get(key);

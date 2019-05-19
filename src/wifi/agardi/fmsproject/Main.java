@@ -1,5 +1,6 @@
 package wifi.agardi.fmsproject;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,8 +17,12 @@ import java.util.Optional;
 
 import org.apache.derby.iapi.store.raw.FetchDescriptor;
 
+import com.itextpdf.text.pdf.PdfReader;
+
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -231,9 +236,9 @@ public class Main extends Application {
 
 //MAIN WINDOW after login
 	public void mainMenu() {
-			Stage mainStage = new Stage();
+		    Stage mainStage = new Stage();
 			HBox mainHB = new HBox();
-			mainHB.setPadding(new Insets(15, 15 , 12, 15));
+			mainHB.setPadding(new Insets(15, 10 , 12, 10));
 			mainHB.setAlignment(Pos.CENTER);
 //Main Title		
 			Label mainTitle = new Label("Fleet Management System");
@@ -253,7 +258,7 @@ public class Main extends Application {
 			reserveTab.setContent(openReserveMenu());
 			reserveTab.setClosable(false);
 			reserveTab.setId("reserveTab");
-			
+		
 			fillCarsObservableList("active", "");
 			carsTab = new Tab("Cars");
 			carsTab.setContent(openCarsMenu());
@@ -272,7 +277,8 @@ public class Main extends Application {
 	
 			mainTabPane = new TabPane();
 			mainTabPane.getTabs().addAll(reserveTab, carsTab, reservationsTab, dashboardTab);
-			
+			mainTabPane.prefHeightProperty().bind(mainStage.heightProperty());
+			mainTabPane.prefWidthProperty().bind(mainStage.widthProperty());
 	
 //Tab on Action		
 			reserveTab.setOnSelectionChanged(e -> {
@@ -298,8 +304,8 @@ public class Main extends Application {
 			});
 	
 //Main VBox Top second Child			
-			mainTopVBox.getChildren().add(mainTabPane);		
-			Scene sceneMain = new Scene(mainHB, 1050, 750);
+			mainTopVBox.getChildren().add(mainTabPane);	
+			Scene sceneMain = new Scene(mainHB, 1060, 720);
 			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 			mainStage.setScene(sceneMain);
 			mainStage.show();
@@ -323,8 +329,8 @@ public class Main extends Application {
 		
 			BorderPane reserveBP = new BorderPane();
 			GridPane reserveGP = new GridPane();
-			reserveGP.setAlignment(Pos.BOTTOM_CENTER);
-			reserveGP.setPadding(new Insets(0, 30, 0, 25));
+			reserveGP.setAlignment(Pos.CENTER);
+			reserveGP.setPadding(new Insets(40, 35, 0, 30));
 			reserveGP.setHgap(15);
 			reserveGP.setVgap(10);
 			reserveGP.setMinSize(0, 0);
@@ -503,10 +509,13 @@ public class Main extends Application {
 			    	e.consume();
 			    });
 			
-//Calculate price button			
+//Calculate price button
+			
+			
+			rentStatusLabel = new Label("Status = ");
+			
 			Button calcPriceButton = new Button("Calculate price");
 			calcPriceButton.setId("calcPriceButton");
-			reserveGP.add(calcPriceButton, 3, 10);
 
 			calcPriceButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
 			        new EventHandler<MouseEvent>() {
@@ -522,6 +531,11 @@ public class Main extends Application {
 			        	  calcPriceButton.setEffect(null);
 			          }
 			        });
+			
+			VBox calcVB = new VBox(rentStatusLabel, calcPriceButton);
+			calcVB.setAlignment(Pos.BOTTOM_CENTER);
+			calcVB.setSpacing(20);
+			reserveGP.add(calcVB, 3, 10);
 			
 //Grid 4. column
 			carLicensePlateTF = new TextField();
@@ -596,12 +610,11 @@ public class Main extends Application {
 //PRICE		    
 			VBox priceVBox = new VBox();
 			resIdLabel =           new Label("ResID  = ");
-			rentStatusLabel =      new Label("Status = ");
 			Label priceDaysLabel = new Label("Rent   = ");
 			Label priceLabelIns =  new Label("Ins.   = "); 
 			Label priceLabel2 =    new Label("Extras = ");
 			Label priceLabel3 =    new Label("Total  = ");
-			priceVBox.getChildren().addAll(resIdLabel, rentStatusLabel, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
+			priceVBox.getChildren().addAll(resIdLabel, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
 			reserveGP.add(priceVBox, 4, 10);
 			
 			
@@ -1218,24 +1231,29 @@ public class Main extends Application {
 
 //CARS MENU	
 	public TableView<CarFX> showCarsTableView() {
+		TableColumn<CarFX, Number> numberCol = new TableColumn<>("nr.");
+		numberCol.setSortable(false);
+		numberCol.setPrefWidth(35);
+		numberCol.setMinWidth(30);
+		
 		TableColumn<CarFX, String> categorieCol = new TableColumn<>("Category");
-		categorieCol.setPrefWidth(80);
+		categorieCol.setPrefWidth(100);
 		categorieCol.setMinWidth(30);
 		categorieCol.setCellValueFactory(new PropertyValueFactory<>("carCategory"));
 		categorieCol.setSortType(TableColumn.SortType.ASCENDING);
 
 		TableColumn<CarFX, String> markeCol = new TableColumn<>("Brand");
-		markeCol.setPrefWidth(105);
+		markeCol.setPrefWidth(110);
 		markeCol.setMinWidth(30);
 		markeCol.setCellValueFactory(new PropertyValueFactory<>("carBrand"));
 	
 		TableColumn<CarFX, String> modellCol = new TableColumn<>("Modell");
-		modellCol.setPrefWidth(105);
+		modellCol.setPrefWidth(110);
 		modellCol.setMinWidth(30);
 		modellCol.setCellValueFactory(new PropertyValueFactory<>("carModel"));
     
 		TableColumn<CarFX, String> licPlateCol = new TableColumn<>("License Plate");
-		licPlateCol.setPrefWidth(100);
+		licPlateCol.setPrefWidth(105);
 		licPlateCol.setMinWidth(30);
     	licPlateCol.setCellValueFactory(new PropertyValueFactory<>("carLicensePlate"));
     	licPlateCol.setSortType(TableColumn.SortType.ASCENDING);
@@ -1249,6 +1267,7 @@ public class Main extends Application {
     	onRentCol.setPrefWidth(60);
     	onRentCol.setMinWidth(30);
     	onRentCol.setCellValueFactory(new PropertyValueFactory<>("isOnRent"));
+    	onRentCol.setSortType(TableColumn.SortType.DESCENDING);
     
     	onRentCol.setCellFactory(col -> new TableCell<CarFX, Boolean>() {
 	    @Override
@@ -1257,13 +1276,14 @@ public class Main extends Application {
 	    		setText(empty ? null : item ? "OnRent" : "Ready" );
 	    	}
     	});
-
   
     	carsTableView = new TableView<>(observCars);
-		carsTableView.setPrefHeight(570);
-		carsTableView.getColumns().addAll(categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
-		carsTableView.getSortOrder().addAll(categorieCol, licPlateCol);
+		carsTableView.setPrefSize(600, 550);
+		carsTableView.getColumns().addAll(numberCol, categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
+		carsTableView.getSortOrder().addAll(onRentCol, categorieCol, licPlateCol);
 		carsTableView.setPlaceholder(new Label("No cars available!"));
+		
+		numberCol.setCellValueFactory(column-> new ReadOnlyObjectWrapper<Number>(carsTableView.getItems().indexOf(column.getValue())+1));
 	
 	 	sortedListCars.comparatorProperty().bind(carsTableView.comparatorProperty());
 	 	carsTableView.setItems(sortedListCars);
@@ -1276,6 +1296,7 @@ public class Main extends Application {
 	public BorderPane openCarsMenu() {
 		Label basePriceLB = new Label("Base price = ");
 			BorderPane carsBP = new BorderPane();
+			
 		    GridPane carsGP = new GridPane();
 		    carsGP.setAlignment(Pos.CENTER_RIGHT);
 		    carsGP.setHgap(15);
@@ -1284,6 +1305,8 @@ public class Main extends Application {
 
 			VBox carsLeftVBox = new VBox();
 			carsLeftVBox.setSpacing(5);
+			carsLeftVBox.setAlignment(Pos.CENTER_LEFT);
+
 //Searching		
 			Label carSearchLB = new Label("Search for a car");
 			carSearchLB.setId("searchLB");
@@ -1302,7 +1325,7 @@ public class Main extends Application {
 			searchTF.setPromptText("License plate nr.");
 				    
 		    HBox carSearchHB = new HBox();
-			carSearchHB.setAlignment(Pos.CENTER_LEFT);
+			carSearchHB.setAlignment(Pos.CENTER);
 			carSearchHB.setSpacing(5);	
 			carSearchHB.getChildren().addAll(carSearchLB, carSearchBox, searchTF);
 			carsLeftVBox.getChildren().add(carSearchHB);
@@ -1334,7 +1357,7 @@ public class Main extends Application {
 		    HBox carsHB = new HBox(); 
 		    carsHB.setAlignment(Pos.CENTER);
 		    carsHB.setPadding(new Insets(15,0,0,0));
-		    carsHB.setSpacing(20);
+		    carsHB.setSpacing(15);
 		    carsHB.getChildren().add(carsLeftVBox);
 		    carsHB.getChildren().add(carsGP);
 		    carsBP.setCenter(carsHB);
@@ -1676,7 +1699,8 @@ public class Main extends Application {
 					reservationsLV.getItems().clear();
 					  ArrayList<String> ls = new ArrayList<>();
 						for(Reservation r : Database.readReservationsTable("active", "")) {
-							if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber()) && !r.getStatusName().equals("Expired")) {
+							if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber()) && 
+																		r.getReturnTime().isAfter(LocalDateTime.now())) {
 							   ls.add(r.getPickupTime() + " - " + r.getReturnTime());
 							}
 						}
@@ -1746,7 +1770,8 @@ public class Main extends Application {
 			deleteCarButton.setOnAction(e -> {
 			   try {
 				    for(Reservation r : Database.readReservationsTable("active", "")) {
-					  if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())) {
+					  if(r.getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber()) && 
+							  									r.getReturnTime().isAfter(LocalDateTime.now())) {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Deleting a car");
 						alertWarn.setHeaderText("You can't delete this car!");
@@ -2002,6 +2027,11 @@ public class Main extends Application {
 	
 //RESERVATIONS MENU	
 	public TableView<ReservationFX> showReservationsTableView(){
+		TableColumn<ReservationFX, Number> numberCol = new TableColumn<>("nr.");
+		numberCol.setSortable(false);
+		numberCol.setPrefWidth(35);
+		numberCol.setMinWidth(35);
+		
 		TableColumn<ReservationFX, String> resNumCol = new TableColumn<>("Reservation nr.");
 		resNumCol.setPrefWidth(125);
 		resNumCol.setMinWidth(30);
@@ -2060,11 +2090,13 @@ public class Main extends Application {
 		fillReservationsObservableList();
 		
 	    reservTableView = new TableView<>(observReservations);
-	    reservTableView.getColumns().addAll(resNumCol, custFirstNameCol, custLastNameCol, carCatCol, carLicensePlateCol,
+	    reservTableView.getColumns().addAll(numberCol, resNumCol, custFirstNameCol, custLastNameCol, carCatCol, carLicensePlateCol,
 	    									pickupTimeCol, pickupLocCol, returnTimeCol, returnLocCol, statusCol);
 	    reservTableView.getSortOrder().addAll(statusCol, pickupTimeCol);
 	    reservTableView.setPlaceholder(new Label("No reservations available!"));
 	    reservTableView.setPrefSize(1000, 570);
+	    
+	    numberCol.setCellValueFactory(column-> new ReadOnlyObjectWrapper<Number>(reservTableView.getItems().indexOf(column.getValue())+1));
 		
 		sortedListReservations.comparatorProperty().bind(reservTableView.comparatorProperty());
 		reservTableView.setItems(sortedListReservations);
@@ -2212,19 +2244,16 @@ public class Main extends Application {
 		printPdfButton.setOnAction(e -> {
 			 if (selectedRes != null) {
 				 	PdfReservation pdfCreator = new PdfReservation();
-		 
-						try {
-							pdfCreator.pdfGenerateReservation(selectedRes.getModellObject());
-						} catch (FileNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-			
+					pdfCreator.pdfGenerateReservation(selectedRes.getModellObject(),
+													  getCategoryPrice(selectedRes.getReservedCategory()), 
+													  getInsurancePrice(selectedRes.getInsuranceType()));
 			 }
+			 File file = new File("Reservations/" + selectedRes.getResNumberID() + ".pdf");
+			 HostServices hostServices = getHostServices();
+			 hostServices.showDocument(file.getAbsolutePath());
 		});
 		
 
-		
 		
 //DELETE RES ON ACTION
 		deleteResButton.setOnAction(e -> {

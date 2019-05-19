@@ -1,15 +1,11 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-import org.apache.derby.iapi.types.DataValueDescriptor;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -145,7 +141,8 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		deleteCustomerButton.setOnAction(e -> {
 			try {
 				for(Reservation r : Database.readReservationsTable("active", "")) {
-					if(r.getCustomer().getCustomerID().equals(selectedCustomer.getCustomerID())) {
+					if(r.getCustomer().getCustomerID().equals(selectedCustomer.getCustomerID()) && 
+													r.getReturnTime().isAfter(LocalDateTime.now())) {
 						Alert alertWarn= new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Deleting a customer");
 						alertWarn.setHeaderText("You can't delete this customer!");
@@ -220,6 +217,10 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 	
 	
 	public TableView<CustomerFX> customersTableView() {
+	TableColumn<CustomerFX, Number> numberCol = new TableColumn<>("nr.");
+	numberCol.setSortable(false);
+	numberCol.setPrefWidth(35);
+	numberCol.setMinWidth(35);
 	
 	TableColumn<CustomerFX, String> custIDCol = new TableColumn<>("Customer ID");
 	custIDCol.setPrefWidth(140);
@@ -260,10 +261,12 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
     
    
     customersTableView = new TableView<>(observCustomers);
-    customersTableView.setPrefHeight(570);
-    customersTableView.getColumns().addAll(custIDCol, firstNameCol, lastNameCol, nationalCol,dateOfBornCol, passportCol, driversLCol);
+    customersTableView.setPrefHeight(550);
+    customersTableView.getColumns().addAll(numberCol, custIDCol, firstNameCol, lastNameCol, nationalCol,dateOfBornCol, passportCol, driversLCol);
     customersTableView.setPlaceholder(new Label("Customer not found!"));
     customersTableView.getSortOrder().addAll(firstNameCol, lastNameCol);
+    
+	numberCol.setCellValueFactory(column-> new ReadOnlyObjectWrapper<Number>(customersTableView.getItems().indexOf(column.getValue())+1));
     
     sortedListCustomers.comparatorProperty().bind(customersTableView.comparatorProperty());
     customersTableView.setItems(sortedListCustomers);
