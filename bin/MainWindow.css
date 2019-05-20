@@ -295,6 +295,31 @@
 
 
 
+#dailyPlanButton{
+	-fx-background-image:url("IconPrintPdf.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#79e0de, #C0C0C0);	
+}
+#weeklyPlanButton{
+	-fx-background-image:url("IconPrintPdf.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#eaa5ff, #C0C0C0);	
+}
+
+
+
+
+
 #deleteCustomerButton {
   -fx-background-image:url("IconDeleteCustomer.png");
   -fx-background-repeat: no-repeat;
