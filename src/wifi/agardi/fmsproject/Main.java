@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import org.apache.derby.iapi.store.raw.FetchDescriptor;
 
-import com.itextpdf.text.pdf.PdfReader;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
@@ -40,6 +39,10 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -272,6 +275,7 @@ public class Main extends Application {
 			reservationsTab.setId("reservationsTab");
 		
 			Tab dashboardTab = new Tab("Dashboard");
+			dashboardTab.setContent(dashboardMenu());
 			dashboardTab.setClosable(false);
 			dashboardTab.setId("dashboardTab");
 	
@@ -300,6 +304,7 @@ public class Main extends Application {
 			dashboardTab.setOnSelectionChanged(e -> {
 				if(dashboardTab.isSelected()) {
 					mainTitle.setText("Dashboard");
+					dashboardTab.setContent(dashboardMenu());
 				}
 			});
 	
@@ -726,7 +731,7 @@ public class Main extends Application {
 
 //SearchDriver ACTION			
 			searchDriverButton.setOnAction(e ->{
-				CustomerListDialog custList = new CustomerListDialog();
+				CustomerListDialog custList = new CustomerListDialog("active", "");
 				Optional<CustomerFX> result = custList.showAndWait();
 				if(result.isPresent()) {
 					selectedCust = result.get();
@@ -2328,6 +2333,163 @@ public class Main extends Application {
 		return reservationsBP;
 		
 	}
+	
+	
+	
+//DASHBOARD MENU
+	public BorderPane dashboardMenu() {
+		BorderPane dashboardBP = new BorderPane();
+		int nowCO = 0;
+		int nowplus1CO = 0;
+		int nowplus2CO = 0;
+		int nowplus3CO = 0;
+		int nowplus4CO = 0;
+		int nowplus5CO = 0;
+		int nowplus6CO = 0;
+
+		int nowCI = 0;
+		int nowplus1CI = 0;
+		int nowplus2CI = 0;
+		int nowplus3CI = 0;
+		int nowplus4CI = 0;
+		int nowplus5CI = 0;
+		int nowplus6CI = 0;
+		
+		LocalDate localDate = LocalDate.now();
+		LocalDateTime startToday = localDate.atStartOfDay();
+		LocalDate localDatePlus1 = localDate.plusDays(1);
+		LocalDate localDatePlus2 = localDate.plusDays(2);
+		LocalDate localDatePlus3 = localDate.plusDays(3);
+		LocalDate localDatePlus4 = localDate.plusDays(4);
+		LocalDate localDatePlus5 = localDate.plusDays(5);
+		LocalDate localDatePlus6 = localDate.plusDays(6);
+    
+		try {
+			for(Reservation r : Database.readReservationsTable("active", "")) {
+				//TODAY
+				if(r.getPickupTime().isBefore(startToday.plusHours(24))) {	
+					nowCO++;  
+				}
+				if(r.getReturnTime().isBefore(startToday.plusHours(24))) {	
+					nowCI++;  
+				}
+				//TOMORROW
+				if(r.getPickupTime().isAfter(startToday.plusHours(24)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(48))) {	
+					nowplus1CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(24)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(48))) {	
+					nowplus1CI++;
+				}
+				//+2. DAY
+				if(r.getPickupTime().isAfter(startToday.plusHours(48)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(72))) {	
+					nowplus2CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(48)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(72))) {	
+					nowplus2CI++;
+				}
+				//+3. DAY
+				if(r.getPickupTime().isAfter(startToday.plusHours(72)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(96))) {	
+					nowplus3CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(72)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(96))) {	
+					nowplus3CI++;
+				}
+				//+4. DAY
+				if(r.getPickupTime().isAfter(startToday.plusHours(96)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(120))) {	
+					nowplus4CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(96)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(120))) {	
+					nowplus4CI++;
+				}
+				//+5. DAY
+				if(r.getPickupTime().isAfter(startToday.plusHours(120)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(144))) {	
+					nowplus5CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(120)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(144))) {	
+					nowplus5CI++;
+				}
+				//+6. DAY
+				if(r.getPickupTime().isAfter(startToday.plusHours(144)) && 
+							r.getPickupTime().isBefore(startToday.plusHours(168))) {	
+					nowplus6CO++;
+				}
+				if(r.getReturnTime().isAfter(startToday.plusHours(144)) && 
+							r.getReturnTime().isBefore(startToday.plusHours(168))) {	
+					nowplus6CI++;
+				}	
+				
+			}
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the database reading of reservations for chart");
+			e.printStackTrace();
+		}
+			
+		System.out.println(nowCO);
+		System.out.println(nowplus1CO);
+		System.out.println(nowplus2CO);
+		System.out.println(nowplus3CO);
+		System.out.println(nowplus4CO);
+		System.out.println(nowplus5CO);
+		System.out.println(nowplus6CO);
+		
+		  final CategoryAxis xAxis = new CategoryAxis();
+	        final NumberAxis yAxis = new NumberAxis();
+	        final BarChart<String,Number> bc =  new BarChart<>(xAxis,yAxis);
+	        bc.setTitle("Weekly Summary");
+	        bc.setMaxSize(600, 600);
+	        xAxis.setLabel("Days");
+	        yAxis.setLabel("Amount");
+		   
+	        String today = localDate.getDayOfWeek() + "\n" +  localDate.getDayOfMonth() + " " + localDate.getMonth();
+	        String todayPlus1 = localDatePlus1.getDayOfWeek() + "\n" +  localDatePlus1.getDayOfMonth() + " " + localDatePlus1.getMonth();
+	        String todayPlus2 = localDatePlus2.getDayOfWeek() + "\n" +  localDatePlus2.getDayOfMonth() + " " + localDatePlus2.getMonth();
+	        String todayPlus3 = localDatePlus3.getDayOfWeek() + "\n" +  localDatePlus3.getDayOfMonth() + " " + localDatePlus3.getMonth();
+	        String todayPlus4 = localDatePlus4.getDayOfWeek() + "\n" +  localDatePlus4.getDayOfMonth() + " " + localDatePlus4.getMonth();
+	        String todayPlus5 = localDatePlus5.getDayOfWeek() + "\n" +  localDatePlus5.getDayOfMonth() + " " + localDatePlus5.getMonth();
+	        String todayPlus6 = localDatePlus6.getDayOfWeek() + "\n" +  localDatePlus6.getDayOfMonth() + " " + localDatePlus6.getMonth();
+	        
+
+	        XYChart.Series<String, Number> seriesCO = new XYChart.Series<>();
+	        seriesCO.setName("Check out");       
+	        seriesCO.getData().add(new XYChart.Data<>(today, nowCO));
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus1, nowplus1CO));
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus2, nowplus2CO));
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus3, nowplus3CO));
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus4, nowplus4CO));
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus5, nowplus5CO)); 
+	        seriesCO.getData().add(new XYChart.Data<>(todayPlus6, nowplus6CO)); 
+	        
+	        XYChart.Series<String, Number> seriesCI = new XYChart.Series<>();
+	        seriesCI.setName("Check in");
+	        seriesCI.getData().add(new XYChart.Data<>(today, nowCI));
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus1, nowplus1CI));
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus2, nowplus2CI));
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus3, nowplus3CI));
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus4, nowplus4CI));
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus5, nowplus5CI)); 
+	        seriesCI.getData().add(new XYChart.Data<>(todayPlus6, nowplus6CI)); 
+	        
+	        bc.getData().addAll(seriesCO, seriesCI);
+		
+	         
+		 dashboardBP.setLeft(bc);
+		
+		
+		
+		
+		return dashboardBP;
+	}
+	
 	
 	
 	

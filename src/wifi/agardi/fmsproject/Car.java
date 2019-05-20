@@ -1,12 +1,8 @@
 package wifi.agardi.fmsproject;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 
 public class Car {
 	private String carVinNumber;

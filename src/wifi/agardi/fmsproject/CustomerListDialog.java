@@ -43,10 +43,10 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 	
 	CustomerFX selectedCustomer;
 	
-	public CustomerListDialog() {
+	public CustomerListDialog(String active, String deactive) {
 		super();
 		this.setTitle("Customer list");
-		this.setHeaderText("Search for a customer");
+		this.setHeaderText("Search");
 		fillCustomersObservableList();
 		
 		ComboBox<String> searchCB = new ComboBox<>();
@@ -83,7 +83,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		custHB.setAlignment(Pos.CENTER);
 		custHB.setSpacing(5);
 		
-		VBox custVB = new VBox(custHB, customersTableView());
+		VBox custVB = new VBox(custHB, customersTableView(active, deactive));
 		custVB.setSpacing(5);
 
 //If a customer selected, delete button enabled		
@@ -215,8 +215,31 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		}
 	
 	
+	public void fillDeactiveCustomersObservableList() {
+		observCustomers = FXCollections.observableArrayList();
+		  ArrayList<Customer> customers = new ArrayList<>();
+			try {
+				customers = Database.readCustomersTable("", "deactive");
+			} catch (SQLException e) {
+				System.out.println("Something is wrong with the filling observable list with customers database");
+				e.printStackTrace();
+			}
+		    for(Customer c : customers) {
+		    	observCustomers.add(new CustomerFX(c));
+		    }
+		    filteredListCustomers = new FilteredList<>(observCustomers, p -> true);
+		    sortedListCustomers = new SortedList<>(filteredListCustomers);
+		}
 	
-	public TableView<CustomerFX> customersTableView() {
+	
+	
+	public TableView<CustomerFX> customersTableView(String active, String deactive) {
+		if(active.equals("active") && deactive.equals(""))	{
+			fillCustomersObservableList();
+		} else {
+			fillDeactiveCustomersObservableList();
+		}
+		
 	TableColumn<CustomerFX, Number> numberCol = new TableColumn<>("nr.");
 	numberCol.setSortable(false);
 	numberCol.setPrefWidth(35);
