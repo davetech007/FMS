@@ -82,7 +82,6 @@ import javafx.scene.layout.VBox;
 
 public class Main extends Application {
 	DropShadow shadow = new DropShadow();  //Effect for the buttons
-	
 	int minEngineSize = 500;
 	int minEnginePower = 40;
 	
@@ -90,11 +89,12 @@ public class Main extends Application {
 	Tab carsTab;
 	Tab reserveTab;
 	Tab reservationsTab;
-	
+	Tab dashboardTab;
 	
 	TableView<CarFX> carsTableView;
 	CarFX selectedCar;
 	private ObservableList<CarFX> observCars;
+	private ObservableList<CarFX> observDeactiveCars;
 	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
 	private SortedList<CarFX> sortedListCars;
 	
@@ -104,6 +104,8 @@ public class Main extends Application {
 	Label custIdLabel;
 	Label resIdLabel;
 	Label rentStatusLabel;
+	Label customerStatusLabel;
+	Label carStatusLabel;
 	CustomerFX selectedCust;
 	
 	TableView<ReservationFX> reservTableView;
@@ -276,8 +278,8 @@ public class Main extends Application {
 			reservationsTab.setClosable(false);
 			reservationsTab.setId("reservationsTab");
 		
-			Tab dashboardTab = new Tab("Dashboard");
-			dashboardTab.setContent(dashboardMenu());
+			dashboardTab = new Tab("Dashboard");
+			dashboardTab.setContent(dashboardMenu(LocalDate.now()));
 			dashboardTab.setClosable(false);
 			dashboardTab.setId("dashboardTab");
 	
@@ -306,7 +308,7 @@ public class Main extends Application {
 			dashboardTab.setOnSelectionChanged(e -> {
 				if(dashboardTab.isSelected()) {
 					mainTitle.setText("Dashboard");
-					dashboardTab.setContent(dashboardMenu());
+					dashboardTab.setContent(dashboardMenu(LocalDate.now()));
 				}
 			});
 	
@@ -517,9 +519,9 @@ public class Main extends Application {
 			    });
 			
 //Calculate price button
-			
-			
-			rentStatusLabel = new Label("Status = ");
+			rentStatusLabel = new Label("Res.status = ");
+			customerStatusLabel = new Label("Cust.status = ");
+			carStatusLabel = new Label("Car status = ");
 			
 			Button calcPriceButton = new Button("Calculate price");
 			calcPriceButton.setId("calcPriceButton");
@@ -539,9 +541,8 @@ public class Main extends Application {
 			          }
 			        });
 			
-			VBox calcVB = new VBox(rentStatusLabel, calcPriceButton);
-			calcVB.setAlignment(Pos.BOTTOM_CENTER);
-			calcVB.setSpacing(20);
+			VBox calcVB = new VBox(rentStatusLabel, customerStatusLabel, carStatusLabel, calcPriceButton);
+			calcVB.setAlignment(Pos.BOTTOM_LEFT);
 			reserveGP.add(calcVB, 3, 10);
 			
 //Grid 4. column
@@ -1097,8 +1098,26 @@ public class Main extends Application {
 						alertWarn.showAndWait();
 					 return;
 				}
-				
-
+				for(Customer r : Database.readCustomersTable("", "deactive")) {
+					if(selectedCust.getCustomerID().equals(r.getCustomerID())) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Make a reservation");
+						alertWarn.setHeaderText("Please check again!");
+						alertWarn.setContentText("You can't make a reservation, because the customer has been DEACTIVATED!");
+						alertWarn.showAndWait();
+					 return;	
+					}
+				}
+				for(Car c : Database.readCarsTable("", "deactive")) {
+					if(selectedCar.getCarVinNumber().equals(c.getCarVinNumber())) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Make a reservation");
+						alertWarn.setHeaderText("Please check again!");
+						alertWarn.setContentText("You can't make a reservation, because this car has been DEACTIVATED!");
+						alertWarn.showAndWait();
+					 return;	
+					}
+				}
 				for(Reservation r : Database.readReservationsTable("active", "")) {
 					if(selectedCar.getModellObject().getCarVinNumber().equals(r.getCar().getCarVinNumber())) {
 						if(r.getReturnTime().isAfter(pickupTime) && r.getPickupTime().isBefore(returnTime)) {
@@ -1177,7 +1196,26 @@ public class Main extends Application {
 								alertWarn.showAndWait();
 							 return;
 						}
-						
+						for(Customer r : Database.readCustomersTable("", "deactive")) {
+							if(selectedCust.getCustomerID().equals(r.getCustomerID())) {
+								Alert alertWarn= new Alert(AlertType.WARNING);
+								alertWarn.setTitle("Update a reservation");
+								alertWarn.setHeaderText("Please check again!");
+								alertWarn.setContentText("You can't update this reservation, because the customer has been DEACTIVATED!");
+								alertWarn.showAndWait();
+							 return;	
+							}
+						}
+						for(Car c : Database.readCarsTable("", "deactive")) {
+							if(selectedCar.getCarVinNumber().equals(c.getCarVinNumber())) {
+								Alert alertWarn= new Alert(AlertType.WARNING);
+								alertWarn.setTitle("UPDATE a reservation");
+								alertWarn.setHeaderText("Please check again!");
+								alertWarn.setContentText("You can't update this reservation, because this car has been DEACTIVATED!");
+								alertWarn.showAndWait();
+							 return;	
+							}
+						}
 						for(Reservation r : Database.readReservationsTable("active", "")) {
 							if((selectedCar.getModellObject().getCarVinNumber().equals(r.getCar().getCarVinNumber()) && !resNumberID.equals(r.getResNumberID()))) {
 								if(r.getReturnTime().isAfter(pickupTime) && r.getPickupTime().isBefore(returnTime)) {
@@ -1283,17 +1321,16 @@ public class Main extends Application {
 	    		setText(empty ? null : item ? "OnRent" : "Ready" );
 	    	}
     	});
-  
+    	
     	carsTableView = new TableView<>(observCars);
 		carsTableView.setPrefSize(600, 550);
 		carsTableView.getColumns().addAll(numberCol, categorieCol, markeCol, modellCol, licPlateCol,fuelTypeCol, onRentCol);
 		carsTableView.getSortOrder().addAll(onRentCol, categorieCol, licPlateCol);
 		carsTableView.setPlaceholder(new Label("No cars available!"));
-		
-		numberCol.setCellValueFactory(column-> new ReadOnlyObjectWrapper<Number>(carsTableView.getItems().indexOf(column.getValue())+1));
-	
-	 	sortedListCars.comparatorProperty().bind(carsTableView.comparatorProperty());
+		sortedListCars.comparatorProperty().bind(carsTableView.comparatorProperty());
 	 	carsTableView.setItems(sortedListCars);
+	 	
+		numberCol.setCellValueFactory(column-> new ReadOnlyObjectWrapper<Number>(carsTableView.getItems().indexOf(column.getValue())+1));
 
 		return carsTableView;	
 }
@@ -2021,7 +2058,7 @@ public class Main extends Application {
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 			bottomHBox.setSpacing(10);
-			bottomHBox.getChildren().addAll(onRentButton, makeResButton, deleteCarButton, updateCarButton, addCarButton);
+			bottomHBox.getChildren().addAll(makeResButton, onRentButton, deleteCarButton, updateCarButton, addCarButton);
 			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
 		    carsBP.setBottom(bottomHBox);	
 			 
@@ -2188,7 +2225,7 @@ public class Main extends Application {
 			
 //Bottom Buttons		
 //PRINT PDF			
-		printPdfButton = new Button("Print PDF");
+		printPdfButton = new Button("Res. PDF");
 		printPdfButton.setId("printPdfButton");
 		printPdfButton.setDisable(true);
 		
@@ -2263,18 +2300,21 @@ public class Main extends Application {
 		
 //DELETE RES ON ACTION
 		deleteResButton.setOnAction(e -> {
-			for(ReservationFX r : observReservations) {
-				if(r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())) {
-					if(r.getModellObject().getStatusName().equals("Cancelled")) {
-					Alert alertWarn= new Alert(AlertType.WARNING);
-					alertWarn.setTitle("Cancelling a reservation");
-					alertWarn.setHeaderText("Please check again, already cancelled!");
-					alertWarn.setContentText("You wanted to cancel this reservation '" + r.getResNumberID() + "', " +
-											 "but it's already cancelled.");
-					alertWarn.showAndWait();
-					return;
+			try {
+				for(Reservation r : Database.readReservationsTable("", "cancelled")) {
+					if(r.getResNumberID().equals(selectedRes.getModellObject().getResNumberID())) {
+						Alert alertWarn= new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Cancelling a reservation");
+						alertWarn.setHeaderText("Please check again, already cancelled!");
+						alertWarn.setContentText("You wanted to cancel this reservation '" + r.getResNumberID() + "', " +
+												 "but it's already cancelled.");
+						alertWarn.showAndWait();
+						return;
 					}
 				}
+			} catch (SQLException e2) {
+				System.out.println("Something is wrong with the reading reservations table for cancelling res.");
+				e2.printStackTrace();
 			}
 			
 			Alert alertCancel = new Alert(AlertType.CONFIRMATION);
@@ -2317,9 +2357,29 @@ public class Main extends Application {
 			
 //SHOW RES ON ACTION
 		showResButton.setOnAction(e -> {
+			try {
 			mainTabPane.getSelectionModel().select(reserveTab);
 			resIdLabel.setText("ResID = " + selectedRes.getModellObject().getResNumberID());
 			rentStatusLabel.setText("Status = " + selectedRes.getStatusName());
+			
+				for(Customer r :  Database.readCustomersTable("", "deactive")) {
+					if(r.getCustomerID().equals(selectedRes.getModellObject().getCustomer().getCustomerID())) {
+						customerStatusLabel.setText("Cust.status = DEACTIVE");
+					} else {
+						customerStatusLabel.setText("Cust.status = active");
+					}
+				}
+			for(Car r : Database.readCarsTable("", "deactive")) {
+				if(r.getCarVinNumber().equals(selectedRes.getModellObject().getCar().getCarVinNumber())) {
+					carStatusLabel.setText("Car status = DEACTIVE");
+				} else {
+					carStatusLabel.setText("Car status = active");
+				}
+			}
+			} catch (SQLException e1) {
+				System.out.println("Something is wrong with the status Database reading");
+				e1.printStackTrace();
+			}
 		});
 		
 		
@@ -2338,7 +2398,7 @@ public class Main extends Application {
 	
 	
 //DASHBOARD MENU
-	public BorderPane dashboardMenu() {
+	public BorderPane dashboardMenu(LocalDate ldt) {
 		BorderPane dashboardBP = new BorderPane();
 		int nowCO = 0;
 		int nowplus1CO = 0;
@@ -2363,8 +2423,8 @@ public class Main extends Application {
 		int actualMonthMins4 = 0;
 		int actualMonthMins5 = 0;
 
-		//Initialise time now
-		LocalDate localDate = LocalDate.now();
+		//Initialize time now
+		LocalDate localDate = ldt;
 		//Creating the actual next 7 days
 		LocalDateTime startToday = localDate.atStartOfDay();
 		LocalDate localDatePlus1 = localDate.plusDays(1);
@@ -2384,12 +2444,14 @@ public class Main extends Application {
 		try {
 			for(Reservation r : Database.readReservationsTable("active", "")) {
 				//TODAY
-				if(r.getPickupTime().isBefore(startToday.plusHours(24))) {	
+				if(r.getPickupTime().isAfter(startToday) && 
+							r.getPickupTime().isBefore(startToday.plusHours(24))) {	
 					nowCO++;
 					todaysResCO.add(r);
 					weeklyResCO.add(r);
 				}
-				if(r.getReturnTime().isBefore(startToday.plusHours(24))) {	
+				if(r.getReturnTime().isAfter(startToday) && 
+							r.getReturnTime().isBefore(startToday.plusHours(24))) {	
 					nowCI++;  
 					todaysResCI.add(r);
 					weeklyResCI.add(r);
@@ -2461,7 +2523,8 @@ public class Main extends Application {
 					weeklyResCI.add(r);
 				}	
 				//MONTHLY, THIS MONTH
-				if(r.getPickupTime().toLocalDate().isAfter(startThisMonth)) {
+				if(r.getPickupTime().toLocalDate().isAfter(startThisMonth) &&  
+							r.getPickupTime().toLocalDate().isBefore(startThisMonth.plusMonths(1))) {
 					actualMonth++;
 				}
 				if(r.getPickupTime().toLocalDate().isBefore(startThisMonth) && 
@@ -2532,7 +2595,7 @@ public class Main extends Application {
 	        int weeklyTotalCI = (nowCI + nowplus1CI + nowplus2CI + nowplus3CI + nowplus4CI + nowplus5CI + nowplus6CI);
 	        
 	        Label infoWeekly = new Label("The next 7 days (from now) you have total " + weeklyTotalCO + " CO, and " +  weeklyTotalCI + " CI");
-	        Label infoDaily= new Label("Today (" + LocalDate.now().getDayOfWeek() + ") you have total " + nowCO + " CO, and "+ nowCI + " CI");
+	        Label infoDaily= new Label("Today (" + localDate.getDayOfWeek() + ") you have total " + nowCO + " CO, and "+ nowCI + " CI");
 	        VBox vboxWeekly = new VBox(bc, infoWeekly, infoDaily);
 	        vboxWeekly.setAlignment(Pos.TOP_CENTER);
 		    
@@ -2563,11 +2626,14 @@ public class Main extends Application {
 	        seriesMonth.getData().add(new XYChart.Data<>(thisMonth, actualMonth));   
 	        lineChart.getData().add(seriesMonth);
 	        
-	        Label infoMonthly = new Label("In this month (" + thisMonth + ") you have total " + actualMonth + " reservations.");
-	        VBox vboxMonthly = new VBox(lineChart, infoMonthly);
+	        int monthlyTotal = (actualMonth + actualMonthMins1 + actualMonthMins2 + actualMonthMins3 + actualMonthMins4 + actualMonthMins5);
+	        int avgTotal = (monthlyTotal / 6);
+	        Label infoMonthlySum = new Label("The last 6 month (" + thisMonth + " and before) you have total " + monthlyTotal + " reservations");
+	        Label avgTotalRes = new Label("Average "  + avgTotal + " reservations/month");
+	        Label infoMonthly = new Label("In this month (" + thisMonth + ") you have total " + actualMonth + " reservations");
+	        VBox vboxMonthly = new VBox(lineChart, infoMonthlySum, avgTotalRes, infoMonthly);
 	        vboxMonthly.setAlignment(Pos.TOP_CENTER);
-	        
-	        
+ 
 	        
 	        HBox centerHB = new HBox(vboxWeekly, vboxMonthly);
 	        centerHB.setPadding(new Insets(20, 0, 0, 0));
@@ -2610,25 +2676,111 @@ public class Main extends Application {
 			        	  weeklPlanButton.setEffect(null);
 			          }
 			        });
+			
+			Button deactivCustButton = new Button("Activate");
+			deactivCustButton.setId("deactivCustButton");
+			
+			deactivCustButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deactivCustButton.setEffect(shadow);
+			          }
+			        });
+			deactivCustButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deactivCustButton.setEffect(null);
+			          }
+			        });
+			
+			Button deactivCarButton = new Button("Activate");
+			deactivCarButton.setId("deactivCarButton");
+			
+			deactivCarButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deactivCarButton.setEffect(shadow);
+			          }
+			        });
+			deactivCarButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  deactivCarButton.setEffect(null);
+			          }
+			        });
 
 //DailyPlan ON ACTION			
 			dailyPlanButton.setOnAction(e -> {
 				PdfGeneration pdfDaily = new PdfGeneration();
-				   pdfDaily.pdfGenerateDailyPlan(todaysResCO, todaysResCI);
+				   pdfDaily.pdfGenerateDailyPlan(todaysResCO, todaysResCI, ldt);
 			});
 			
 //WeeklyPlan ON ACTION				
 			weeklPlanButton.setOnAction(e -> {
 				PdfGeneration pdfWeekly = new PdfGeneration();
-				pdfWeekly.pdfGenerateWeeklyPlan(weeklyResCO, weeklyResCI);
+				pdfWeekly.pdfGenerateWeeklyPlan(weeklyResCO, weeklyResCI, ldt);
+			});
+
+//Activate CUSTOMER
+			deactivCustButton.setOnAction(e -> {
+				CustomerListDialog custList = new CustomerListDialog("", "deactive");
+				custList.showAndWait();
 			});
 			
-		 
+//Activate CAR			
+			deactivCarButton.setOnAction(e -> {
+				fillCarsObservableList("", "deactive");
+				CarListDialog carList = new CarListDialog(observDeactiveCars);
+				Optional<CarFX> result = carList.showAndWait();
+				if(result.isPresent()) {
+					observCars.add(result.get());
+				}
+			});
+//CHOOSE DATE			
+			Button chooseDateBT = new Button("Choose");
+			chooseDateBT.setDisable(true);
+			chooseDateBT.setId("chooseDateBT");
+			
+			
+			chooseDateBT.addEventHandler(MouseEvent.MOUSE_ENTERED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  chooseDateBT.setEffect(shadow);
+			          }
+			        });
+			chooseDateBT.addEventHandler(MouseEvent.MOUSE_EXITED,
+			        new EventHandler<MouseEvent>() {
+			          @Override
+			          public void handle(MouseEvent e) {
+			        	  chooseDateBT.setEffect(null);
+			          }
+			        });
+			
+			DatePicker dateP = new DatePicker();
+			dateP.setValue(ldt);
+			chooseDateBT.disableProperty().bind(dateP.valueProperty().isNull());
+			
+			HBox tobHB = new HBox(dateP, chooseDateBT);
+			tobHB.setAlignment(Pos.CENTER);
+			dashboardBP.setTop(tobHB);
+			
+//Choose date ON ACTION
+			chooseDateBT.setOnAction(e -> {
+				dashboardTab.setContent(dashboardMenu(dateP.getValue()));
+			});
+			
+			
 		    HBox bottomHBox = new HBox();
 			bottomHBox.setPadding(new Insets(10, 5, 0, 0));
 			bottomHBox.setSpacing(10);
-			bottomHBox.getChildren().addAll(dailyPlanButton, weeklPlanButton);
+			bottomHBox.getChildren().addAll(deactivCarButton, deactivCustButton, dailyPlanButton, weeklPlanButton);
 			bottomHBox.setAlignment(Pos.BOTTOM_RIGHT);
+			dashboardBP.setPadding(new Insets(15,0,0,0));
 			dashboardBP.setBottom(bottomHBox);
 		
 		
@@ -2642,6 +2794,7 @@ public class Main extends Application {
 //METHODS for menu
 //Initialize lists, reading data out from cars database	
 	public void fillCarsObservableList(String active, String deactive) {
+		if(active.equals("active") && deactive.equals("")) {
 		 observCars = FXCollections.observableArrayList();
 			ArrayList<Car> cars = new ArrayList<>();
 			try {
@@ -2655,6 +2808,20 @@ public class Main extends Application {
 			 }
 			  filteredListCars = new FilteredList<>(observCars, p -> true);
 			  sortedListCars = new SortedList<>(filteredListCars);
+		}
+		if(active.equals("") && deactive.equals("deactive")) {
+			 observDeactiveCars = FXCollections.observableArrayList();
+				ArrayList<Car> cars = new ArrayList<>();
+				try {
+					cars = Database.readCarsTable(active, deactive);
+				} catch (SQLException e) {
+					System.out.println("Something is wrong with the filling observable list with deactive cars database");
+					e.printStackTrace();
+				}
+				 for(Car c : cars) {
+					 observDeactiveCars.add(new CarFX(c));
+				 }
+			}
 		}
 	
 	

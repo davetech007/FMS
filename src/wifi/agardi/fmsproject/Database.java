@@ -1407,6 +1407,7 @@ public class Database {
 			pstmt = conn.prepareStatement(delete);
 			pstmt.setBoolean(1, true);
 		    pstmt.executeUpdate();
+		    System.out.println("Car deleted successfully!");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with deleteCar database connection");
 			e.printStackTrace();
@@ -1540,6 +1541,7 @@ public class Database {
 			pstmt = conn.prepareStatement(delete);
 			pstmt.setBoolean(1, false);
 		    pstmt.executeUpdate();
+		    System.out.println("Car activated successfully!");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with activateDeletedCar database connection");
 			e.printStackTrace();
@@ -1572,7 +1574,7 @@ public class Database {
 			pstmt.setString(2, vinNum);
 			
 			pstmt.executeUpdate();
-			System.out.println("Car rented out successfully");
+			System.out.println("Car checked out successfully");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the rentOutCar database connection...");
 			e.printStackTrace();
@@ -1607,7 +1609,7 @@ public class Database {
 			pstmt.setString(3, vinNum);
 			
 			pstmt.executeUpdate();
-			System.out.println("Car returned successfully");
+			System.out.println("Car checked in successfully");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the returnCar database connection...");
 			e.printStackTrace();
@@ -2048,6 +2050,7 @@ public class Database {
 			pstmt = conn.prepareStatement(delete);
 			pstmt.setBoolean(1, false);
 		    pstmt.executeUpdate();
+		    System.out.println("Customer successfully activated!");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with activateDeletedCustomer database connection");
 			e.printStackTrace();
@@ -2241,6 +2244,7 @@ public class Database {
 			pstmt = conn.prepareStatement(cancel);
 		    pstmt.setBoolean(1, true);
 		    pstmt.executeUpdate();
+		    System.out.println("Reservation successfully cancelled!");
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with cancelReservation database connection");
 			e.printStackTrace();

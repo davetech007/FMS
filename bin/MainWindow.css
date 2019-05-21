@@ -153,7 +153,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #C0C0C0);	
+  -fx-background-color: linear-gradient(#96d666, #e5e5e5);	
 }
 #updateCustomerButton {
   -fx-background-image:url("IconUpdateCustomer.png");
@@ -163,7 +163,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#ffeed1, #FFA500);	
+  -fx-background-color: linear-gradient(#FFA500, #e5e5e5);	
 }
 
 
@@ -211,7 +211,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#eaa5ff, #C0C0C0);	
+  -fx-background-color: linear-gradient(#eaa5ff, #e5e5e5);	
 }
 #makeResButton {
   -fx-background-image:url("IconReserveCar.png");
@@ -268,7 +268,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
+  -fx-background-color: linear-gradient(#79e0de,  #e5e5e5);	
 }
 #deleteResButton {
   -fx-background-image:url("IconDeleteRes.png");
@@ -278,7 +278,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
+  -fx-background-color: linear-gradient(#e5e5e5, #ff7c7c);	
 }
 #showResButton {
   -fx-background-image:url("IconResDetails.png");
@@ -288,7 +288,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#ffeed1, #FFA500);	
+  -fx-background-color: linear-gradient(#e5e5e5, #FFA500);	
 }
 
 
@@ -303,7 +303,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#79e0de, #C0C0C0);	
+  -fx-background-color: linear-gradient(#79e0de,  #e5e5e5);	
 }
 #weeklyPlanButton{
 	-fx-background-image:url("IconPrintPdf.png");
@@ -313,7 +313,29 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#eaa5ff, #C0C0C0);	
+  -fx-background-color: linear-gradient(#eaa5ff,  #e5e5e5);	
+}
+
+#deactivCustButton{
+ -fx-background-image:url("IconUpdateCustomer.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#e5e5e5, #C0C0C0);
+}
+
+#deactivCarButton{
+ -fx-background-image:url("IconUpdateCar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 33px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#e5e5e5, #C0C0C0);
 }
 
 
@@ -324,12 +346,28 @@
   -fx-background-image:url("IconDeleteCustomer.png");
   -fx-background-repeat: no-repeat;
   -fx-background-size: 25px;
-  -fx-pref-width: 100px;
+  -fx-pref-width: 120px;
   -fx-pref-height: 30px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
   -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
 }
+
+#chooseDateBT {
+  -fx-background-image:url("IconChooseDate.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 25px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 30px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#79e0de,  #e5e5e5);		
+ }
+
+
+
+
+
 .dialog-pane:header .header-panel {
   -fx-background-color: transparent;
   

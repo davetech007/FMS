@@ -47,7 +47,13 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		super();
 		this.setTitle("Customer list");
 		this.setHeaderText("Search");
-		fillCustomersObservableList();
+		
+		if(active.equals("active") && deactive.equals("")) {
+			fillCustomersObservableList();
+		}
+		if(active.equals("") && deactive.equals("deactive")) {
+			fillDeactiveCustomersObservableList();
+		}
 		
 		ComboBox<String> searchCB = new ComboBox<>();
 		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Customer ID", "First name", "Last name"));
@@ -59,7 +65,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		custSearchTF.promptTextProperty().bind(searchCB.valueProperty());
 		custSearchTF.setId("searchTF");
 		
-		Button deleteCustomerButton = new Button("Delete");
+		Button deleteCustomerButton = new Button("Activate/deactivate");
 		deleteCustomerButton.setPadding(new Insets(0, 0, 0, 20));
 		deleteCustomerButton.setId("deleteCustomerButton");
 		deleteCustomerButton.setDisable(true);
@@ -157,24 +163,46 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 				System.out.println("Something is wrong with the customer delete");
 				e2.printStackTrace();
 			}
-
-			Alert confirmDel = new Alert(AlertType.CONFIRMATION);
-			confirmDel.setTitle("Delete customer");
-			confirmDel.setHeaderText("Please confirm!");
-			confirmDel.setContentText("Would you really want to DELETE this customer '" + 
-									  selectedCustomer.getModellObject().getFirstName() + 
-									  " " + selectedCustomer.getModellObject().getLastName() + "'?" +
-									  "\n\nNote, that the customer stays in the database, and you can check his/her reservations from the past.");
-			Optional<ButtonType> result = confirmDel.showAndWait();
-			if(result.get() == ButtonType.OK) {
-				try {
-					Database.deleteCustomer(selectedCustomer.getModellObject().getCustomerID());
-				} catch (SQLException e1) {
-					System.out.println("Something is wrong with the customer delete database connection");
-					e1.printStackTrace();
+			if(active.equals("active") && deactive.equals("")) {
+				Alert confirmDel = new Alert(AlertType.CONFIRMATION);
+				confirmDel.setTitle("Delete customer");
+				confirmDel.setHeaderText("Please confirm!");
+				confirmDel.setContentText("Would you really want to DELETE this customer '" + 
+										  selectedCustomer.getModellObject().getFirstName() + 
+										  " " + selectedCustomer.getModellObject().getLastName() + "'?" +
+										  "\n\nNote, that the customer stays in the database, and you can check his/her reservations from the past."
+										  + " When you want to activate again, you can do it in the 'Dashboard menu'");
+				Optional<ButtonType> result = confirmDel.showAndWait();
+				if(result.get() == ButtonType.OK) {
+					try {
+						Database.deleteCustomer(selectedCustomer.getModellObject().getCustomerID());
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the customer delete database connection");
+						e1.printStackTrace();
+					}
+					observCustomers.remove(selectedCustomer);
+					selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
 				}
-				observCustomers.remove(selectedCustomer);
-				selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
+			}
+			if(active.equals("") && deactive.equals("deactive")) {
+				Alert confirmDel = new Alert(AlertType.CONFIRMATION);
+				confirmDel.setTitle("Activate customer");
+				confirmDel.setHeaderText("Please confirm!");
+				confirmDel.setContentText("Would you really want to ACTIVATE this customer '" + 
+										  selectedCustomer.getModellObject().getFirstName() + 
+										  " " + selectedCustomer.getModellObject().getLastName() + "'?");
+				Optional<ButtonType> result = confirmDel.showAndWait();
+				if(result.get() == ButtonType.OK) {
+					try {
+						Database.activateDeletedCustomer(selectedCustomer.getModellObject().getCustomerID());
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the customer activate database connection");
+						e1.printStackTrace();
+					}
+					observCustomers.remove(selectedCustomer);
+					selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
+				}
+				
 			}
 		});
 		    

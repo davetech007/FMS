@@ -22,10 +22,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 
 public class PdfGeneration {
-	 LocalDate now = LocalDate.now();
 	 Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
      Font secondTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, BaseColor.BLACK);
-     Font smallFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
+     Font smallFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
      Chunk signature = new Chunk("FMSADV - Wien, "  + LocalDateTime.now());
 	
      
@@ -114,10 +113,10 @@ public class PdfGeneration {
 	
 
 	
-	public void pdfGenerateDailyPlan(ArrayList<Reservation> todaysResCO, ArrayList<Reservation> todaysResCI){
+	public void pdfGenerateDailyPlan(ArrayList<Reservation> todaysResCO, ArrayList<Reservation> todaysResCI, LocalDate ldt){
 		Document document = new Document();
 		try {
-			PdfWriter.getInstance(document, new FileOutputStream("DailyPlans/" + LocalDate.now() + "_dailyPlanFMS.pdf"));
+			PdfWriter.getInstance(document, new FileOutputStream("DailyPlans/" + ldt + "_dailyPlanFMS.pdf"));
 			document.open();
 			
 		    Image image1 = Image.getInstance(getClass().getResource("/Backgroundfms.jpg"));
@@ -126,7 +125,7 @@ public class PdfGeneration {
 	            document.add(image1);
 
 	        document.add(new Paragraph("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
-			Paragraph titleP = new Paragraph("Your daily plan, in " + LocalDate.now() + "\n\n", titleFont);
+			Paragraph titleP = new Paragraph("Your daily plan, in " + ldt + "\n\n", titleFont);
 			titleP.setAlignment(Paragraph.ALIGN_CENTER);
 			document.add(titleP);
 	 
@@ -147,7 +146,7 @@ public class PdfGeneration {
 			table.addCell("Reserved category");
 			table.addCell("Car");
 			table.addCell("Customer");
-			table.addCell("Notes");
+			table.addCell("Note");
 			table.setHeaderRows(1);
 
 			table.getDefaultCell().setBackgroundColor(GrayColor.GRAYWHITE);
@@ -157,13 +156,13 @@ public class PdfGeneration {
 			for (int i = 1; i <= todaysResCO.size(); i++) {
 				Reservation actualRes = todaysResCO.get(i - 1);
 
-				table.addCell("" + i);
-				table.addCell(actualRes.getPickupTime().toString());
-				table.addCell(actualRes.getPickupLocation());
-				table.addCell(actualRes.getReservedCategory());
-				table.addCell(actualRes.getCar().getCarLicensePlate());
-				table.addCell(actualRes.getCustomer().getFirstName() + " " + actualRes.getCustomer().getLastName());
-				table.addCell(actualRes.getResNotes());
+				table.addCell(new PdfPCell(new Phrase("" + i, smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getPickupTime().toString(), smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getPickupLocation(), smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getReservedCategory(), smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getCar().getCarLicensePlate(), smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getCustomer().getFirstName() + " " + actualRes.getCustomer().getLastName(), smallFont)));
+				table.addCell(new PdfPCell(new Phrase(actualRes.getResNotes(), smallFont)));
 			}
 			document.add(table);
 			document.add(new Paragraph("\n\n\n"));
@@ -184,7 +183,7 @@ public class PdfGeneration {
 			tableCI.addCell("Reserved category");
 			tableCI.addCell("Car");
 			tableCI.addCell("Customer");
-			tableCI.addCell("Notes");
+			tableCI.addCell("Note");
 			tableCI.setHeaderRows(1);
 
 			tableCI.getDefaultCell().setBackgroundColor(GrayColor.GRAYWHITE);
@@ -194,13 +193,13 @@ public class PdfGeneration {
 			for (int i = 1; i <= todaysResCI.size(); i++) {
 				Reservation actualRes = todaysResCI.get(i - 1);
 
-				tableCI.addCell("" + i);
-				tableCI.addCell(actualRes.getReturnTime().toString());
-				tableCI.addCell(actualRes.getReturnLocation());
-				tableCI.addCell(actualRes.getReservedCategory());
-				tableCI.addCell(actualRes.getCar().getCarLicensePlate());
-				tableCI.addCell(actualRes.getCustomer().getFirstName() + " " + actualRes.getCustomer().getLastName());
-				tableCI.addCell(actualRes.getResNotes());
+				tableCI.addCell(new PdfPCell(new Phrase("" + i, smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getReturnTime().toString(), smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getReturnLocation(), smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getReservedCategory(), smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getCar().getCarLicensePlate(), smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getCustomer().getFirstName() + " " + actualRes.getCustomer().getLastName(), smallFont)));
+				tableCI.addCell(new PdfPCell(new Phrase(actualRes.getResNotes(), smallFont)));
 			}
 			document.add(tableCI); 
 	            
@@ -218,10 +217,10 @@ public class PdfGeneration {
 	
 	
 	
-	public void pdfGenerateWeeklyPlan(ArrayList<Reservation> weeklyResCO, ArrayList<Reservation> weeklyResCI){
+	public void pdfGenerateWeeklyPlan(ArrayList<Reservation> weeklyResCO, ArrayList<Reservation> weeklyResCI, LocalDate ldt){
 		Document document = new Document();
 		try {
-			PdfWriter.getInstance(document, new FileOutputStream("WeeklyPlans/" + LocalDate.now() + "_weeklyPlanFMS.pdf"));
+			PdfWriter.getInstance(document, new FileOutputStream("WeeklyPlans/" + ldt + "_weeklyPlanFMS.pdf"));
 			document.open();
 			
 		    Image image1 = Image.getInstance(getClass().getResource("/Backgroundfms.jpg"));
@@ -232,7 +231,7 @@ public class PdfGeneration {
 	       
 	        document.add(new Paragraph("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
 			Paragraph titleP = new Paragraph("Your weekly plan", titleFont);
-			Paragraph titlePDate = new Paragraph(now + " (" + now.getDayOfWeek() + ") - " + now.plusDays(6) + " (" + now.plusDays(6).getDayOfWeek() + ")\n\n", secondTitleFont);
+			Paragraph titlePDate = new Paragraph(ldt + " (" + ldt.getDayOfWeek() + ") - " + ldt.plusDays(6) + " (" + ldt.plusDays(6).getDayOfWeek() + ")\n\n", secondTitleFont);
 			titleP.setAlignment(Paragraph.ALIGN_CENTER);
 			titlePDate.setAlignment(Paragraph.ALIGN_CENTER);
 			document.add(titleP);
