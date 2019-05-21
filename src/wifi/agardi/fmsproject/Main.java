@@ -2762,6 +2762,7 @@ public class Main extends Application {
 			        });
 			
 			DatePicker dateP = new DatePicker();
+			dateP.setPrefSize(160, 30);
 			dateP.setValue(ldt);
 			chooseDateBT.disableProperty().bind(dateP.valueProperty().isNull());
 			

@@ -123,7 +123,7 @@
 
 #chooseCarButton {
   -fx-background-image:url("ChooseCar.png");
-  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);		
   -fx-background-repeat: no-repeat;
   -fx-background-size: 50px;
   -fx-background-position: right center;
@@ -134,7 +134,7 @@
 
 #searchDriverButton {
   -fx-background-image:url("ChooseCustomer.png");
-  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);		
   -fx-background-repeat: no-repeat;
   -fx-background-size: 33px;
   -fx-background-position: right center;
@@ -192,7 +192,7 @@
 
 #calcPriceButton {
   -fx-background-image:url("IconCalculatePrice.png");
-  -fx-background-color: linear-gradient(#f2f1ed, #ccccc7);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);		
   -fx-background-repeat: no-repeat;
   -fx-background-size: 33px;
   -fx-background-position: right center;
@@ -221,7 +221,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #C0C0C0);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);	
 }
 #deleteCarButton {
   -fx-background-image:url("IconDelete.png");
@@ -324,7 +324,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#e5e5e5, #C0C0C0);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);	
 }
 
 #deactivCarButton{
@@ -335,7 +335,7 @@
   -fx-pref-height: 40px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#e5e5e5, #C0C0C0);
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);	
 }
 
 
@@ -361,7 +361,7 @@
   -fx-pref-height: 30px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#79e0de,  #e5e5e5);		
+  -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);		
  }
 
 
