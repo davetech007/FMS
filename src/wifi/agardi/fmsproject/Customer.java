@@ -18,11 +18,6 @@ public class Customer {
 	private String addressPostalCode;
 	
 	
-	public Customer() {
-		super();
-	}
-	
-	
 	public Customer(String customerID, String firstName, String lastName, LocalDate dateOfBorn, String nationality,
 			String passportNum, String driversLicenseNum, String telefon, String eMail, String addressLand,
 			String addressCity, String addressStreet, String addressPostalCode) {

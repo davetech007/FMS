@@ -5,35 +5,43 @@
 	
 }
 .label {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-font-family: "Avenir";
     -fx-text-fill: #ffffff;
     -fx-effect: dropshadow( gaussian , rgba(0,0,0) , 0,0,1,1 );
+     -fx-opacity: 0.9;
 }
 
 #nameLabel{
-	-fx-font-size: 30px;
-    -fx-font-weight: bold;
+	-fx-font-size: 34px;
     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-family: "Avenir next";
+    -fx-opacity: 0.7;
 }
 
 #actionTarget{
-	-fx-font-size: 12px;
+	-fx-font-family: "Avenir next";
+	-fx-font-size: 15px;
     -fx-text-fill: #ff0d00;
   	-fx-font-weight: bold;
   	-fx-effect: dropshadow( gaussian , rgba(255,255,255, 0.5) , 0,0,0,0 );
 }
 
 #actionTargetSuccess {
-	 -fx-font-size: 14px;
+	-fx-font-size: 15px;
+	-fx-font-family: "Avenir next";
 	-fx-text-fill: #30ff02;
   	-fx-font-weight: bold;
   	-fx-effect: dropshadow( gaussian , rgba(0, 0, 0, 0.5) , 0,0,0,0 );
 }
 
 .button {
+	-fx-font-family: "Avenir next";
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-color: linear-gradient(#8ee7f9, #61a2b1);
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-pref-height: 30px;
+  	-fx-pref-width: 70px;
 }

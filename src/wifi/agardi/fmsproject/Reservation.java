@@ -18,9 +18,6 @@ public class Reservation {
 	private boolean status;
 	private String statusName;
 	
-	public Reservation() {
-		super();
-	}
 
 	public Reservation(String resNumberID, Customer customer, Car car, String reservedCategory,
 			String insuranceType, String pickupLocation, LocalDateTime pickupTime,
@@ -158,15 +155,6 @@ public class Reservation {
 		}
 		return "";
 	}
-	
 
-	public void setStatusName(String statusName) {
-		this.statusName = statusName;
-	}
-
-	
-	
-
-	
 
 }

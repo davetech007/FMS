@@ -42,10 +42,6 @@ public class Car {
 		this.isOnRent = isOnRent;
 	}
 
-	
-
-
-
 	public String getCarVinNumber() {
 		return carVinNumber;
 	}

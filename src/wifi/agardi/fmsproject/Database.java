@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 
 
 public class Database {
-	public static final String DBlocation = "DatabaseTestNew9";
+	public static final String DBlocation = "Database";
 	public static final String connString = "jdbc:derby:" + DBlocation +";create=true";
 //USERS
 	public static final String usersTable = "Users";
@@ -30,12 +30,12 @@ public class Database {
 	public static final String fuelTypesTable = "FuelTypes";
 	public static final String fuelTypeIDCol = "FuelType_ID";
 	public static final String fuelTypeNameCol = "FuelTypeName";
-	private static final String[] fuelTypes = {"Benzin", "Diesel", "Hybrid", "Electric"};
+	private static final String[] fuelTypes = {"Benzin", "Diesel", "Hybrid", "Electric", "LPG", "Bio-diesel", "Ethanol", "Hydrogen"};
 	
 	public static final String transmissionsTable = "Transmissions";
 	public static final String transmissionIDCol = "Transmission_ID";
 	public static final String transmissionTypeCol = "TransmissionType";
-	private static final String[] transmissionTypes = {"Manual", "Automatic"};
+	private static final String[] transmissionTypes = {"Manual", "Automatic", "Semi-automatic"};
 	
 	public static final String colorsTable = "Colors";
 	public static final String colorIDCol = "Color_ID";
@@ -46,8 +46,11 @@ public class Database {
 	public static final String featuresTable = "Features";
 	public static final String featureIDCol = "Feature_ID";
 	public static final String featureNameCol = "FeatureName";
-	private static final String[] features = {"Air Condition", "Bluetooth", "Digital Cockpit", "Head-up display", "Heated seats", "Heated s.wheel", "Isofix", 
-			"Navigation", "Rain sensor", "Seat ventillation", "Start-stop", "USB", "WIFI", "Xenon", "LED-light", "Laser-light"};
+	private static final String[] features = {"Ambient lightning", "Air condition", "Camera 360", "Bluetooth", "Digital Cockpit","Head-up display", 
+											"Heated front seats", "Heated rear seats", "Heated s.wheel", "Isofix", "Navigation", "Rain sensor", 
+											"Seat ventilation", "Start-stop", "USB", "Xenon light", "LED-light", "Laser-light", "Tempomat", 
+											 "Electric front seats", "Electric rear seats", "Massage seats", "Sound system", "WLAN/Wifi", 
+											 "Night vision assist", "Sport seats", "Sunroof", "Panoramic roof", "Leather", "Alcantara", "Alloy wheels"};
 	
 	public static final String carFeaturesTable = "CarFeatures";
 	public static final String carFeaturesIDCol = "CarFeatures_ID";
@@ -164,14 +167,12 @@ public class Database {
 		
 		if(conn != null) {
 		try {
-			stmt = conn.createStatement();
-				
+			stmt = conn.createStatement();	
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the login creation of Statement...");
 			e.printStackTrace();
 			}
 		}
-		
 		try {
 			rs = stmt.executeQuery("SELECT * FROM "+ usersTable + 
 								   " WHERE " + userNameCol + " = '" + username + 
@@ -264,8 +265,7 @@ public class Database {
 	}
 	
     
-//CARS
-	
+//CARS	
 //CATEGORIES TABLE	
 	public static void createCarCategoriesTable() throws SQLException {
 		Connection conn = null;
@@ -343,6 +343,37 @@ public class Database {
 	    }
 	}
 
+	
+	public static void updateCarCategory(String category, String newName, int price) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "UPDATE " + categoriesTable + " SET " +
+											categoryNameCol + " = ?, " + 
+											categoryPriceCol + " = ? " +
+											"WHERE " + categoryIDCol + " = ?";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, newName);
+			pstmt.setInt(2, price);
+			pstmt.setInt(3, readCarCategoriesID(category));
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateCarCategory database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
 	
 	public static LinkedHashMap<String, Integer> readCarCategoriesTable() throws SQLException{
 		  Connection conn = null;
@@ -1629,7 +1660,6 @@ public class Database {
 	
 	
 	
-	
 //CUSTOMERS	
 	
 //NATIONALITY	
@@ -2069,7 +2099,6 @@ public class Database {
 	
 	
 	
-	
 //RESERVATIONS
 	public static void createReservationsTable() throws SQLException {
 		Connection conn = null;
@@ -2341,7 +2370,6 @@ public class Database {
 	
 	
 	
-	
 //INSURANCES
 	public static void createInsurancesTable() throws SQLException {
 		Connection conn = null;
@@ -2398,6 +2426,37 @@ public class Database {
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the addInsuranceType database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void updateInsuranceType(String insurance, String newName, int price) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "UPDATE " + insurancesTable + " SET " +
+											insuranceTypeCol + " = ?, " + 
+											insurancePriceCol + " = ? " +
+											"WHERE " + insuranceIDCol + " = ?";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, newName);
+			pstmt.setInt(2, price);
+			pstmt.setInt(3, readInsuraceID(insurance));
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateInsuranceType database connection...");
 			e.printStackTrace();
 		}finally {
 			try {
@@ -2573,6 +2632,37 @@ public class Database {
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Something is wrong with the addExtraType database connection...");
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(conn != null)
+					conn.close();
+			}
+			catch(SQLException e) {
+				throw e;
+			}
+	    }
+	}
+	
+	
+	public static void updateExtraType(String extra, String newName, int price) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String add = "UPDATE " + extrasTable + " SET " +
+											extraNameCol + " = ?, " + 
+											extraPriceCol + " = ? " +
+											"WHERE " + extraIDCol + " = ?";
+		try {
+			conn = DriverManager.getConnection(connString);
+			pstmt = conn.prepareStatement(add);
+			pstmt.setString(1, newName);
+			pstmt.setInt(2, price);
+			pstmt.setInt(3, readExtraID(extra));
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Something is wrong with the updateExtraType database connection...");
 			e.printStackTrace();
 		}finally {
 			try {

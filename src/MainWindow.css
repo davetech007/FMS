@@ -1,6 +1,6 @@
 
 .root *{
-	-fx-font-family: "Segoe UI Light";
+	-fx-font-family: "Avenir";
 }
 
 .root {
@@ -10,11 +10,8 @@
 
 .tab {
     -fx-alignment: center;   
-    -fx-pref-width: 253
-} 
-.tab {
-    -fx-alignment: center;
-    -fx-pref-height: 40
+    -fx-pref-width: 253;
+    -fx-pref-height: 40;
 } 
 
 .tab-header-background {
@@ -34,7 +31,9 @@
 }
 
 .tab .tab-label{
-    -fx-text-fill: #1e1003;
+    -fx-text-fill: #514f4b;
+    -fx-font-family: "Avenir";
+    -fx-font-size: 17px;
 }
 
 .tab:selected .focus-indicator {
@@ -47,6 +46,18 @@
 }
 .tab:selected .tab-label {
      -fx-text-fill: #1e1003;
+}
+
+#mainTitle{
+	-fx-font-size: 28px;
+	-fx-font-family: "Avenir";
+	-fx-opacity: 0.9;
+    -fx-text-fill: #1e1003;
+    -fx-effect: dropshadow( gaussian , rgba(255, 255, 255) , 0,0,1,1 );
+}
+
+.table-view {
+	-fx-opacity: 0.8;
 }
 
 
@@ -78,17 +89,6 @@
 }
 
 
-#mainTitle{
-	-fx-font-size: 26px;
-	-fx-font-family: "Segoe UI Light";
-	-fx-opacity: 1;
-    -fx-text-fill: #1e1003;
-    -fx-effect: dropshadow( gaussian , rgba(255, 255, 255) , 0,0,1,1 );
-}
-
-.table-view {
-	-fx-opacity: 0.8;
-}
 
 #searchTF {
   -fx-background-image:url("IconSearch.png");
@@ -142,6 +142,7 @@
   -fx-pref-height: 30px;
   -fx-pref-width: 195px;
 }
+
 
 
 
@@ -258,8 +259,6 @@
 
 
 
-
-
 #printPdfButton {
   -fx-background-image:url("IconPrintPdf.png");
   -fx-background-repeat: no-repeat;
@@ -337,8 +336,26 @@
   -fx-padding: 0 0 0 20;
   -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);	
 }
-
-
+#addTypesButton{
+  -fx-background-image:url("IconAddTypes.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 36px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#d7cedb,  #e2e2e2);	
+}
+#updateTypesButton{
+  -fx-background-image:url("IconUpdateTypes.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 40px;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 40px;
+  -fx-background-position: 5%;	
+  -fx-padding: 0 0 0 20;
+  -fx-background-color: linear-gradient(#d7cedb,  #e2e2e2);	
+}
 
 
 
@@ -350,21 +367,19 @@
   -fx-pref-height: 30px;
   -fx-background-position: 5%;	
   -fx-padding: 0 0 0 20;
-  -fx-background-color: linear-gradient(#efefef, #ff7c7c);	
+  -fx-background-color: linear-gradient(#ff7c7c, #e5e5e5);	
 }
 
 #chooseDateBT {
   -fx-background-image:url("IconChooseDate.png");
   -fx-background-repeat: no-repeat;
   -fx-background-size: 25px;
-  -fx-pref-width: 120px;
+  -fx-pref-width: 125px;
   -fx-pref-height: 30px;
-  -fx-background-position: 5%;	
-  -fx-padding: 0 0 0 20;
+  -fx-background-position: 95%;
+  -fx-padding: 0 0 0 0;
   -fx-background-color: linear-gradient(#c8bdcc,  #e2e2e2);		
  }
-
-
 
 
 
@@ -374,8 +389,7 @@
 }
 .dialog-pane:header .header-panel .label{
   -fx-alignment: center;
-  -fx-font-size: 14px;
-  -fx-font-family: "Segoe UI Light";
-  -fx-font-weight: bold;
+  -fx-font-size: 18px;
+  -fx-font-family: "Avenir";
 }
 

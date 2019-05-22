@@ -62,6 +62,4 @@ public class ReturnCarDialog extends Dialog<Integer>{
 		});	
 	}
 
-	
-
 }

@@ -221,8 +221,5 @@ public class CustomerFX {
 		return addressPostalCode;
 	}
 	
-	
-	
-	
 
 }
