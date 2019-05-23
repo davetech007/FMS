@@ -42,7 +42,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 
 	CustomerFX selectedCustomer;
 
-	public CustomerListDialog(String active, String deactive) {
+	public CustomerListDialog(String active, String deactive, ObservableList<ReservationFX> obsRes) {
 		super();
 		this.setTitle("Customer list");
 		this.setHeaderText("Search");
@@ -55,8 +55,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		}
 
 		ComboBox<String> searchCB = new ComboBox<>();
-		searchCB.setItems(
-				FXCollections.observableArrayList("Searching criteria", "Customer ID", "First name", "Last name"));
+		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Customer ID", "First name", "Last name"));
 		searchCB.getSelectionModel().selectFirst();
 		searchCB.setId("carSearchBox");
 
@@ -142,14 +141,15 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 //DELETE Customer
 		deleteCustomerButton.setOnAction(e -> {
 			try {
-				for (Reservation r : Database.readReservationsTable("active", "")) {
-					if (r.getCustomer().getCustomerID().equals(selectedCustomer.getCustomerID())
-											&& r.getReturnTime().isAfter(LocalDateTime.now())) {
+				for (ReservationFX r : obsRes) {
+					if (r.getModellObject().isStatus() == false && 
+								r.getModellObject().getCustomer().getCustomerID().equals(selectedCustomer.getCustomerID())
+											&& r.getModellObject().getReturnTime().isAfter(LocalDateTime.now())) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Deleting a customer");
 						alertWarn.setHeaderText("You can't delete this customer!");
 						alertWarn.setContentText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName()
-												+ " still has a reservation (ID = '" + r.getResNumberID() + "').\n"
+												+ " still has a reservation (ID = '" + r.getModellObject().getResNumberID() + "').\n"
 												+ "You should first cancel the reservation.");
 						alertWarn.showAndWait();
 						return;
