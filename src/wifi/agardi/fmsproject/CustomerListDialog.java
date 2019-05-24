@@ -33,14 +33,12 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class CustomerListDialog extends Dialog<CustomerFX> {
-	DropShadow shadow = new DropShadow();
+	private CustomerFX selectedCustomer;
 	private ObservableList<CustomerFX> observCustomers;
-	TableView<CustomerFX> customersTableView;
 	private FilteredList<CustomerFX> filteredListCustomers; // Filtered and sorted list are connected with the
-															// observable list, needed to make because the id search
-	private SortedList<CustomerFX> sortedListCustomers;
-
-	CustomerFX selectedCustomer;
+	private SortedList<CustomerFX> sortedListCustomers;		// observable list, needed to make because the id search							
+	
+	private TableView<CustomerFX> customersTableView;
 
 	public CustomerListDialog(String active, String deactive, ObservableList<ReservationFX> obsRes) {
 		super();
@@ -68,7 +66,8 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		deleteCustomerButton.setPadding(new Insets(0, 0, 0, 20));
 		deleteCustomerButton.setId("deleteCustomerButton");
 		deleteCustomerButton.setDisable(true);
-//Animation shadow for delete button		
+//Animation shadow for delete button	
+		DropShadow shadow = new DropShadow();
 		deleteCustomerButton.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent e) {
@@ -94,6 +93,13 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			if (newV != null) {
 				selectedCustomer = customersTableView.getSelectionModel().getSelectedItem();
 				deleteCustomerButton.setDisable(false);
+				this.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
+			}
+			if(newV == null) {
+				deleteCustomerButton.setDisable(true);
+				if (active.equals("active") && deactive.equals("")) {
+				this.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+				}
 			}
 		});
 
@@ -195,6 +201,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		ButtonType ok = ButtonType.OK;
 		ButtonType cancel = ButtonType.CANCEL;
 		this.getDialogPane().getButtonTypes().addAll(ok, cancel);
+		this.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 
 //Return selected customer object
 		this.setResultConverter(new Callback<ButtonType, CustomerFX>() {
@@ -208,7 +215,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		});
 	}
 
-	public void fillCustomersObservableList() {
+	private void fillCustomersObservableList() {
 		observCustomers = FXCollections.observableArrayList();
 		ArrayList<Customer> customers = new ArrayList<>();
 		try {
@@ -224,7 +231,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		sortedListCustomers = new SortedList<>(filteredListCustomers);
 	}
 
-	public void fillDeactiveCustomersObservableList() {
+	private void fillDeactiveCustomersObservableList() {
 		observCustomers = FXCollections.observableArrayList();
 		ArrayList<Customer> customers = new ArrayList<>();
 		try {
@@ -240,7 +247,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		sortedListCustomers = new SortedList<>(filteredListCustomers);
 	}
 
-	public TableView<CustomerFX> customersTableView(String active, String deactive) {
+	private TableView<CustomerFX> customersTableView(String active, String deactive) {
 		if (active.equals("active") && deactive.equals("")) {
 			fillCustomersObservableList();
 		} else {

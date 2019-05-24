@@ -59,6 +59,10 @@
 .table-view {
 	-fx-opacity: 0.8;
 }
+#IdLabel{
+	-fx-font-weight: bold;
+	-fx-font-size: 14px;
+}
 
 
 

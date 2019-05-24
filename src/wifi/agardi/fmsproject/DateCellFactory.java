@@ -7,8 +7,8 @@ import javafx.scene.control.DateCell;
 import javafx.scene.paint.Color;
 
 public class DateCellFactory extends DateCell {
-	LocalDate before;
-	LocalDate after;
+	private LocalDate before;
+	private LocalDate after;
 
 	public DateCellFactory() {
 

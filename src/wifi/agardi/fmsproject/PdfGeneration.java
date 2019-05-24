@@ -21,10 +21,10 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class PdfGeneration {
-	Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
-	Font secondTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, BaseColor.BLACK);
-	Font smallFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
-	Chunk signature = new Chunk("FMSADV - Wien, " + LocalDateTime.now());
+	private Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
+	private Font secondTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, BaseColor.BLACK);
+	private Font smallFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
+	private Chunk signature = new Chunk("FMSADV - Wien, " + LocalDateTime.now());
 
 	public void pdfGenerateReservation(Reservation res, int catPrice, int insPrice) {
 		Document document = new Document();
@@ -126,7 +126,7 @@ public class PdfGeneration {
 			float[] columnWidths = { 1, 3, 3, 2, 2, 3, 1 };
 			PdfPTable table = new PdfPTable(columnWidths);
 			table.setWidthPercentage(100);
-			PdfPCell cell = new PdfPCell(new Phrase("CHECK OUT", secondTitleFont));
+			PdfPCell cell = new PdfPCell(new Phrase("CHECK-OUT", secondTitleFont));
 			cell.setBackgroundColor(GrayColor.GRAYWHITE);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(7);
@@ -164,7 +164,7 @@ public class PdfGeneration {
 
 			PdfPTable tableCI = new PdfPTable(columnWidths);
 			tableCI.setWidthPercentage(100);
-			PdfPCell cell2 = new PdfPCell(new Phrase("CHECK IN", secondTitleFont));
+			PdfPCell cell2 = new PdfPCell(new Phrase("CHECK-IN", secondTitleFont));
 			cell2.setBackgroundColor(GrayColor.GRAYWHITE);
 			cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell2.setColspan(7);
@@ -234,7 +234,7 @@ public class PdfGeneration {
 			float[] columnWidths = { 1, 2, 3, 2, 2, 2, 3, 1 };
 			PdfPTable table = new PdfPTable(columnWidths);
 			table.setWidthPercentage(100);
-			PdfPCell cell = new PdfPCell(new Phrase("CHECK OUT", secondTitleFont));
+			PdfPCell cell = new PdfPCell(new Phrase("CHECK-OUT", secondTitleFont));
 			cell.setBackgroundColor(GrayColor.GRAYWHITE);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(8);
@@ -275,7 +275,7 @@ public class PdfGeneration {
 
 			PdfPTable tableCI = new PdfPTable(columnWidths);
 			tableCI.setWidthPercentage(100);
-			PdfPCell cell2 = new PdfPCell(new Phrase("CHECK IN", secondTitleFont));
+			PdfPCell cell2 = new PdfPCell(new Phrase("CHECK-IN", secondTitleFont));
 			cell2.setBackgroundColor(GrayColor.GRAYWHITE);
 			cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell2.setColspan(8);
@@ -324,7 +324,7 @@ public class PdfGeneration {
 		}
 	}
 
-	public int getDays(Reservation rs) {
+	private int getDays(Reservation rs) {
 		LocalDateTime ldtReturn = rs.getReturnTime().minusMinutes(45);
 		int days = 0;
 		long hrs = Duration.between(rs.getPickupTime(), ldtReturn).toHours();

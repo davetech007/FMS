@@ -14,7 +14,6 @@
 
 #nameLabel{
 	-fx-font-size: 34px;
-    -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
     -fx-font-family: "Avenir next";
     -fx-opacity: 0.7;
@@ -26,6 +25,7 @@
     -fx-text-fill: #ff0d00;
   	-fx-font-weight: bold;
   	-fx-effect: dropshadow( gaussian , rgba(255,255,255, 0.5) , 0,0,0,0 );
+  	-fx-background-color: linear-gradient(#70604c,  #d6c7b3);
 }
 
 #actionTargetSuccess {

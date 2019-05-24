@@ -14,9 +14,9 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class CarListDialog extends Dialog<CarFX> {
-	ObservableList<CarFX> cars;
-	CarFX selectedCar;
-	TableView<CarFX> carsTableView;
+	private ObservableList<CarFX> cars;
+	private CarFX selectedCar;
+	private TableView<CarFX> carsTableView;
 
 	public CarListDialog(ObservableList<CarFX> cars) {
 		super();
@@ -57,7 +57,7 @@ public class CarListDialog extends Dialog<CarFX> {
 		});
 	}
 
-	public TableView<CarFX> carsTableView() {
+	private TableView<CarFX> carsTableView() {
 		TableColumn<CarFX, Number> numberCol = new TableColumn<>("nr.");
 		numberCol.setSortable(false);
 		numberCol.setPrefWidth(35);

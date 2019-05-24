@@ -155,7 +155,7 @@ public class UpdateTypesDialog extends Dialog<String> {
 		});
 	}
 
-	public Alert alert(String s) {
+	private Alert alert(String s) {
 		Alert alertWarn = new Alert(AlertType.WARNING);
 		alertWarn.setTitle("Please restart!");
 		alertWarn.setHeaderText("Please restart the program to see the changes!");

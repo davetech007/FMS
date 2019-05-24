@@ -11,13 +11,13 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class ReturnCarDialog extends Dialog<Integer>{
-	int newKm = 0;
+	private int newKm = 0;
 	
 	public ReturnCarDialog(Car car) {
 		super();
-		this.setTitle("Check in car");
+		this.setTitle("Check-in car");
 
-		this.setHeaderText("Check in '" + car.getCarLicensePlate() + "' \n" +
+		this.setHeaderText("Check-in '" + car.getCarLicensePlate() + "' \n" +
 						   "Old km : " + car.getCarKM() + " km");
 		
 		Label lbMessage = new Label();

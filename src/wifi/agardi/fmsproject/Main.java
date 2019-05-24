@@ -42,6 +42,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -64,54 +66,53 @@ import javafx.scene.layout.VBox;
 
 
 public class Main extends Application {
-	DropShadow shadow = new DropShadow();  //Effect for the buttons
-	int minEngineSize = 500;
-	int minEnginePower = 40;
-	Stage mainStage;
+	private DropShadow shadow = new DropShadow();  //Effect for the buttons
+	private int minEngineSize = 500;
+	private int minEnginePower = 40;
+	private Stage mainStage;
 	
-	TabPane mainTabPane;
-	Tab carsTab;
-	Tab reserveTab;
-	Tab reservationsTab;
-	Tab dashboardTab;
+	private TabPane mainTabPane;
+	private Tab carsTab;
+	private Tab reserveTab;
+	private Tab reservationsTab;
+	private Tab dashboardTab;
 	
-	TableView<CarFX> carsTableView;
-	CarFX selectedCar;
+	private TableView<CarFX> carsTableView;
+	private CarFX selectedCar;
 	private ObservableList<CarFX> observCars;
 	private ObservableList<CarFX> observDeactiveCars;
 	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
 	private SortedList<CarFX> sortedListCars;
 	
-	Label carLicensePlateLB;
-    ComboBox<String> carComboBox;
+	private Label carLicensePlateLB;
+	private ComboBox<String> carComboBox;
 
-	Label custIdLabel;
-	Label resIdLabel;
-	Label rentStatusLabel;
-	Label customerStatusLabel;
-	Label carStatusLabel;
-	CustomerFX selectedCust;
+	private Label custIdLabel;
+	private Label resIdLabel;
+	private Label rentStatusLabel;
+	private Label customerStatusLabel;
+	private Label carStatusLabel;
+	private CustomerFX selectedCust;
 	
-	TableView<ReservationFX> reservTableView;
-	ReservationFX selectedRes;
+	private TableView<ReservationFX> reservTableView;
+	private ReservationFX selectedRes;
 	private ObservableList<ReservationFX> observReservations;
 	private FilteredList<ReservationFX> filteredListReservations;
 	private SortedList<ReservationFX> sortedListReservations;
 	
-	BorderPane reservationsBP;
+	private BorderPane reservationsBP;
 
-	Button printPdfButton;
-	Button deleteResButton;
-	Button showResButton;
+	private Button printPdfButton;
+	private Button deleteResButton;
+	private Button showResButton;
 	
-	ArrayList<String> featuresOriginal;
-	ArrayList<String> extrasOriginal;
+	private ArrayList<String> featuresOriginal;
+	private ArrayList<String> extrasOriginal;
 	
-
 //LOGIN WINDOW	
 	@Override
 	public void start(Stage primaryStage) {
-//Setting up LOGIN page		
+//Setting up LOGIN page	
 			BorderPane loginBP = new BorderPane();
 			loginBP.setPadding(new Insets(35, 35, 35, 35));
 			GridPane loginGP = new GridPane();
@@ -153,13 +154,15 @@ public class Main extends Application {
 			HBox actionHBox = new HBox();
 			actionHBox.setAlignment(Pos.BOTTOM_CENTER);
 			actionHBox.getChildren().add(actionTarget);
-			loginGP.add(actionHBox, 0, 8);
+			loginGP.add(actionHBox, 0, 7);
+			
 //LogIn on action			
 			logInButton.setOnAction(new EventHandler<ActionEvent>() {	
 				@Override
 				public void handle(ActionEvent event) {
 					try {
 						if(Database.logIn(userNameTField.getText(), passwordField.getText())) {
+						actionTarget.setText("Loading...");
 						primaryStage.close();
 						mainMenu();
 						}
@@ -232,8 +235,9 @@ public class Main extends Application {
 	
 
 //MAIN WINDOW after login
-	public void mainMenu() {
+	private void mainMenu() {
 		    mainStage = new Stage();
+		    
 			HBox mainHB = new HBox();
 			mainHB.setPadding(new Insets(15, 10 , 12, 10));
 			mainHB.setAlignment(Pos.CENTER);
@@ -255,7 +259,7 @@ public class Main extends Application {
 			reserveTab.setContent(openReserveMenu());
 			reserveTab.setClosable(false);
 			reserveTab.setId("reserveTab");
-		
+			
 			fillCarsObservableList("active", "");
 			fillCarsObservableList("", "deactive");
 			carsTab = new Tab("Cars");
@@ -314,7 +318,7 @@ public class Main extends Application {
 	
 	
 //RESERVE MENU	
-	public BorderPane openReserveMenu() {
+	private BorderPane openReserveMenu() {
 		//Creating hours, and minutes for the pickup/return time
 		ArrayList<String> hours = new ArrayList<>();
 		for(int i = 0; i<24; i++) {
@@ -393,8 +397,12 @@ public class Main extends Application {
 			reserveGP.add(dLicenseTF, 0, 7);
 					
 //Grid 1. column	
-			custIdLabel = new Label("ID: ");
-			reserveGP.add(custIdLabel, 1, 0);
+			
+			custIdLabel = new Label();
+			custIdLabel.setId("IdLabel");
+			HBox custHB = new HBox(custIdLabel);
+			custHB.setAlignment(Pos.CENTER);
+			reserveGP.add(custHB, 1, 0);
 			
 			Label addressLabel = new Label("Address / Contact");
 			reserveGP.add(addressLabel, 1, 1);
@@ -526,10 +534,13 @@ public class Main extends Application {
 			calcVB.setAlignment(Pos.BOTTOM_LEFT);
 			reserveGP.add(calcVB, 3, 10);
 			
+			
 //Grid 4. column
-			carLicensePlateLB = new Label("Lic.plate: ");
-			carLicensePlateLB.setPrefWidth(130);
-			reserveGP.add(carLicensePlateLB, 4, 0);
+			carLicensePlateLB = new Label();
+			carLicensePlateLB.setId("IdLabel");
+			HBox lbHB = new HBox(carLicensePlateLB);
+			lbHB.setAlignment(Pos.CENTER);
+			reserveGP.add(lbHB, 4, 0);
 
 			Label dateLabel = new Label("Insurance");
 			reserveGP.add(dateLabel, 4, 1);
@@ -586,12 +597,15 @@ public class Main extends Application {
 		
 //PRICE		    
 			VBox priceVBox = new VBox();
-			resIdLabel =           new Label("ResID : ");
+			resIdLabel =           new Label();
+			resIdLabel.setId("IdLabel");
+			HBox residHB = new HBox(resIdLabel);
+			residHB.setAlignment(Pos.CENTER);
 			Label priceDaysLabel = new Label("Rent  : ");
 			Label priceLabelIns =  new Label("Ins.  : "); 
 			Label priceLabel2 =    new Label("Extras: ");
 			Label priceLabel3 =    new Label("Total : ");
-			priceVBox.getChildren().addAll(resIdLabel, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
+			priceVBox.getChildren().addAll(residHB, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
 			reserveGP.add(priceVBox, 4, 10);
 			
 			
@@ -684,7 +698,7 @@ public class Main extends Application {
 			          }
 			        });
 			
-//TODO			
+		
 			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
 			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
 			
@@ -706,7 +720,7 @@ public class Main extends Application {
 				Optional<CustomerFX> result = custList.showAndWait();
 				if(result.isPresent()) {
 					selectedCust = result.get();
-					custIdLabel.setText("ID: " + selectedCust.getModellObject().getCustomerID());
+					custIdLabel.setText(selectedCust.getModellObject().getCustomerID());
 					firstNameTF.setText(selectedCust.getModellObject().getFirstName());
 					lastNameTF.setText(selectedCust.getModellObject().getLastName());
 					dateBornPicker.setValue(selectedCust.getModellObject().getDateOfBorn());
@@ -725,7 +739,7 @@ public class Main extends Application {
 			custIdLabel.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					if(newValue.length() > 8) {
+					if(newValue.length() > 4) {
 						updateCustomerButton.disableProperty().bind(custObs);
 					}
 				}
@@ -793,7 +807,7 @@ public class Main extends Application {
 				Optional<ButtonType> result = confirmAdd.showAndWait();
 				if (result.get() == ButtonType.OK) {
 					Database.addNewCustomer(newCustomer.getModellObject());
-					custIdLabel.setText("ID: " + newCustomer.getModellObject().getCustomerID());
+					custIdLabel.setText(newCustomer.getModellObject().getCustomerID());
 					selectedCust = newCustomer;
 				}
 			} catch (SQLException e1) {
@@ -824,7 +838,6 @@ public class Main extends Application {
 														addressLand, addressCity, addressStreet, addressPostalCode));
 				
 				
-				
 				for (Customer r : Database.readCustomersTable("", "deactive")) {
 					if (selectedCust.getCustomerID().equals(r.getCustomerID())) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
@@ -835,7 +848,11 @@ public class Main extends Application {
 						return;
 					}
 				}
+				Customer dbCustomer = null;
 				for (Customer c : Database.readCustomersTable("", "")) {
+					if (c.getCustomerID().equals(customerID)) {
+						dbCustomer = c;
+					}
 					if (!selectedCust.getModellObject().getCustomerID().equals(c.getCustomerID())
 							&& c.getPassportNum().equals(passportNum)) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
@@ -868,13 +885,15 @@ public class Main extends Application {
 						alertWarn.showAndWait();
 						return;
 					}
-					if (c.getCustomerID().equals(customerID)) {
+				}
+				
+					if (dbCustomer != null && dbCustomer.getCustomerID().equals(customerID)) {
 						Alert confirmUpdate = new Alert(AlertType.CONFIRMATION);
 						confirmUpdate.setTitle("Updating customer");
 						confirmUpdate.setHeaderText("Please confirm!");
 						confirmUpdate.setContentText("Would you really want to UPDATE the selected customer?\n\n"
 													+ "Customer with this ID '" + customerID + "' exists under this name '"
-													+ c.getFirstName() + " " + c.getLastName() + "'.\n\n" + "Update to '" + firstName + " "
+													+ dbCustomer.getFirstName() + " " + dbCustomer.getLastName() + "'.\n\n" + "Update to '" + firstName + " "
 													+ lastName + "'?");
 						Optional<ButtonType> result = confirmUpdate.showAndWait();
 						if (result.get() == ButtonType.OK) {
@@ -883,7 +902,6 @@ public class Main extends Application {
 							reservationsBP.setCenter(showReservationsTableView());
 						}
 					}
-				}
 			} catch (SQLException e1) {
 				System.out.println("Something is wrong with the database - update custormer");
 				e1.printStackTrace();
@@ -903,7 +921,7 @@ public class Main extends Application {
 			
 			//Enable with calculate price + other details the reserve button 
 			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(6).
-															or(carLicensePlateLB.textProperty().length().lessThan(12)).
+															or(carLicensePlateLB.textProperty().isEmpty()).
 															or(pickupLocTF.textProperty().isEmpty()).
 															or(returnLocTF.textProperty().isEmpty()).
 															or((ObservableBooleanValue) calcObs);
@@ -958,7 +976,7 @@ public class Main extends Application {
 			resIdLabel.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue.length() > 8) {
+				if (newValue.length() > 5) {
 					try {
 						for (Customer s : Database.readCustomersTable("", "")) {
 							if (s.getCustomerID().equals(selectedRes.getModellObject().getCustomer().getCustomerID())) {
@@ -979,7 +997,7 @@ public class Main extends Application {
 							System.out.println("Something is wrong with the reading customers");
 							e1.printStackTrace();
 						}
-						custIdLabel.setText("ID: " + selectedRes.getModellObject().getCustomer().getCustomerID());
+						custIdLabel.setText(selectedRes.getModellObject().getCustomer().getCustomerID());
 						firstNameTF.setText(selectedRes.getModellObject().getCustomer().getFirstName());
 					    lastNameTF.setText(selectedRes.getModellObject().getCustomer().getLastName());
 					    dateBornPicker.setValue(selectedRes.getModellObject().getCustomer().getDateOfBorn());
@@ -993,7 +1011,7 @@ public class Main extends Application {
 					    telefonTF.setText(selectedRes.getModellObject().getCustomer().getTelefon());
 					    emailTF.setText(selectedRes.getModellObject().getCustomer().geteMail());
 					    carComboBox.setValue(selectedRes.getModellObject().getReservedCategory());
-					    carLicensePlateLB.setText("Lic.plate: " + selectedRes.getModellObject().getCar().getCarLicensePlate());
+					    carLicensePlateLB.setText(selectedRes.getModellObject().getCar().getCarLicensePlate());
 					    insuranceComboBox.setValue(selectedRes.getModellObject().getInsuranceType());
 					    pickupLocTF.setText(selectedRes.getModellObject().getPickupLocation());
 					    returnLocTF.setText(selectedRes.getModellObject().getReturnLocation());
@@ -1038,6 +1056,13 @@ public class Main extends Application {
 //RESERVE BUTTON ON ACTION			
 			reserveButton.setOnAction(e -> {
 			  try {	
+				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+					for (CarFX car : observCars) {
+						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+							selectedCar = car;
+						}
+					}
+				}
 				String resNumberID = "RESID" + String.valueOf(System.currentTimeMillis() / 1000);
 				String reservedCategory = carComboBox.getSelectionModel().getSelectedItem().toString();
 				String insuranceType = insuranceComboBox.getSelectionModel().getSelectedItem().toString();
@@ -1086,7 +1111,8 @@ public class Main extends Application {
 					}
 				}
 				for (CarFX c : observDeactiveCars) {
-					if (selectedCar.getCarVinNumber().equals(c.getModellObject().getCarVinNumber())) {
+					if (selectedCar.getCarVinNumber().equals(c.getModellObject().getCarVinNumber())
+							 || carLicensePlateLB.getText().equals(c.getModellObject().getCarLicensePlate())) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Make a reservation");
 						alertWarn.setHeaderText("Please check again!");
@@ -1126,7 +1152,7 @@ public class Main extends Application {
 						Database.addNewReservation(newRes.getModellObject());
 						observReservations.add(newRes);
 						selectedRes = newRes;
-						resIdLabel.setText("ResID: " + selectedRes.getModellObject().getResNumberID());
+						resIdLabel.setText(selectedRes.getModellObject().getResNumberID());
 						rentStatusLabel.setText("Status : " + selectedRes.getStatusName());
 						calcPriceButton.fire();
 				}
@@ -1140,6 +1166,20 @@ public class Main extends Application {
 //UPDATE RES BUTTON ON ACTION
 			updateResButton.setOnAction(e -> {
 			 try {	
+				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+					for (CarFX car : observCars) {
+						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+							selectedCar = car;
+						}
+					}
+				}
+				if (!selectedRes.getModellObject().getResNumberID().equals(resIdLabel.getText())) {
+					for (ReservationFX r : observReservations) {
+						if (r.getModellObject().getResNumberID().equals(resIdLabel.getText())) {
+							selectedRes = r;
+						}
+					}
+				}
 				String resNumberID = selectedRes.getModellObject().getResNumberID();
 				String reservedCategory = carComboBox.getSelectionModel().getSelectedItem().toString();
 				String insuranceType = insuranceComboBox.getSelectionModel().getSelectedItem().toString();
@@ -1187,7 +1227,8 @@ public class Main extends Application {
 					}
 				}
 				for (CarFX c : observDeactiveCars) {
-					if (selectedCar.getCarVinNumber().equals(c.getModellObject().getCarVinNumber())) {
+					if (selectedCar.getCarVinNumber().equals(c.getModellObject().getCarVinNumber())
+							 || carLicensePlateLB.getText().equals(c.getModellObject().getCarLicensePlate())) {
 						Alert alertWarn = new Alert(AlertType.WARNING);
 						alertWarn.setTitle("UPDATE a reservation");
 						alertWarn.setHeaderText("Please check again!");
@@ -1219,7 +1260,8 @@ public class Main extends Application {
 				Alert alertUpdate = new Alert(AlertType.CONFIRMATION);
 				alertUpdate.setTitle("Updating a reservation");
 				alertUpdate.setHeaderText("Please confirm!");
-				alertUpdate.setContentText("Would you really want to UPDATE this reservation?\n\n" + "Reserved category: '"
+				alertUpdate.setContentText("Would you really want to UPDATE this reservation?\n"
+										+ "Reservation number: " + resNumberID + "\n\nReserved category: '"
 										+ reservedCategory + "'\n" + "License plate: '" + selectedCar.getCarLicensePlate()
 										+ "'\n" + "For: '" + selectedCust.getModellObject().getFirstName() + " "
 										+ selectedCust.getModellObject().getLastName() + "'");
@@ -1259,7 +1301,7 @@ public class Main extends Application {
 
 
 //CARS MENU	
-	public TableView<CarFX> showCarsTableView() {
+	private TableView<CarFX> showCarsTableView() {
 		TableColumn<CarFX, Number> numberCol = new TableColumn<>("nr.");
 		numberCol.setSortable(false);
 		numberCol.setPrefWidth(35);
@@ -1323,7 +1365,7 @@ public class Main extends Application {
 	
 	
 	
-	public BorderPane openCarsMenu() {
+	private BorderPane openCarsMenu() {
 		Label basePriceLB = new Label("Base price = ");
 			BorderPane carsBP = new BorderPane();
 			
@@ -1366,6 +1408,7 @@ public class Main extends Application {
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
 					searchTF.setDisable(false);
+					searchTF.clear();
 				}
 				else {
 					filteredListCars.setPredicate(s -> s.getModellObject().getCarCategory().contains(newV));
@@ -1701,6 +1744,13 @@ public class Main extends Application {
 				Collections.sort(ls);
 				reservationsLV.getItems().addAll(ls);
 			}
+			if(newS == null) {
+				makeResButton.setDisable(true);
+				onRentButton.setDisable(true);
+				deleteCarButton.setDisable(true);
+				updateCarButton.disableProperty().unbind();
+				updateCarButton.setDisable(true);
+			}
 		});
 			
 			
@@ -1740,9 +1790,9 @@ public class Main extends Application {
 					return;
 				} else {
 					Alert alertConf = new Alert(AlertType.CONFIRMATION);
-					alertConf.setTitle("Check out car");
+					alertConf.setTitle("Check-out car");
 					alertConf.setHeaderText("Please confirm!");
-					alertConf.setContentText("Check out '" + licPlate + "'?");
+					alertConf.setContentText("Check-out '" + licPlate + "'?");
 					Optional<ButtonType> result = alertConf.showAndWait();
 					if (result.get() == ButtonType.OK) {
 						Database.checkOutCar(vinNum);
@@ -1775,7 +1825,7 @@ public class Main extends Application {
 		makeResButton.setOnAction(e -> {
 			mainTabPane.getSelectionModel().select(reserveTab);
 			selectedCar = carsTableView.getSelectionModel().getSelectedItem();
-			carLicensePlateLB.setText("Lic.plate: " + selectedCar.getModellObject().getCarLicensePlate());
+			carLicensePlateLB.setText(selectedCar.getModellObject().getCarLicensePlate());
 			carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
 		});
 
@@ -1805,6 +1855,9 @@ public class Main extends Application {
 				try {
 					Database.deleteCar(selectedCar.getModellObject().getCarVinNumber());
 					observDeactiveCars.add(selectedCar);
+					if(carLicensePlateLB.getText().equals(selectedCar.getModellObject().getCarLicensePlate())) {
+					carStatusLabel.setText("Car status : DEACTIVE");
+					}
 					observCars.remove(selectedCar);
 					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
 				} catch (SQLException e1) {
@@ -1848,8 +1901,16 @@ public class Main extends Application {
 					alertWarn.setTitle("Updating a car");
 					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
 					alertWarn.setContentText("Car with the VIN number '" + vinNumber + "' doesn't exists! Please add as a new car! "
-											+ "\n\nNote, that it is NOT possible to update the VIN number. "
-											+ "In this case, please delete this car, and add as a new one!");
+											+ "\n\nNote, that it is NOT possible to update the VIN number.");
+					alertWarn.showAndWait();
+					return;
+				}
+				if (licPDatabase.equals("")) {
+					Alert alertWarn = new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Updating a car");
+					alertWarn.setHeaderText("Please check again, it seems it's a new car!");
+					alertWarn.setContentText("Car with the license plate '" + licPlate + "' doesn't exists! Please add as a new car! "
+											+ "\n\nNote, that it is NOT possible to update the license plate number.");
 					alertWarn.showAndWait();
 					return;
 				}
@@ -2027,7 +2088,7 @@ public class Main extends Application {
 	
 	
 //RESERVATIONS MENU	
-	public TableView<ReservationFX> showReservationsTableView(){
+	private TableView<ReservationFX> showReservationsTableView(){
 		TableColumn<ReservationFX, Number> numberCol = new TableColumn<>("nr.");
 		numberCol.setSortable(false);
 		numberCol.setPrefWidth(30);
@@ -2109,17 +2170,22 @@ public class Main extends Application {
 				showResButton.setDisable(false);
 				deleteResButton.setDisable(false);
 			}
+			if(newS == null) {
+				printPdfButton.setDisable(true);
+				showResButton.setDisable(true);
+				deleteResButton.setDisable(true);
+			}
 		});
 		return reservTableView;
 	}
 
 	
 
-	public BorderPane openReservationsMenu() {
+	private BorderPane openReservationsMenu() {
 		reservationsBP = new BorderPane();			
 //Search		
 		ComboBox<String> searchCB = new ComboBox<>();
-		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Reservation ID", "First name", "Last name"));
+		searchCB.setItems(FXCollections.observableArrayList("All reservations", "Reservation ID", "First name", "Last name"));
 		searchCB.getSelectionModel().selectFirst();
 		searchCB.setId("carSearchBox");
 		
@@ -2173,6 +2239,11 @@ public class Main extends Application {
 							filteredListReservations.setPredicate(s -> s.getModellObject().getCustomer().getLastName().toLowerCase().contains(newV));
 						}
 					});	
+				}
+				if(newValue.contains("All reservations")){
+					resSearchTF.clear();
+					resSearchTF.setDisable(true);
+					filteredListReservations.setPredicate(s -> true);
 				}
 			}
 		});
@@ -2265,50 +2336,48 @@ public class Main extends Application {
 		
 //DELETE RES ON ACTION
 		deleteResButton.setOnAction(e -> {
-				for (ReservationFX r : observReservations) {
-					if (r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())
-														&& r.getModellObject().isStatus()) {
-						Alert alertWarn = new Alert(AlertType.WARNING);
-						alertWarn.setTitle("Cancelling a reservation");
-						alertWarn.setHeaderText("Please check again, already cancelled!");
-						alertWarn.setContentText("You wanted to cancel this reservation '" 
-												+ r.getModellObject().getResNumberID() + "', " + "but it's already cancelled.");
-						alertWarn.showAndWait();
-						return;
-					}
+			ReservationFX newRes = null;
+			for (ReservationFX r : observReservations) {
+				if (r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())
+						&& r.getModellObject().isStatus()) {
+					Alert alertWarn = new Alert(AlertType.WARNING);
+					alertWarn.setTitle("Cancelling a reservation");
+					alertWarn.setHeaderText("Please check again, already cancelled!");
+					alertWarn.setContentText("You wanted to cancel this reservation '"
+									+ r.getModellObject().getResNumberID() + "', " + "but it's already cancelled.");
+					alertWarn.showAndWait();
+					return;
 				}
-
-			Alert alertCancel = new Alert(AlertType.CONFIRMATION);
-			alertCancel.setTitle("Cancelling a reservation");
-			alertCancel.setHeaderText("Please confirm!");
-			alertCancel.setContentText("Would you really want to CANCEL the selected '"
+				if (r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())
+						&& r.getModellObject().isStatus() == false) {
+						     newRes = new ReservationFX(new Reservation(
+									r.getModellObject().getResNumberID(), r.getModellObject().getCustomer(),
+									r.getModellObject().getCar(), r.getModellObject().getReservedCategory(),
+									r.getModellObject().getInsuranceType(), r.getModellObject().getPickupLocation(),
+									r.getModellObject().getPickupTime(), r.getModellObject().getReturnLocation(),
+									r.getModellObject().getReturnTime(), r.getModellObject().getResNotes(),
+									r.getModellObject().getResExtras(), true));
+				}	
+			}	
+			if(newRes != null) {
+				Alert alertCancel = new Alert(AlertType.CONFIRMATION);
+				alertCancel.setTitle("Cancelling a reservation");
+				alertCancel.setHeaderText("Please confirm!");
+				alertCancel.setContentText("Would you really want to CANCEL the selected '"
 										+ selectedRes.getModellObject().getResNumberID() + "' reservation?");
-			Optional<ButtonType> result = alertCancel.showAndWait();
-			if (result.get() == ButtonType.OK) {
-				try {
-					Database.cancelReservation(selectedRes.getModellObject().getResNumberID());
-					for(ReservationFX r : observReservations) {
-						if(r.getModellObject().getResNumberID().equals(selectedRes.getModellObject().getResNumberID())) {
-							
-							observReservations.remove(selectedRes);
-							ReservationFX newRes = new ReservationFX(new Reservation(r.getModellObject().getResNumberID(),
-																r.getModellObject().getCustomer(),
-																r.getModellObject().getCar(),
-																r.getModellObject().getReservedCategory(),
-																r.getModellObject().getInsuranceType(),
-																r.getModellObject().getPickupLocation(),
-																r.getModellObject().getPickupTime(), 
-																r.getModellObject().getReturnLocation(),
-																r.getModellObject().getReturnTime(),
-																r.getModellObject().getResNotes(),
-																r.getModellObject().getResExtras(),
-																true));
-							observReservations.add(newRes);
+				Optional<ButtonType> result = alertCancel.showAndWait();
+				if (result.get() == ButtonType.OK) {
+					try {
+						Database.cancelReservation(selectedRes.getModellObject().getResNumberID());
+						observReservations.remove(selectedRes);
+						observReservations.add(newRes);
+						if(resIdLabel.getText().equals(newRes.getModellObject().getResNumberID())) {
+						rentStatusLabel.setText("Status : " + newRes.getStatusName());
 						}
+					} catch (SQLException e1) {
+							System.out.println("Something is wrong with the cancel res database connection");
+							e1.printStackTrace();
 					}
-				} catch (SQLException e1) {
-					System.out.println("Something is wrong with the cancel res database connection");
-					e1.printStackTrace();
 				}
 			}
 		});
@@ -2317,8 +2386,8 @@ public class Main extends Application {
 		showResButton.setOnAction(e -> {
 			try {
 				mainTabPane.getSelectionModel().select(reserveTab);
-				resIdLabel.setText("ResID : ");
-				resIdLabel.setText("ResID : " + selectedRes.getModellObject().getResNumberID());
+				resIdLabel.setText("");
+				resIdLabel.setText(selectedRes.getModellObject().getResNumberID());
 				rentStatusLabel.setText("Status : " + selectedRes.getStatusName());
 				customerStatusLabel.setText("Cust.status: active");
 				carStatusLabel.setText("Car status : active");
@@ -2354,7 +2423,7 @@ public class Main extends Application {
 	
 	
 //DASHBOARD MENU
-	public BorderPane dashboardMenu(LocalDate ldt) {
+	private BorderPane dashboardMenu(LocalDate ldt) {
 		BorderPane dashboardBP = new BorderPane();
 		int nowCO = 0;
 		int nowplus1CO = 0;
@@ -2525,7 +2594,7 @@ public class Main extends Application {
 	        yAxis.setLabel("Amount");
 		   
 	        XYChart.Series<String, Number> seriesCO = new XYChart.Series<>();
-	        seriesCO.setName("Check out");       
+	        seriesCO.setName("Check-out");       
 	        seriesCO.getData().add(new XYChart.Data<>(today, nowCO));
 	        seriesCO.getData().add(new XYChart.Data<>(todayPlus1, nowplus1CO));
 	        seriesCO.getData().add(new XYChart.Data<>(todayPlus2, nowplus2CO));
@@ -2535,7 +2604,7 @@ public class Main extends Application {
 	        seriesCO.getData().add(new XYChart.Data<>(todayPlus6, nowplus6CO)); 
 	        
 	        XYChart.Series<String, Number> seriesCI = new XYChart.Series<>();
-	        seriesCI.setName("Check in");
+	        seriesCI.setName("Check-in");
 	        seriesCI.getData().add(new XYChart.Data<>(today, nowCI));
 	        seriesCI.getData().add(new XYChart.Data<>(todayPlus1, nowplus1CI));
 	        seriesCI.getData().add(new XYChart.Data<>(todayPlus2, nowplus2CI));
@@ -2548,7 +2617,7 @@ public class Main extends Application {
 	        int weeklyTotalCO = (nowCO + nowplus1CO + nowplus2CO + nowplus3CO + nowplus4CO + nowplus5CO + nowplus6CO);
 	        int weeklyTotalCI = (nowCI + nowplus1CI + nowplus2CI + nowplus3CI + nowplus4CI + nowplus5CI + nowplus6CI);
 	        
-	        Label infoWeekly = new Label("The next 7 days (from now) you have total " + weeklyTotalCO + " CO, and " +  weeklyTotalCI + " CI");
+	        Label infoWeekly = new Label("The next 7 days (from "+ ldt.getDayOfMonth() +" "+ ldt.getMonth() +") you have total " + weeklyTotalCO + " CO, and " +  weeklyTotalCI + " CI");
 	        Label infoDaily= new Label("Today (" + localDate.getDayOfWeek() + ") you have total " + nowCO + " CO, and "+ nowCI + " CI");
 	        VBox vboxWeekly = new VBox(bc, infoWeekly, infoDaily);
 	        vboxWeekly.setAlignment(Pos.TOP_CENTER);
@@ -2582,7 +2651,7 @@ public class Main extends Application {
 	        
 	        int monthlyTotal = (actualMonth + actualMonthMins1 + actualMonthMins2 + actualMonthMins3 + actualMonthMins4 + actualMonthMins5);
 	        int avgTotal = (monthlyTotal / 6);
-	        Label infoMonthlySum = new Label("The last 6 months (" + thisMonth + " and before) you had total " + monthlyTotal + " reservations");
+	        Label infoMonthlySum = new Label("The last 6 months (" + thisMonth + " and before) you have had total " + monthlyTotal + " reservations");
 	        Label avgTotalRes = new Label("Average "  + avgTotal + " reservations/month");
 	        Label infoMonthly = new Label("In this month (" + thisMonth + ") you have total " + actualMonth + " reservations");
 	        VBox vboxMonthly = new VBox(lineChart, infoMonthlySum, avgTotalRes, infoMonthly);
@@ -2756,6 +2825,9 @@ public class Main extends Application {
 				if(result.isPresent()) {
 					observDeactiveCars.remove(result.get());
 					observCars.add(result.get());
+					if(carLicensePlateLB.getText().equals(result.get().getModellObject().getCarLicensePlate())) {
+						carStatusLabel.setText("Car status : active");
+					}
 				}
 			});
 			
@@ -2825,7 +2897,7 @@ public class Main extends Application {
 	
 //METHODS for menu
 //Initialize lists, reading data out from cars database	
-	public void fillCarsObservableList(String active, String deactive) {
+	private void fillCarsObservableList(String active, String deactive) {
 		if (active.equals("active") && deactive.equals("")) {
 			observCars = FXCollections.observableArrayList();
 			ArrayList<Car> cars = new ArrayList<>();
@@ -2858,7 +2930,7 @@ public class Main extends Application {
 	
 	
 	
-	public void fillReservationsObservableList() {
+	private void fillReservationsObservableList() {
 		observReservations = FXCollections.observableArrayList();
 		ArrayList<Reservation> reservations = new ArrayList<>();
 		try {
@@ -2876,7 +2948,7 @@ public class Main extends Application {
 	
 //FILL Types
 //Categories	
-	public ArrayList<String> categoriesList() {
+	private ArrayList<String> categoriesList() {
 		ArrayList<String> categoryNames = new ArrayList<>();
 		try {
 			for (String key : Database.readCarCategoriesTable().keySet()) {
@@ -2892,7 +2964,7 @@ public class Main extends Application {
 	
 	
 	
-	public int getCategoryPrice(String category) {
+	private int getCategoryPrice(String category) {
 		int price = 0;
 		try {
 			for (String key : Database.readCarCategoriesTable().keySet()) {
@@ -2908,7 +2980,7 @@ public class Main extends Application {
 	
 
 //FuelTypes	
-	public ArrayList<String> fuelTypesList() {
+	private ArrayList<String> fuelTypesList() {
 		ArrayList<String> fuelTypes = new ArrayList<>();
 		try {
 			for (String s : Database.readCarFuelTypeTable()) {
@@ -2924,7 +2996,7 @@ public class Main extends Application {
 
 	
 //Transmission
-	public ArrayList<String> transmissionsList() {
+	private ArrayList<String> transmissionsList() {
 		ArrayList<String> transmissions = new ArrayList<>();
 		try {
 			for (String s : Database.readCarTransmissionTypeTable()) {
@@ -2940,7 +3012,7 @@ public class Main extends Application {
 	
 
 //Car colors
-	public ArrayList<String> carColorList() {
+	private ArrayList<String> carColorList() {
 		ArrayList<String> colors = new ArrayList<>();
 		try {
 			for (String s : Database.readCarColorsTable()) {
@@ -2956,7 +3028,7 @@ public class Main extends Application {
 	
 	
 //Car features	
-	public ArrayList<String> featuresList() {
+	private ArrayList<String> featuresList() {
 		ArrayList<String> features = new ArrayList<>();
 		featuresOriginal = new ArrayList<>();
 		try {
@@ -2975,7 +3047,7 @@ public class Main extends Application {
 
 
 //Nationalities	
-	public ArrayList<String> nationalitiesList() {
+	private ArrayList<String> nationalitiesList() {
 		ArrayList<String> nationalities = new ArrayList<>();
 		try {
 			for (String s : Database.readNationalitiesTable()) {
@@ -2991,7 +3063,7 @@ public class Main extends Application {
 	
 	
 //Insurances	
-	public ArrayList<String> insurancesList() {
+	private ArrayList<String> insurancesList() {
 		ArrayList<String> insuranceTypes = new ArrayList<>();
 		try {
 			for (String key : Database.readInsurancesTable().keySet()) {
@@ -3007,7 +3079,7 @@ public class Main extends Application {
 	
 	
 	
-	public int getInsurancePrice(String insurance) {
+	private int getInsurancePrice(String insurance) {
 		int price = 0;
 		try {
 			for (String key : Database.readInsurancesTable().keySet()) {
@@ -3023,7 +3095,7 @@ public class Main extends Application {
 	
 	
 //Extras
-	public ArrayList<String> extrasList() {
+	private ArrayList<String> extrasList() {
 		ArrayList<String> extras = new ArrayList<>();
 		extrasOriginal = new ArrayList<>();
 		try {
@@ -3042,7 +3114,7 @@ public class Main extends Application {
 	
 	
 	
-	public int getExtraPrice(String extraName) {
+	private int getExtraPrice(String extraName) {
 		int price = 0;
 		try {
 			for (String key : Database.readExtrasTable().keySet()) {
