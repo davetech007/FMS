@@ -106,7 +106,7 @@ public class PdfGeneration {
 		}
 
 	}
-
+//From the chosen (ldt) date 00:00- 24:00
 	public void pdfGenerateDailyPlan(ArrayList<Reservation> todaysResCO, ArrayList<Reservation> todaysResCI, LocalDate ldt) {
 		Document document = new Document();
 		try {
@@ -210,7 +210,7 @@ public class PdfGeneration {
 			e.printStackTrace();
 		}
 	}
-
+//From the chosen (ldt) exact date - next 7 days
 	public void pdfGenerateWeeklyPlan(ArrayList<Reservation> weeklyResCO, ArrayList<Reservation> weeklyResCI, LocalDate ldt) {
 		Document document = new Document();
 		try {

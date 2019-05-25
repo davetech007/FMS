@@ -185,7 +185,7 @@
   -fx-background-color: linear-gradient(#ffeed1, #FFA500);
 }
 #saveResButton {
-  -fx-background-image:url("IconSaveRes.png");
+  -fx-background-image:url("IconSaveResOld.png");
   -fx-background-repeat: no-repeat;
   -fx-background-size: 35px;
   -fx-pref-width: 120px;

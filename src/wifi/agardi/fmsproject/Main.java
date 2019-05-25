@@ -1,4 +1,6 @@
 package wifi.agardi.fmsproject;
+/*MAY 2019 - WIFI Project Fleet Management System (Car reservations management) ADV
+ *created David Viktor Agardi*/
 
 import java.io.File;
 import java.sql.SQLException;
@@ -42,8 +44,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -67,7 +67,7 @@ import javafx.scene.layout.VBox;
 
 public class Main extends Application {
 	private DropShadow shadow = new DropShadow();  //Effect for the buttons
-	private int minEngineSize = 500;
+	private int minEngineSize = 500;   //The minimum size/power that is allowed for the engine, just to not to have not realistic data
 	private int minEnginePower = 40;
 	private Stage mainStage;
 	
@@ -81,7 +81,7 @@ public class Main extends Application {
 	private CarFX selectedCar;
 	private ObservableList<CarFX> observCars;
 	private ObservableList<CarFX> observDeactiveCars;
-	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the license plate search
+	private FilteredList<CarFX> filteredListCars;  //Filtered and sorted list are connected with the observable list, needed to make because the 'live' license plate search
 	private SortedList<CarFX> sortedListCars;
 	
 	private Label carLicensePlateLB;
@@ -110,6 +110,9 @@ public class Main extends Application {
 	private ArrayList<String> extrasOriginal;
 	
 //LOGIN WINDOW	
+/*Here is going to be checked the user name/password. It is possible the sign up freely, and use all the features.
+*Now everything is open, but it is ready to lock the functions/sign up easily.
+*/
 	@Override
 	public void start(Stage primaryStage) {
 //Setting up LOGIN page	
@@ -156,7 +159,7 @@ public class Main extends Application {
 			actionHBox.getChildren().add(actionTarget);
 			loginGP.add(actionHBox, 0, 7);
 			
-//LogIn on action			
+//LogIn on action, when successfully it opens the main menu		
 			logInButton.setOnAction(new EventHandler<ActionEvent>() {	
 				@Override
 				public void handle(ActionEvent event) {
@@ -185,8 +188,7 @@ public class Main extends Application {
 			
 			signUpVBox.getChildren().addAll(signUpLabel, signUpButton);
 			loginBP.setBottom(signUpVBox);
-			
-			
+					
 //SignUp on action			
 			signUpButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
@@ -236,8 +238,7 @@ public class Main extends Application {
 
 //MAIN WINDOW after login
 	private void mainMenu() {
-		    mainStage = new Stage();
-		    
+		    mainStage = new Stage();	    
 			HBox mainHB = new HBox();
 			mainHB.setPadding(new Insets(15, 10 , 12, 10));
 			mainHB.setAlignment(Pos.CENTER);
@@ -259,7 +260,7 @@ public class Main extends Application {
 			reserveTab.setContent(openReserveMenu());
 			reserveTab.setClosable(false);
 			reserveTab.setId("reserveTab");
-			
+//initialize database readings
 			fillCarsObservableList("active", "");
 			fillCarsObservableList("", "deactive");
 			carsTab = new Tab("Cars");
@@ -338,7 +339,7 @@ public class Main extends Application {
 			reserveGP.setVgap(10);
 			reserveGP.setMinSize(0, 0);
 			reserveBP.setCenter(reserveGP);
-			//set the 3rd column's size to be automatic
+			//set the 3rd column's size to be automatic stretched
 			ColumnConstraints columnSpace = new ColumnConstraints();
 			columnSpace.setHgrow(Priority.ALWAYS);				
 			ColumnConstraints col1 = new ColumnConstraints();
@@ -396,8 +397,7 @@ public class Main extends Application {
 			dLicenseTF.setPromptText("Driver's license nr.");
 			reserveGP.add(dLicenseTF, 0, 7);
 					
-//Grid 1. column	
-			
+//Grid 1. column		
 			custIdLabel = new Label();
 			custIdLabel.setId("IdLabel");
 			HBox custHB = new HBox(custIdLabel);
@@ -435,8 +435,11 @@ public class Main extends Application {
 			reserveGP.add(emailTF, 1, 7);
 			
 //Grid 3. column
-//Searching for a car	
-			//It opens CARS menu to choose a car, then fills the license plate / brand
+/*Searching for a car	
+ * It opens CARS menu to choose a car, then fills the license plate / category. 
+ * Note, that after you can choose any type of category, because when you have only a different category,
+ * and the client needs another type, it is possible the make this upgrade.
+ */
 			Button chooseCarButton = new Button("Choose a car  ");
 			chooseCarButton.setId("chooseCarButton");
 			reserveGP.add(chooseCarButton, 3, 0);
@@ -501,6 +504,7 @@ public class Main extends Application {
 			notesTA2.setPromptText("Comments, category wish,...");
 			notesTA2.setPrefSize(195, 100);
 			reserveGP.add(notesTA2, 3, 8);
+			//Max 300 characters, database set to 300 too
 			notesTA2.setOnKeyTyped(e -> {
 			    	int maxChar = 299;
 			    	if(notesTA2.getText().length() == maxChar) 
@@ -531,9 +535,8 @@ public class Main extends Application {
 			        });
 			
 			VBox calcVB = new VBox(rentStatusLabel, customerStatusLabel, carStatusLabel, calcPriceButton);
-			calcVB.setAlignment(Pos.BOTTOM_LEFT);
-			reserveGP.add(calcVB, 3, 10);
-			
+			calcVB.setAlignment(Pos.BOTTOM_CENTER);
+			reserveGP.add(calcVB, 3, 10);		
 			
 //Grid 4. column
 			carLicensePlateLB = new Label();
@@ -575,8 +578,7 @@ public class Main extends Application {
 			Label returnMinuteLB = new Label("min.");
 			returnHBox.getChildren().addAll(returnHourCB, returnHourLB, returnMinCB, returnMinuteLB);
 			reserveGP.add(returnHBox, 4, 6);	
-			
-				
+							
 			
 //EXTRAS LISTVIEW		
 			LinkedHashMap<String, ObservableValue<Boolean>> extrasMap = new LinkedHashMap<>();
@@ -606,11 +608,11 @@ public class Main extends Application {
 			Label priceLabel2 =    new Label("Extras: ");
 			Label priceLabel3 =    new Label("Total : ");
 			priceVBox.getChildren().addAll(residHB, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
-			reserveGP.add(priceVBox, 4, 10);
-			
+			reserveGP.add(priceVBox, 4, 10);		
 			
 //Reserve BorderPane BOTTOM BUTTONS
 //DESIGN, Disable property
+			//for save customers
 			ObservableValue<Boolean> custObs = firstNameTF.textProperty().isEmpty()
 					.or(lastNameTF.textProperty().isEmpty())
 					.or(dateBornPicker.valueProperty().isNull())
@@ -697,8 +699,11 @@ public class Main extends Application {
 			        	  reserveButton.setEffect(null);
 			          }
 			        });
-			
-		
+	
+/*The return date can't be set, only after the pickup date has been chosen.
+ * When the pickup date	set after the return date, it automatically changes the return date 
+ * to the pickup date.	
+ */
 			datePickupPicker.setDayCellFactory(dp -> new DateCellFactory(LocalDate.now(), LocalDate.MAX));
 			dateReturnPicker.disableProperty().bind(datePickupPicker.valueProperty().isNull());
 			
@@ -713,8 +718,7 @@ public class Main extends Application {
 				}
 			});
 		
-
-//SearchDriver ACTION			
+//SearchDriver ACTION for active customers, changes accordingly the customer label too, when selected		
 			searchDriverButton.setOnAction(e ->{
 				CustomerListDialog custList = new CustomerListDialog("active", "", observReservations);
 				Optional<CustomerFX> result = custList.showAndWait();
@@ -734,8 +738,27 @@ public class Main extends Application {
 					streetTF.setText(selectedCust.getModellObject().getAddressStreet());
 					postCodeTF.setText(selectedCust.getModellObject().getAddressPostalCode());		
 				}
+				if(selectedCust != null && 
+							custIdLabel.getText().equals(selectedCust.getModellObject().getCustomerID())) {
+					try {
+						for(Customer c : Database.readCustomersTable("active", "")) {
+							if(c.getCustomerID().equals(custIdLabel.getText())) {
+								customerStatusLabel.setText("Cust.status: active");
+								return;
+							}
+						}
+						for(Customer c : Database.readCustomersTable("", "deactive")) {
+							if(c.getCustomerID().equals(custIdLabel.getText())) {
+								customerStatusLabel.setText("Cust.status: DEACTIVE");
+							}
+						}
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the cust.status label database connection");
+						e1.printStackTrace();
+					}
+				}
 			});	
-			
+//When a customer has been selected, it is possible to update too			
 			custIdLabel.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -744,7 +767,6 @@ public class Main extends Application {
 					}
 				}
 			});
-	
 			
 //SAVE CUSTOMER ON ACTION			
 			saveCustomerButton.setOnAction(e -> {
@@ -816,7 +838,10 @@ public class Main extends Application {
 			}
 		});
 			
-//UPDATE CUSTOMER ON ACTION			
+/*UPDATE CUSTOMER ON ACTION	
+ * After updating the customer, the whole reservations menu will be also reloaded, to be up to date.
+ * This can be a little slower.		
+ */
 			updateCustomerButton.setOnAction(e -> {
 				try {
 				String customerID = selectedCust.getModellObject().getCustomerID();
@@ -887,7 +912,7 @@ public class Main extends Application {
 					}
 				}
 				
-					if (dbCustomer != null && dbCustomer.getCustomerID().equals(customerID)) {
+				if (dbCustomer != null && dbCustomer.getCustomerID().equals(customerID)) {
 						Alert confirmUpdate = new Alert(AlertType.CONFIRMATION);
 						confirmUpdate.setTitle("Updating customer");
 						confirmUpdate.setHeaderText("Please confirm!");
@@ -901,7 +926,7 @@ public class Main extends Application {
 							selectedCust = updateCustomer;
 							reservationsBP.setCenter(showReservationsTableView());
 						}
-					}
+				}
 			} catch (SQLException e1) {
 				System.out.println("Something is wrong with the database - update custormer");
 				e1.printStackTrace();
@@ -919,15 +944,16 @@ public class Main extends Application {
 						or(returnHourCB.valueProperty().isNull()).
 						or(returnMinCB.valueProperty().isNull());
 			
-			//Enable with calculate price + other details the reserve button 
-			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(6).
+		/*Enable with calculate price + other details the reserve button 
+		 * (reserve possible only when a customer has been saved)
+		 */
+			ObservableValue<Boolean> resCustObs = custIdLabel.textProperty().length().lessThan(5).
 															or(carLicensePlateLB.textProperty().isEmpty()).
 															or(pickupLocTF.textProperty().isEmpty()).
 															or(returnLocTF.textProperty().isEmpty()).
 															or((ObservableBooleanValue) calcObs);
 			reserveButton.disableProperty().bind(resCustObs);
-			
-			
+					
 //CALCULATE PRICE ON ACTION	
 			calcPriceButton.disableProperty().bind(calcObs);
 			
@@ -953,7 +979,6 @@ public class Main extends Application {
 			    if(hrs >= 24) {
 			    	days = (int) (hrs/24) + 1;
 			    }
-			    
 			    int dailyPrice = getCategoryPrice(carComboBox.getValue());
 			    int insurancePrice = (int) (getInsurancePrice(insuranceComboBox.getValue()) * days);
 			    int rentPrice = (int) (days * dailyPrice);
@@ -972,7 +997,7 @@ public class Main extends Application {
 			});
 					
 			
-//RES ID LABEL WHEN A RESERVATION IS SELECTED, set selected CUSTOMER and CAR 			
+//RES ID LABEL WHEN A RESERVATION IS SELECTED, set selected CUSTOMER and CAR, and fills all the details			
 			resIdLabel.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -1053,11 +1078,24 @@ public class Main extends Application {
 				}
 			});
 				
-//RESERVE BUTTON ON ACTION			
+/*RESERVE BUTTON ON ACTION
+ * in reserve, and update reservation, firstly it checks, that the selected car/reservation
+ * is the same as before (or not null) when it was chosen, comparing the license plate/reservation ID LABEL 
+ * with the actual in the observable lists. When not, it changes accordingly to the correct. It needed, 
+ * because when you check a car, or reservation during the res/update procedure, the program changes 
+ * the selected object accordingly. It could have make problems.			
+ */
 			reserveButton.setOnAction(e -> {
 			  try {	
 				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
 					for (CarFX car : observCars) {
+						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+							selectedCar = car;
+						}
+					}
+				}
+				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+					for (CarFX car : observDeactiveCars) {
 						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
 							selectedCar = car;
 						}
@@ -1153,7 +1191,7 @@ public class Main extends Application {
 						observReservations.add(newRes);
 						selectedRes = newRes;
 						resIdLabel.setText(selectedRes.getModellObject().getResNumberID());
-						rentStatusLabel.setText("Status : " + selectedRes.getStatusName());
+						rentStatusLabel.setText("Res.status : " + selectedRes.getStatusName());
 						calcPriceButton.fire();
 				}
 
@@ -1163,11 +1201,22 @@ public class Main extends Application {
 			}
 		});	
 			
-//UPDATE RES BUTTON ON ACTION
+/*UPDATE RES BUTTON ON ACTION
+ * Same as with reserve, but it needs to check the reservation too.
+ * After updating the car, the whole reservations menu will be also reloaded, to be up to date.
+ * This can be a little slower.		
+ */
 			updateResButton.setOnAction(e -> {
 			 try {	
 				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
 					for (CarFX car : observCars) {
+						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+							selectedCar = car;
+						}
+					}
+				}
+				if (selectedCar == null || !selectedCar.getCarLicensePlate().equals(carLicensePlateLB.getText())) {
+					for (CarFX car : observDeactiveCars) {
 						if (car.getModellObject().getCarLicensePlate().equals(carLicensePlateLB.getText())) {
 							selectedCar = car;
 						}
@@ -1271,7 +1320,7 @@ public class Main extends Application {
 					observReservations.remove(selectedRes);
 					observReservations.add(updateRes);
 					selectedRes = updateRes;
-					rentStatusLabel.setText("Status : " + selectedRes.getStatusName());
+					rentStatusLabel.setText("Res.status : " + selectedRes.getStatusName());
 					calcPriceButton.fire();
 				}
 
@@ -1403,7 +1452,10 @@ public class Main extends Application {
 			carsLeftVBox.getChildren().add(carSearchHB);
 			carsLeftVBox.getChildren().add(showCarsTableView());
 			
-//SEARCHING LISTENERS		
+/*SEARCHING LISTENERS
+ * You choose an exact category, then you can check all the cars in it, 
+ * or you can search by typing a license plate in the search field.	
+ */
 			carSearchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {	
 				if(newV.contains("All cars")) {
 					filteredListCars.setPredicate(s -> true);
@@ -1461,12 +1513,19 @@ public class Main extends Application {
 		    kmHB.getChildren().addAll(kmTF, kmLbl);
 		    carsGP.add(kmHB, 0, 4);
 		    
-		   //ONLY numbers for km, max 6 characters
+		   //ONLY numbers for km, max 6 characters.
 		    kmTF.textProperty().addListener(new ChangeListener<String>() {
 	            @Override
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 	                if (!newValue.matches("\\d{0,6}?")) {
 	                    kmTF.setText(oldValue);
+	                	Alert alertWarn = new Alert(AlertType.WARNING);
+						alertWarn.setTitle("Car km");
+						alertWarn.setHeaderText("Really??? :)");
+						alertWarn.setContentText("This car has more than a MILLION KM? :) :D \n\n" +
+												"No way, or at least, show me one, i'm going to buy it!! :D");
+						alertWarn.showAndWait();
+						return;
 	                }
 	            }
 	        });
@@ -1497,7 +1556,7 @@ public class Main extends Application {
 		    carCategorieBox.setPrefWidth(195);
 		    carCategorieBox.setPromptText("Category");
 		    carsGP.add(carCategorieBox, 1, 1);
-		    
+		    //Chosen category shows the base price of the car
 		    carCategorieBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -1512,7 +1571,7 @@ public class Main extends Application {
 		    TextField vinNumTF = new TextField();
 		    vinNumTF.setPromptText("VIN number");
 		    carsGP.add(vinNumTF, 1, 3);
-		    //All the VIN numbers are max 17 characters
+		    //All the VIN numbers are max the real 17 characters
 		    vinNumTF.setOnKeyTyped(e -> {
 		    	int maxChar = 17;
 		    	if(vinNumTF.getText().length() == maxChar) 
@@ -1678,7 +1737,9 @@ public class Main extends Application {
 			        	  addCarButton.setEffect(null);
 			          }
 			        });
-//Disable property for add/update car			
+/*Disable property for add/update car. Update a car is possible after it is chosen,
+ * but it should be disabled, when somehting is empty
+ */
 		ObservableValue<Boolean> carBT = brandTF.textProperty().isEmpty()
 					.or(modelTF.textProperty().isEmpty())
 					.or(kmTF.textProperty().isEmpty())
@@ -1694,7 +1755,7 @@ public class Main extends Application {
 		
 		addCarButton.disableProperty().bind(carBT);
 		
-//Filling text fields from table view selected items, enable buttons
+//Filling text fields from table view selected items, enable buttons, or disable, when nothing is selected
 			carsTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
 				if (newS != null) {
 					selectedCar = carsTableView.getSelectionModel().getSelectedItem();
@@ -1715,7 +1776,7 @@ public class Main extends Application {
 					carColorBox.setValue(selectedCar.getModellObject().getCarColor());
 					engineSizeTF.setText(String.valueOf(selectedCar.getModellObject().getCarEngineSize()));
 					enginePowerTF.setText(String.valueOf(selectedCar.getModellObject().getCarEnginePower()));
-		//Clear features map, then fill it with the cars features			
+		//Clear features map to empty, then fill it with the selected cars features			
 					for(String e : featuresOriginal) {
 								featuresLV.getItems().clear();
 								featuresMap.put(e, new SimpleBooleanProperty(false));
@@ -1730,7 +1791,7 @@ public class Main extends Application {
 							}
 						} 
 					}
-			//Active reservations for car
+			//Shows the active reservations for car
 				reservationsLV.getItems().clear();
 				ArrayList<String> ls = new ArrayList<>();
 				for (ReservationFX r : observReservations) {
@@ -1754,7 +1815,12 @@ public class Main extends Application {
 		});
 			
 			
-//ON RENT ON ACTION			
+/*ON RENT ON ACTION. 
+ * It is for the 'self-control', you can manage it freely, to see how many have you got on-rent,...
+ * With returning, you need to write the actual km, when it is smaller, then before, nothing will be updated.
+ * Because thus funktion is prepared too, later it is easyto connect with an extended part of the program, 
+ * where the real rental agreements are made from the reservations.
+ */
 		onRentButton.setOnAction(e -> {
 			try {
 				String vinNum = selectedCar.getModellObject().getCarVinNumber();
@@ -1829,7 +1895,10 @@ public class Main extends Application {
 			carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
 		});
 
-//DELETE ACTION			
+/*DELETE ACTION	
+ * When the car has an active (not expired, from the past, and not cancelled) reservation,
+ * it is not possible to delete.	
+ */
 		deleteCarButton.setOnAction(e -> {
 				for (ReservationFX r : observReservations) {
 					if (r.getModellObject().getCar().getCarVinNumber().equals(selectedCar.getModellObject().getCarVinNumber())
@@ -1983,7 +2052,6 @@ public class Main extends Application {
 					
 			
 //ADD NEW CAR ACTION
-			
 		addCarButton.setOnAction(e -> {
 			try {
 				String vinNumber = vinNumTF.getText().toUpperCase();
@@ -2162,7 +2230,7 @@ public class Main extends Application {
 		
 		sortedListReservations.comparatorProperty().bind(reservTableView.comparatorProperty());
 		reservTableView.setItems(sortedListReservations);
-		
+		//Enable/disable buttons according to if it is selected or not
 		reservTableView.getSelectionModel().selectedItemProperty().addListener((o, oldS, newS) -> {
 			if (newS != null) {
 				selectedRes = reservTableView.getSelectionModel().getSelectedItem();
@@ -2183,7 +2251,7 @@ public class Main extends Application {
 
 	private BorderPane openReservationsMenu() {
 		reservationsBP = new BorderPane();			
-//Search		
+//Search with more options		
 		ComboBox<String> searchCB = new ComboBox<>();
 		searchCB.setItems(FXCollections.observableArrayList("All reservations", "Reservation ID", "First name", "Last name"));
 		searchCB.getSelectionModel().selectFirst();
@@ -2310,7 +2378,9 @@ public class Main extends Application {
 
 		
 		
-//PRINT PDF ON ACTION
+/*PRINT PDF ON ACTION
+ * Firstly, it generates the pdf, then it is possible to open it in the file chooser
+ */
 		printPdfButton.setOnAction(e -> {
 			 if (selectedRes != null) {
 				 	PdfGeneration pdfCreator = new PdfGeneration();
@@ -2334,7 +2404,9 @@ public class Main extends Application {
 		});
 
 		
-//DELETE RES ON ACTION
+/*DELETE RES ON ACTION
+ * Already cancelled reservation can't be cancelled
+ */
 		deleteResButton.setOnAction(e -> {
 			ReservationFX newRes = null;
 			for (ReservationFX r : observReservations) {
@@ -2382,13 +2454,16 @@ public class Main extends Application {
 			}
 		});
 			
-//SHOW RES ON ACTION
+/*SHOW RES ON ACTION
+ * Res.number id will be changed, and then everything. If the selected res-customer is deactive, 
+ * or selected res-car, the id will be changed accordingly.
+ */
 		showResButton.setOnAction(e -> {
 			try {
 				mainTabPane.getSelectionModel().select(reserveTab);
 				resIdLabel.setText("");
 				resIdLabel.setText(selectedRes.getModellObject().getResNumberID());
-				rentStatusLabel.setText("Status : " + selectedRes.getStatusName());
+				rentStatusLabel.setText("Res.status : " + selectedRes.getStatusName());
 				customerStatusLabel.setText("Cust.status: active");
 				carStatusLabel.setText("Car status : active");
 				
@@ -2422,7 +2497,9 @@ public class Main extends Application {
 	
 	
 	
-//DASHBOARD MENU
+/*DASHBOARD MENU, LocalDate ldt is the actual chosen date in the menu, 
+ * from this day will the whole statistic / PDF printing generated
+ */
 	private BorderPane dashboardMenu(LocalDate ldt) {
 		BorderPane dashboardBP = new BorderPane();
 		int nowCO = 0;
@@ -2466,7 +2543,6 @@ public class Main extends Application {
 		ArrayList<Reservation> weeklyResCO = new ArrayList<>();
 		ArrayList<Reservation> weeklyResCI = new ArrayList<>();
 
-		
 			for(ReservationFX s : observReservations) {
 				Reservation r = s.getModellObject();
 				if(r.isStatus() == false) {
@@ -2778,10 +2854,9 @@ public class Main extends Application {
 				pdfDaily.pdfGenerateDailyPlan(todaysResCO, todaysResCI, ldt);
 
 				Alert alertReady = new Alert(AlertType.CONFIRMATION);
-				alertReady.setTitle("Daily plan has been successfully created!");
-				alertReady.setHeaderText("Open it?");
-				alertReady.setContentText("Would you want to open the created .pdf file? File name: '" +
-																	         ldt + "_dailyPlanFMS.pdf'");
+				alertReady.setHeaderText("Daily plan has been successfully created(in the 'DailyPlans' folder)!");
+				alertReady.setTitle("Open this folder?");
+				alertReady.setContentText("Would you want to open the created '" + ldt +  "_dailyPlanFMS.pdf' file?");
 				Optional<ButtonType> result = alertReady.showAndWait();
 				if (result.get() == ButtonType.OK) {
 					FileChooser fileChooser = new FileChooser();
@@ -2798,10 +2873,10 @@ public class Main extends Application {
 				pdfWeekly.pdfGenerateWeeklyPlan(weeklyResCO, weeklyResCI, ldt);
 
 				Alert alertReady = new Alert(AlertType.CONFIRMATION);
-				alertReady.setTitle("Weekly plan has been successfully created!");
-				alertReady.setHeaderText("Open it?");
-				alertReady.setContentText("Would you want to open the created .pdf file? File name: '" + 
-										  ldt + "-" + ldt.plusDays(6).getDayOfMonth() + "_weeklyPlanFMS.pdf'");
+				alertReady.setHeaderText("Weekly plan has been successfully created(in the 'WeeklyPlans' folder)!");
+				alertReady.setTitle("Open this folder?");
+				alertReady.setContentText("Would you want to open the created '" + ldt + "-" 
+											+ ldt.plusDays(6).getDayOfMonth() + "_weeklyPlanFMS.pdf' file?");
 				Optional<ButtonType> result = alertReady.showAndWait();
 				if (result.get() == ButtonType.OK) {
 					FileChooser fileChooser = new FileChooser();
@@ -2812,10 +2887,31 @@ public class Main extends Application {
 				}
 			});
 
-//Activate CUSTOMER
+/*Activate CUSTOMER
+ * It opens the customer list dialog, but with the deactivated customers. 
+ */
 			deactivCustButton.setOnAction(e -> {
 				CustomerListDialog custList = new CustomerListDialog("", "deactive", observReservations);
 				custList.showAndWait();
+				if(selectedCust != null && 
+						custIdLabel.getText().equals(selectedCust.getModellObject().getCustomerID())) {
+					try {
+						for(Customer c : Database.readCustomersTable("active", "")) {
+							if(c.getCustomerID().equals(custIdLabel.getText())) {
+								customerStatusLabel.setText("Cust.status: active");
+								return;
+							}
+						}
+						for(Customer c : Database.readCustomersTable("", "deactive")) {
+							if(c.getCustomerID().equals(custIdLabel.getText())) {
+								customerStatusLabel.setText("Cust.status: DEACTIVE");
+							}
+						}
+					} catch (SQLException e1) {
+						System.out.println("Something is wrong with the cust.status label database connection");
+						e1.printStackTrace();
+					}
+				}
 			});
 			
 //Activate CAR			
@@ -2831,13 +2927,17 @@ public class Main extends Application {
 				}
 			});
 			
-//Add Types ON ACTION
+/*Add Types ON ACTION
+ * With this function it is possible to add new types, like category, insurance,...
+ */
 			addTypesButton.setOnAction(e -> {
 				AddTypesDialog addTypes = new AddTypesDialog();
 				addTypes.showAndWait();
 			});
 			
-//Update Types ON ACTION
+/*Update Types ON ACTION
+ * It is possible to update the category, insurance, extras, with their prices too.
+ */
 			updateTypesButton.setOnAction(e -> {
 				UpdateTypesDialog updateTypes = new UpdateTypesDialog(categoriesList(), insurancesList(), extrasList());
 				updateTypes.showAndWait();
@@ -2875,7 +2975,9 @@ public class Main extends Application {
 			tobHB.setAlignment(Pos.CENTER);
 			dashboardBP.setTop(tobHB);
 			
-//Choose date ON ACTION
+/*Choose date ON ACTION
+ * After the chosen date, the whole dashboard menu will be reloaded, starting the statistic with chosen date
+ */
 			chooseDateBT.setOnAction(e -> {
 				dashboardTab.setContent(dashboardMenu(dateP.getValue()));
 			});
@@ -2929,7 +3031,7 @@ public class Main extends Application {
 	}
 	
 	
-	
+//Initialize reservations list	
 	private void fillReservationsObservableList() {
 		observReservations = FXCollections.observableArrayList();
 		ArrayList<Reservation> reservations = new ArrayList<>();
@@ -2963,7 +3065,7 @@ public class Main extends Application {
 	}
 	
 	
-	
+//Get the price for a category	
 	private int getCategoryPrice(String category) {
 		int price = 0;
 		try {
@@ -3078,7 +3180,7 @@ public class Main extends Application {
 	}
 	
 	
-	
+//Get the price for an insurance	
 	private int getInsurancePrice(String insurance) {
 		int price = 0;
 		try {
@@ -3113,7 +3215,7 @@ public class Main extends Application {
 	}
 	
 	
-	
+//Get the price for an extra	
 	private int getExtraPrice(String extraName) {
 		int price = 0;
 		try {
@@ -3131,7 +3233,9 @@ public class Main extends Application {
 	
 
 	
-	
+/*Starting, initializing the whole database, when the table/database not existing, will be created	
+ * with the basic data.
+ */
 	public static void main(String[] args) {
 		try {
 			Database.createUsersTable();

@@ -143,7 +143,7 @@ public class AddTypesDialog extends Dialog<String> {
 		});
 
 	}
-
+//Warning to restart it, after the changes
 	private Alert alert(String s) {
 		Alert alertWarn = new Alert(AlertType.WARNING);
 		alertWarn.setTitle("Please restart!");

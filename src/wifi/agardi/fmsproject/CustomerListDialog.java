@@ -39,7 +39,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 	private SortedList<CustomerFX> sortedListCustomers;		// observable list, needed to make because the id search							
 	
 	private TableView<CustomerFX> customersTableView;
-
+//When the active comes in, it shows the active res, otherwise the deactivated customers
 	public CustomerListDialog(String active, String deactive, ObservableList<ReservationFX> obsRes) {
 		super();
 		this.setTitle("Customer list");
@@ -144,7 +144,11 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			}
 		});
 
-//DELETE Customer
+/*DELETE Customer
+ * If the active has been chosen, it is possible to deactivate a customer. When he/she has a res.,then 
+ * it is not possible to delete
+ * If the deactive has been chosen, it is possible to activate
+ */
 		deleteCustomerButton.setOnAction(e -> {
 			try {
 				for (ReservationFX r : obsRes) {
@@ -203,7 +207,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		this.getDialogPane().getButtonTypes().addAll(ok, cancel);
 		this.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 
-//Return selected customer object
+//Return selected customer object, that is going to be the selectedCust in main
 		this.setResultConverter(new Callback<ButtonType, CustomerFX>() {
 			@Override
 			public CustomerFX call(ButtonType bt) {
@@ -214,7 +218,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 			}
 		});
 	}
-
+//If active
 	private void fillCustomersObservableList() {
 		observCustomers = FXCollections.observableArrayList();
 		ArrayList<Customer> customers = new ArrayList<>();
@@ -230,7 +234,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		filteredListCustomers = new FilteredList<>(observCustomers, p -> true);
 		sortedListCustomers = new SortedList<>(filteredListCustomers);
 	}
-
+//If deactive
 	private void fillDeactiveCustomersObservableList() {
 		observCustomers = FXCollections.observableArrayList();
 		ArrayList<Customer> customers = new ArrayList<>();

@@ -1,7 +1,6 @@
 package wifi.agardi.fmsproject;
 
 import java.sql.SQLException;
-
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonType;
@@ -13,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
+//This is for activating a deactive car
 public class CarListDialog extends Dialog<CarFX> {
 	private ObservableList<CarFX> cars;
 	private CarFX selectedCar;

@@ -48,7 +48,7 @@ public class UpdateTypesDialog extends Dialog<String> {
 				}
 			}
 		});
-
+//According to what has been chosen, it fills the newComboBox with the data from the arrayList
 		typesComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
