@@ -54,7 +54,7 @@ public class PdfGeneration {
 						price = Database.readExtrasTable().get(key);
 				}
 				extraPrices += price;
-				extras += "   - " + s + ": " + price + " € / rental\n";
+				extras += "   - " + s + ": " + price + " EUR/rental\n";
 			}
 
 			document.add(new Paragraph("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
@@ -87,12 +87,12 @@ public class PdfGeneration {
 			document.add(new Paragraph("Reservation notes: " + res.getResNotes()));
 
 			document.add(new Paragraph("\nPrice", subMenuFont));
-			document.add(new Paragraph("Base price for this category: " + catPrice + " € * " + days + " day(s): " + rentPrice + " €"));
+			document.add(new Paragraph("Base price for this category: " + catPrice + " EUR * " + days + " day(s): " + rentPrice + " EUR"));
 			document.add(new Paragraph("Insurance: " + res.getInsuranceType() + ": " + insPrice +
-										" € / day, total: "+ (insPrice * days) + " €"));
-			document.add(new Paragraph("Selected extras total: " + extraPrices + " €\n" + extras));
+										" EUR/day, total: "+ (insPrice * days) + " EUR"));
+			document.add(new Paragraph("Selected extras total: " + extraPrices + " EUR\n" + extras));
 			document.add(new Paragraph("Total car rental estimate: " + (rentPrice + (insPrice * days) + 
-										extraPrices) + " € incl. TAX", subMenuFont));
+										extraPrices) + " EUR incl. TAX", subMenuFont));
 
 			Paragraph base = new Paragraph(signature);
 			base.setAlignment(Paragraph.ALIGN_RIGHT);

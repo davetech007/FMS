@@ -604,7 +604,7 @@ public class Main extends Application {
 			HBox residHB = new HBox(resIdLabel);
 			residHB.setAlignment(Pos.CENTER);
 			Label priceDaysLabel = new Label("Rent  : ");
-			Label priceLabelIns =  new Label("Ins.  : "); 
+			Label priceLabelIns =  new Label("Insurance: "); 
 			Label priceLabel2 =    new Label("Extras: ");
 			Label priceLabel3 =    new Label("Total : ");
 			priceVBox.getChildren().addAll(residHB, priceDaysLabel, priceLabelIns, priceLabel2, priceLabel3);
@@ -990,10 +990,10 @@ public class Main extends Application {
 						extraPrices += getExtraPrice(key);
 					}
 				}
-				priceDaysLabel.setText("Rent: " + days + " days*" + dailyPrice + " = " + rentPrice + " €");
-			    priceLabelIns.setText("Ins.   : " + insurancePrice + " €");
-				priceLabel2.setText("Extras: " + extraPrices + " €");
-				priceLabel3.setText("Total : " + (rentPrice + extraPrices + insurancePrice) + " €");
+				priceDaysLabel.setText("Rent: " + days + " days*" + dailyPrice + " = " + rentPrice + " EUR");
+			    priceLabelIns.setText("Insurance: " + insurancePrice + " EUR");
+				priceLabel2.setText("Extras: " + extraPrices + " EUR");
+				priceLabel3.setText("Total : " + (rentPrice + extraPrices + insurancePrice) + " EUR");
 			});
 					
 			
@@ -1170,7 +1170,7 @@ public class Main extends Application {
 							alertWarn.setHeaderText("You can't reserve this car!");
 							alertWarn.setContentText(selectedCar.getCarLicensePlate()
 													+ " has a reservation around this time. Please choose another date!\n\n"
-													+ "Reservation ID = '" + r.getModellObject().getResNumberID() + "'\n"
+													+ "Reservation ID: '" + r.getModellObject().getResNumberID() + "'\n"
 													+ "From '" + r.getModellObject().getPickupTime()
 													+ "' until '" + r.getModellObject().getReturnTime() + "'");
 							alertWarn.showAndWait();
@@ -1298,7 +1298,7 @@ public class Main extends Application {
 							alertWarn.setHeaderText("You can't update this reservation with this car!");
 							alertWarn.setContentText(selectedCar.getCarLicensePlate()
 													+ " has a reservation around this time. Please choose another date!\n\n"
-													+ "Reservation ID = '" + r.getModellObject().getResNumberID() + "'\n" 
+													+ "Reservation ID: '" + r.getModellObject().getResNumberID() + "'\n" 
 													+ "From '" + r.getModellObject().getPickupTime()
 													+ "' until '" + r.getModellObject().getReturnTime() + "'");
 							alertWarn.showAndWait();
@@ -1519,6 +1519,9 @@ public class Main extends Application {
 	            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 	                if (!newValue.matches("\\d{0,6}?")) {
 	                    kmTF.setText(oldValue);
+	                }
+	                if (newValue.length() > 6) {
+	                    kmTF.setText(oldValue);
 	                	Alert alertWarn = new Alert(AlertType.WARNING);
 						alertWarn.setTitle("Car km");
 						alertWarn.setHeaderText("Really??? :)");
@@ -1560,7 +1563,7 @@ public class Main extends Application {
 		    carCategorieBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					basePriceLB.setText("Base price = " + getCategoryPrice(newValue) + " € / day");
+					basePriceLB.setText("Base price = " + getCategoryPrice(newValue) + " EUR/day");
 				}
 			});
 		   		    
@@ -1989,7 +1992,7 @@ public class Main extends Application {
 					alertWarn.setTitle("Updating a car");
 					alertWarn.setHeaderText("Please check again, it's an existing car!");
 					alertWarn.setContentText("Car with the VIN number '" + vinNumber + "' already exists!\n\n"
-											+ "This car is a " + vinNDatabase);
+											+ "This car is a(n) " + vinNDatabase);
 					alertWarn.showAndWait();
 					return;
 				}
@@ -1999,7 +2002,7 @@ public class Main extends Application {
 					alertWarn.setTitle("Updating a car");
 					alertWarn.setHeaderText("Please check again, it's an existing car!");
 					alertWarn.setContentText("Car with the license plate '" + licPlate + "' already exists!\n\n"
-											+ "This car is a " + licPDatabase);
+											+ "This car is a(n) " + licPDatabase);
 					alertWarn.showAndWait();
 					return;
 				}
@@ -2084,7 +2087,7 @@ public class Main extends Application {
 					alertWarn.setTitle("Adding a new car");
 					alertWarn.setHeaderText("Please check again, it's an existing car!");
 					alertWarn.setContentText("Car with the VIN number '" + vinNumber + "' already exists!\n\n"
-											+ "This car is a " + vinNDatabase);
+											+ "This car is a(n) " + vinNDatabase);
 					alertWarn.showAndWait();
 					return;
 				}
@@ -2093,7 +2096,7 @@ public class Main extends Application {
 					alertWarn.setTitle("Adding a new car");
 					alertWarn.setHeaderText("Please check again, it's an existing car!");
 					alertWarn.setContentText("Car with the license plate '" + licPlate + "' already exists!\n\n"
-											+ "This car is a " + licPDatabase);
+											+ "This car is a(n) " + licPDatabase);
 					alertWarn.showAndWait();
 					return;
 				}

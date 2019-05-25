@@ -53,7 +53,7 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 		}
 
 		ComboBox<String> searchCB = new ComboBox<>();
-		searchCB.setItems(FXCollections.observableArrayList("Searching criteria", "Customer ID", "First name", "Last name"));
+		searchCB.setItems(FXCollections.observableArrayList("All customers", "Customer ID", "First name", "Last name"));
 		searchCB.getSelectionModel().selectFirst();
 		searchCB.setId("carSearchBox");
 
@@ -140,6 +140,11 @@ public class CustomerListDialog extends Dialog<CustomerFX> {
 									.setPredicate(s -> s.getModellObject().getLastName().toLowerCase().contains(newV));
 						}
 					});
+				}
+				if(newValue.contains("All customers")){
+					custSearchTF.clear();
+					custSearchTF.setDisable(true);
+					filteredListCustomers.setPredicate(s -> true);
 				}
 			}
 		});

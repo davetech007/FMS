@@ -1,8 +1,8 @@
 ----------------------------------------------------------------
-Sat May 25 13:22:27 CEST 2019:
- Derby The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579) változat betöltése: a816c00e-016a-eeba-48c5-0000067ab7a0 példány
-a(z) /Users/david.agardi/eclipse-workspace/FleetManagementSystem/Database adatbázis-könyvtáron: sun.misc.Launcher$AppClassLoader@2a139a55 
-
+Sat May 25 15:34:15 CEST 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-016a-ef32-f709-0000067ec6d8 
+on database directory /Users/david.agardi/eclipse-workspace/FleetManagementSystem/Database with class loader sun.misc.Launcher$AppClassLoader@2a139a55 
+Loaded from file:/Users/david.agardi/eclipse-workspace/FleetManagementSystem/src/derby.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_191-b12
 user.dir=/Users/david.agardi/eclipse-workspace/FleetManagementSystem
@@ -10,4 +10,4 @@ os.name=Mac OS X
 os.arch=x86_64
 os.version=10.14.5
 derby.system.home=null
-Az adatbázis-osztálybetöltő elindult - derby.database.classpath=''
+Database Class Loader started - derby.database.classpath=''
