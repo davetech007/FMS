@@ -1,5 +1,6 @@
 package wifi.agardi.fmsproject;
 /*MAY 2019 - WIFI Project Fleet Management System (Car reservations management) ADV
+ *open version, v. 1.0
  *created David Viktor Agardi*/
 
 import java.io.File;
@@ -15,6 +16,7 @@ import static java.time.temporal.TemporalAdjusters.*;
 
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -30,6 +32,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
@@ -67,8 +70,8 @@ import javafx.scene.layout.VBox;
 
 public class Main extends Application {
 	private DropShadow shadow = new DropShadow();  //Effect for the buttons
-	private int minEngineSize = 500;   //The minimum size/power that is allowed for the engine, just to not to have not realistic data
-	private int minEnginePower = 40;
+	private int minEngineSize = 200;   //The minimum size/power that is allowed for the engine, just to not to have not realistic data
+	private int minEnginePower = 20;
 	private Stage mainStage;
 	
 	private TabPane mainTabPane;
@@ -312,6 +315,21 @@ public class Main extends Application {
 			Scene sceneMain = new Scene(mainHB, 1070, 720);
 			mainHB.getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 			mainStage.setScene(sceneMain);
+			mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					Alert alertClose = new Alert(AlertType.CONFIRMATION);
+					alertClose.setTitle("Quit");
+					alertClose.setHeaderText("Please confirm!");
+					alertClose.setContentText("There maybe unsaved work. Are you sure you want to quit?");
+					Optional<ButtonType> result = alertClose.showAndWait();
+					if (result.get() == ButtonType.OK) {
+						Platform.exit();
+					} else {
+						event.consume();
+					}
+				}
+			});
 			mainStage.show();
 	  }
 	
