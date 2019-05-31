@@ -124,7 +124,9 @@ public class UpdateTypesDialog extends Dialog<String> {
 		this.getDialogPane().getStylesheets().add(Main.class.getResource("/MainWindow.css").toExternalForm());
 
 		this.getDialogPane().lookupButton(ButtonType.OK).disableProperty()
-				.bind(nameTF.textProperty().isEmpty().or(priceTF.textProperty().isEmpty()));
+				.bind(nameTF.textProperty().isEmpty()
+						.or(priceTF.textProperty().isEmpty()
+						.or(newComboBox.valueProperty().isNull())));
 
 		this.setResultConverter(new Callback<ButtonType, String>() {
 			@Override

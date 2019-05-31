@@ -87,6 +87,7 @@ public class AddTypesDialog extends Dialog<String> {
 								alertWarn.setHeaderText("Please check the category price again!");
 								alertWarn.setContentText("Category must have a daily price in €!");
 								alertWarn.showAndWait();
+								return null;
 							}
 							Database.addCarCategory(name, Integer.parseInt(priceTF.getText()));
 							alert("category");
@@ -118,6 +119,7 @@ public class AddTypesDialog extends Dialog<String> {
 								alertWarn.setHeaderText("Please check the insurane price again!");
 								alertWarn.setContentText("Insurance must have a daily price in €!");
 								alertWarn.showAndWait();
+								return null;
 							}
 							Database.addInsuranceType(name, Integer.parseInt(priceTF.getText()));
 							alert("insurance");
@@ -129,6 +131,7 @@ public class AddTypesDialog extends Dialog<String> {
 								alertWarn.setHeaderText("Please check the reservation extra price again!");
 								alertWarn.setContentText("Reservation extra must have a (/rental) price in €!");
 								alertWarn.showAndWait();
+								return null;
 							}
 							Database.addExtraType(name, Integer.parseInt(priceTF.getText()));
 							alert("reservation extra");
