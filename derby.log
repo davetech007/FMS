@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Fri May 31 11:48:33 CEST 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-016b-0d4a-7a5c-0000067fd780 
+Fri Jun 07 09:29:31 CEST 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-016b-30d7-b690-0000068057f0 
 on database directory /Users/david.agardi/eclipse-workspace/FleetManagementSystem/Database with class loader sun.misc.Launcher$AppClassLoader@2a139a55 
 Loaded from file:/Users/david.agardi/eclipse-workspace/FleetManagementSystem/src/derby.jar
 java.vendor=Oracle Corporation

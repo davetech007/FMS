@@ -1914,6 +1914,7 @@ public class Main extends Application {
 			selectedCar = carsTableView.getSelectionModel().getSelectedItem();
 			carLicensePlateLB.setText(selectedCar.getModellObject().getCarLicensePlate());
 			carComboBox.getSelectionModel().select(selectedCar.getModellObject().getCarCategory());
+			carStatusLabel.setText("Car status : active");
 		});
 
 /*DELETE ACTION	
